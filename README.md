@@ -1,25 +1,44 @@
-# GymApp - Aplicación de Ejercicios de Gimnasio
+# 🎬 GymApp - Aplicación de Ejercicios con Diseño Netflix
 
-Una aplicación web moderna para explorar y gestionar ejercicios de gimnasio, construida con React, TypeScript y Vite.
+Una aplicación web moderna para explorar y gestionar ejercicios de gimnasio, construida con React, TypeScript y Vite. **Ahora con un diseño completamente inspirado en Netflix para una experiencia visual premium.**
 
 > 🐳 **¡Aplicación completamente dockerizada!** - [Ver guía de Docker](DOCKER_SUMMARY.md)
+> 🎨 **¡Nuevo diseño Netflix!** - [Ver documentación de diseño](NETFLIX_DESIGN.md)
 
-## 🏋️ Características
+## ✨ Características Principales
 
-- **Catálogo completo de ejercicios** con información detallada
-- **Sistema de filtros avanzado** por categoría, dificultad y grupos musculares
-- **Búsqueda en tiempo real** de ejercicios
-- **Vista detallada** con instrucciones paso a paso
-- **Diseño responsivo** optimizado para móvil y escritorio
-- **Interfaz moderna** con Tailwind CSS
+- **🎬 Diseño Netflix-style** - Interfaz moderna con gradientes oscuros y acentos rojos
+- **🏋️ Catálogo completo de ejercicios** con información detallada
+- **🔍 Sistema de filtros avanzado** por categoría, dificultad y grupos musculares
+- **⚡ Búsqueda en tiempo real** de ejercicios
+- **📱 Vista detallada responsiva** con instrucciones paso a paso
+- **🎨 Animaciones suaves** y efectos hover profesionales
+- **🌙 Tema oscuro** optimizado para la vista
 
-## 🚀 Tecnologías utilizadas
+## 🎨 Nuevo Diseño Netflix
+
+### Características Visuales
+- **Fondo con gradiente oscuro** (negro → gris → negro)
+- **Header rojo característico** inspirado en Netflix
+- **Tarjetas con efectos hover** y escalado suave
+- **Panel de filtros dark mode** con acentos rojos
+- **Badges coloridos** para categorías y dificultad
+- **Transiciones profesionales** en todos los elementos
+
+### Paleta de Colores
+- 🔴 **Rojo Netflix**: Acentos principales y header
+- ⚫ **Negro/Gris**: Fondos y contenedores
+- ⚪ **Blanco**: Texto principal
+- 🌈 **Gradientes temáticos**: Categorías de ejercicios
+
+## 🚀 Tecnologías Utilizadas
 
 - **React 18** - Biblioteca de interfaz de usuario
 - **TypeScript** - Tipado estático para JavaScript
 - **Vite** - Herramienta de construcción rápida
-- **Tailwind CSS** - Framework de CSS utilitario
+- **Tailwind CSS v4** - Framework de CSS utilitario moderno
 - **ESLint** - Linter para mantener calidad del código
+- **Docker** - Containerización para desarrollo y producción
 
 ## 📋 Categorías de ejercicios
 
