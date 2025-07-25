@@ -1,13 +1,9 @@
 /// <reference types="vitest" />
-/// <reference types="vite/client" />
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: process.env.NODE_ENV === 'production' ? '/gym-full/' : '/',
-  // @ts-expect-error - Vitest configuration
   test: {
     globals: true,
     environment: 'jsdom',
@@ -21,7 +17,8 @@ export default defineConfig({
         '**/*.d.ts',
         'postcss.config.js',
         'tailwind.config.js',
-        'vite.config.ts'
+        'vite.config.ts',
+        'vitest.config.ts'
       ]
     }
   }
