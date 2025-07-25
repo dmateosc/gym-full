@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  gymapp:
+    build: .
+    container_name: gymapp-container
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - gymapp-network
+
+  # Servicio para desarrollo (opcional)
+  gymapp-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: gymapp-dev-container
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - gymapp-network
+    profiles:
+      - dev
+
+networks:
+  gymapp-network:
+    driver: bridge
+
+volumes:
+  node_modules:

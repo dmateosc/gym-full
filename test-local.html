@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GymApp - Test Local</title>
+    <meta name="description" content="Aplicación web para explorar y gestionar ejercicios de gimnasio">
+  </head>
+  <body>
+    <div id="root">
+      <!-- Fallback content mientras carga la aplicación -->
+      <div style="
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: system-ui, -apple-system, sans-serif;
+        background-color: #f9fafb;
+        color: #374151;
+      ">
+        <div style="text-align: center;">
+          <div style="
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e5e7eb;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+          "></div>
+          <h2 style="margin: 0 0 8px 0; font-size: 1.5rem; font-weight: 600;">GymApp - Test</h2>
+          <p style="margin: 0; color: #6b7280;">Verificando carga de aplicación...</p>
+          <div id="status" style="margin-top: 20px; font-family: monospace; text-align: left; background: #f3f4f6; padding: 10px; border-radius: 4px;">
+            <div>🔄 Iniciando verificaciones...</div>
+          </div>
+        </div>
+      </div>
+      <style>
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      </style>
+    </div>
+    
+    <script>
+      const status = document.getElementById('status');
+      
+      function addStatus(message) {
+        const div = document.createElement('div');
+        div.textContent = message;
+        status.appendChild(div);
+      }
+      
+      // Verificar que JavaScript funciona
+      addStatus('✅ JavaScript funcionando');
+      
+      // Verificar que podemos acceder a la API de fetch
+      if (typeof fetch !== 'undefined') {
+        addStatus('✅ Fetch API disponible');
+      } else {
+        addStatus('❌ Fetch API no disponible');
+      }
+      
+      // Verificar que podemos cargar módulos
+      try {
+        addStatus('🔄 Verificando carga de módulos...');
+        
+        // Intentar cargar el módulo principal
+        import('/assets/index-eGLH8SGh.js')
+          .then(() => {
+            addStatus('✅ Módulo principal cargado exitosamente');
+          })
+          .catch((error) => {
+            addStatus('❌ Error al cargar módulo: ' + error.message);
+          });
+      } catch (error) {
+        addStatus('❌ Error con import dinámico: ' + error.message);
+      }
+      
+      // Verificar CSS
+      addStatus('🔄 Verificando CSS...');
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/assets/index-BY2yfWs5.css';
+      link.onload = () => addStatus('✅ CSS cargado exitosamente');
+      link.onerror = () => addStatus('❌ Error al cargar CSS');
+      document.head.appendChild(link);
+      
+    </script>
+  </body>
+</html>
