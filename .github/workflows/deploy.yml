@@ -26,7 +26,7 @@ jobs:
       - name: 📦 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           
       - name: 📦 Install dependencies
@@ -39,6 +39,7 @@ jobs:
         run: npm run build
         env:
           NODE_ENV: production
+          NODE_OPTIONS: --openssl-legacy-provider
           
       - name: 📄 Setup Pages
         uses: actions/configure-pages@v4
