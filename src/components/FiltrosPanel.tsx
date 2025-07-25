@@ -25,12 +25,12 @@ const FiltrosPanel = ({ filtros, onFiltrosChange }: FiltrosPanelProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-xl shadow-2xl p-6 sticky top-4 border border-gray-700">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">Filtros</h2>
+        <h2 className="text-xl font-bold text-white">Filtros</h2>
         <button
           onClick={limpiarFiltros}
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+          className="text-sm text-red-400 hover:text-red-300 font-medium transition-colors duration-200 hover:bg-gray-800 px-3 py-1 rounded-md"
         >
           Limpiar
         </button>
@@ -39,7 +39,7 @@ const FiltrosPanel = ({ filtros, onFiltrosChange }: FiltrosPanelProps) => {
       <div className="space-y-6">
         {/* Búsqueda */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Buscar ejercicio
           </label>
           <input
@@ -47,23 +47,23 @@ const FiltrosPanel = ({ filtros, onFiltrosChange }: FiltrosPanelProps) => {
             placeholder="Nombre del ejercicio..."
             value={filtros.busqueda || ''}
             onChange={(e) => actualizarFiltro('busqueda', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200"
           />
         </div>
 
         {/* Categoría */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Categoría
           </label>
           <select
             value={filtros.categoria || ''}
             onChange={(e) => actualizarFiltro('categoria', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer"
           >
             <option value="">Todas las categorías</option>
             {categorias.map(categoria => (
-              <option key={categoria.value} value={categoria.value}>
+              <option key={categoria.value} value={categoria.value} className="bg-gray-800 text-white">
                 {categoria.label}
               </option>
             ))}
@@ -72,17 +72,17 @@ const FiltrosPanel = ({ filtros, onFiltrosChange }: FiltrosPanelProps) => {
 
         {/* Dificultad */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Dificultad
           </label>
           <select
             value={filtros.dificultad || ''}
             onChange={(e) => actualizarFiltro('dificultad', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer"
           >
             <option value="">Todas las dificultades</option>
             {dificultades.map(dificultad => (
-              <option key={dificultad.value} value={dificultad.value}>
+              <option key={dificultad.value} value={dificultad.value} className="bg-gray-800 text-white">
                 {dificultad.label}
               </option>
             ))}
@@ -91,17 +91,17 @@ const FiltrosPanel = ({ filtros, onFiltrosChange }: FiltrosPanelProps) => {
 
         {/* Grupo Muscular */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Grupo muscular
           </label>
           <select
             value={filtros.grupoMuscular || ''}
             onChange={(e) => actualizarFiltro('grupoMuscular', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer"
           >
             <option value="">Todos los grupos</option>
             {gruposMusculares.map(grupo => (
-              <option key={grupo} value={grupo}>
+              <option key={grupo} value={grupo} className="bg-gray-800 text-white">
                 {grupo}
               </option>
             ))}

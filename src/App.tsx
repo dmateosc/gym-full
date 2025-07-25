@@ -42,11 +42,21 @@ function App() {
   // Estado de carga
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">GymApp</h2>
-          <p className="text-gray-600">Cargando ejercicios...</p>
+          <div className="relative mb-8">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-red-600 border-t-transparent mx-auto"></div>
+            <div className="absolute inset-0 rounded-full bg-red-600 opacity-20 animate-pulse"></div>
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-4">GymApp</h2>
+          <p className="text-gray-300 text-lg">Cargando tu catálogo de ejercicios...</p>
+          <div className="mt-6 flex justify-center">
+            <div className="flex space-x-2">
+              <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -102,7 +112,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div 
+      className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black" 
+      style={{
+        background: 'linear-gradient(to bottom right, #000000, #111827, #000000)',
+        minHeight: '100vh'
+      }}
+    >
       <Header />
       
       <div className="container mx-auto px-4 py-8">

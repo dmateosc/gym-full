@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GymApp - Test de Conectividad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            background: linear-gradient(135deg, #e50914 0%, #b81d24 100%);
+            margin: -20px -20px 40px -20px;
+            border-radius: 0 0 20px 20px;
+        }
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .server-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .server-card {
+            background: linear-gradient(145deg, #1e1e1e 0%, #2a2a2a 100%);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.3),
+                0 1px 3px rgba(255,255,255,0.1) inset;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .server-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 
+                0 20px 40px rgba(0,0,0,0.4),
+                0 1px 3px rgba(255,255,255,0.2) inset;
+        }
+        .server-card h2 {
+            color: #e50914;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .server-card .url {
+            background: rgba(229, 9, 20, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 15px 0;
+            border-left: 4px solid #e50914;
+        }
+        .status {
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status.success { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        .status.error { 
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+        .status.loading { 
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .link-button {
+            background: linear-gradient(135deg, #e50914 0%, #b81d24 100%);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.9rem;
+        }
+        .link-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(229, 9, 20, 0.5);
+            background: linear-gradient(135deg, #f40612 0%, #c41e3a 100%);
+        }
+        .system-info {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-radius: 15px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .system-info h2 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .info-item {
+            background: rgba(229, 9, 20, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #e50914;
+        }
+        .info-item strong {
+            color: #e50914;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .info-item span {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #cccccc;
+            word-break: break-all;
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .icon {
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏋️ GymApp</h1>
+            <p>Sistema de Monitoreo de Servidores</p>
+        </div>
+        
+        <div class="server-grid">
+            <div class="server-card">
+                <h2><span class="icon">🔨</span> Desarrollo</h2>
+                <div class="url">http://localhost:5173</div>
+                <p><strong>Descripción:</strong> Servidor de desarrollo con hot reload y debugging</p>
+                <div id="dev-status" class="status loading pulse">
+                    <span>⏳</span> Verificando conexión...
+                </div>
+                <br>
+                <a href="http://localhost:5173" class="link-button" target="_blank">
+                    <span>🚀</span> Abrir Desarrollo
+                </a>
+            </div>
+
+            <div class="server-card">
+                <h2><span class="icon">🐳</span> Producción</h2>
+                <div class="url">http://localhost:3000</div>
+                <p><strong>Descripción:</strong> Versión optimizada para producción servida por Nginx</p>
+                <div id="prod-status" class="status loading pulse">
+                    <span>⏳</span> Verificando conexión...
+                </div>
+                <br>
+                <a href="http://localhost:3000" class="link-button" target="_blank">
+                    <span>🌐</span> Abrir Producción
+                </a>
+            </div>
+        </div>
+
+        <div class="system-info">
+            <h2>🔧 Información del Sistema</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>Fecha y Hora</strong>
+                    <span id="current-time"></span>
+                </div>
+                <div class="info-item">
+                    <strong>User Agent</strong>
+                    <span id="user-agent"></span>
+                </div>
+                <div class="info-item">
+                    <strong>Resolución de Pantalla</strong>
+                    <span id="resolution"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para verificar el estado de un servidor
+        async function checkServer(url, statusElementId) {
+            const statusEl = document.getElementById(statusElementId);
+            try {
+                const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+                statusEl.innerHTML = '<span>✅</span> Servidor Activo';
+                statusEl.className = 'status success';
+            } catch (error) {
+                try {
+                    // Intentar con un enfoque diferente
+                    const img = new Image();
+                    img.onload = img.onerror = () => {
+                        statusEl.innerHTML = '<span>✅</span> Servidor Activo';
+                        statusEl.className = 'status success';
+                    };
+                    img.src = url + '/vite.svg?t=' + Date.now();
+                    
+                    // Timeout después de 3 segundos
+                    setTimeout(() => {
+                        if (statusEl.className.includes('loading')) {
+                            statusEl.innerHTML = '<span>❌</span> Servidor No Disponible';
+                            statusEl.className = 'status error';
+                        }
+                    }, 3000);
+                } catch (e) {
+                    statusEl.innerHTML = '<span>❌</span> Error de Conexión';
+                    statusEl.className = 'status error';
+                }
+            }
+        }
+
+        // Información del sistema
+        document.getElementById('current-time').textContent = new Date().toLocaleString();
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('resolution').textContent = `${screen.width}x${screen.height}`;
+
+        // Verificar servidores
+        checkServer('http://localhost:5173', 'dev-status');
+        checkServer('http://localhost:3000', 'prod-status');
+
+        // Auto-refresh cada 30 segundos
+        setInterval(() => {
+            checkServer('http://localhost:5173', 'dev-status');
+            checkServer('http://localhost:3000', 'prod-status');
+            document.getElementById('current-time').textContent = new Date().toLocaleString();
+        }, 30000);
+    </script>
+</body>
+</html>
