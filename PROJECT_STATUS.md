@@ -85,7 +85,7 @@
 - Testear la URL live
 
 ### 3. **Extensiones Futuras** (Opcional)
-- **Database Integration**: Supabase para ejercicios dinámicos
+- **Database Integration**: Usar datos locales (Supabase configurado pero deshabilitado)
 - **User Authentication**: Login/register system
 - **Progress Tracking**: Historial de entrenamientos
 - **PWA Features**: Offline functionality

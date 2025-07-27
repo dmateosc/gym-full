@@ -11,6 +11,10 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+
+# Supabase files (disabled for frontend-only version)
+src/disabled-supabase/
 
 # Editor directories and files
 .vscode/*

@@ -10,6 +10,8 @@ export interface Exercise {
   image?: string;
   estimatedDuration?: number;
   calories?: number;
+  imageUrl?: string | null;
+  videoUrl?: string | null;
 }
 
 export type ExerciseCategory = 
