@@ -13,6 +13,9 @@ dist-ssr
 *.local
 .env
 
+# Test coverage
+coverage/
+
 # Supabase files (disabled for frontend-only version)
 src/disabled-supabase/
 

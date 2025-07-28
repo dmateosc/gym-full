@@ -1,0 +1,28 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "baseUrl": "./src",
+    "paths": {
+      "*": ["*"],
+      "components/*": ["components/*"],
+      "services/*": ["services/*"],
+      "types/*": ["types/*"],
+      "data/*": ["data/*"],
+      "assets/*": ["assets/*"]
+    },
+    "types": ["jest", "@testing-library/jest-dom"]
+  },
+  "include": [
+    "src/**/*",
+    "src/test/**/*"
+  ]
+}
