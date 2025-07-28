@@ -1,53 +1,70 @@
-# 🐳 GymApp - Guía de Docker
+# 🐳 Guía de Despliegue con Docker
 
-Esta guía explica cómo ejecutar la aplicación GymApp usando Docker para un desarrollo y despliegue consistente.
+Esta guía describe cómo desplegar la aplicación Gym Full usando Docker en diferentes entornos.
 
-## 📋 Prerrequisitos
+## 📋 Tabla de Contenidos
 
-- [Docker](https://docs.docker.com/get-docker/) instalado
-- [Docker Compose](https://docs.docker.com/compose/install/) instalado
+- [Prerrequisitos](#prerrequisitos)
+- [Arquitectura](#arquitectura)
+- [Despliegue Rápido](#despliegue-rápido)
+- [Entornos](#entornos)
+- [Comandos Útiles](#comandos-útiles)
+- [Configuración](#configuración)
+- [Troubleshooting](#troubleshooting)
 
-## 🚀 Inicio Rápido
+## Prerrequisitos
 
-### Usando Docker Compose (Recomendado)
+- Docker (versión 20.10 o superior)
+- Docker Compose (versión 2.0 o superior)
+- Node.js 20+ (para desarrollo local)
 
-```bash
-# Ejecutar en modo producción
-docker-compose up -d
+## Arquitectura
 
-# Ejecutar en modo desarrollo
-docker-compose --profile dev up -d
+La aplicación está dividida en dos servicios principales:
+
+```
+┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │    Backend      │
+│   (React +      │    │   (NestJS)      │
+│   Vite + Nginx) │    │                 │
+│   Puerto: 3000  │◄──►│  Puerto: 3001   │
+└─────────────────┘    └─────────────────┘
 ```
 
-### Usando el Script de Gestión
+### Servicios
+
+- **Frontend**: Aplicación React con Vite servida por Nginx
+- **Backend**: API NestJS con TypeScript
+- **Red**: Comunicación interna entre servicios
+
+## Despliegue Rápido
+
+### 🚀 Producción (Recomendado)
 
 ```bash
-# Hacer el script ejecutable (solo la primera vez)
-chmod +x docker-scripts.sh
+# 1. Clonar el repositorio
+git clone <repo-url>
+cd gym-full
 
-# Ver comandos disponibles
-./docker-scripts.sh help
+# 2. Construir y ejecutar
+./docker-deploy.sh build
+./docker-deploy.sh run
 
-# Ejecutar en producción
-./docker-scripts.sh run
-
-# Ejecutar en desarrollo
-./docker-scripts.sh run-dev
+# 3. Acceder a la aplicación
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:3001
 ```
 
-## 🛠️ Comandos Disponibles
-
-### Scripts NPM
+### 🛠️ Desarrollo
 
 ```bash
-# Construir imagen de producción
-npm run docker:build
+# Ejecutar en modo desarrollo con hot reload
+./docker-deploy.sh build-dev
+./docker-deploy.sh run-dev
 
-# Construir imagen de desarrollo
-npm run docker:build-dev
-
-# Ejecutar contenedor de producción
-npm run docker:run
+# Frontend: http://localhost:5173
+# Backend: http://localhost:3002
+```
 
 # Ejecutar contenedor de desarrollo
 npm run docker:run-dev

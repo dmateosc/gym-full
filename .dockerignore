@@ -40,15 +40,34 @@ Thumbs.db
 
 # Archivos de cobertura de pruebas
 coverage
+.nyc_output
+*.lcov
 
 # Cache
 .cache
 .parcel-cache
 
-# Docker
+# Docker files (except the ones we need)
 Dockerfile*
 docker-compose*
 .dockerignore
+
+# Development scripts
+docker-deploy.sh
+docker-scripts.sh
+test-*.html
+test-ports.sh
+
+# Documentation (except essential ones)
+*.md
+!README.md
+!MONOREPO_README.md
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
 # Documentación
 README.md

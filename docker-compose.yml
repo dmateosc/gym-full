@@ -1,9 +1,13 @@
 version: '3.8'
 
 services:
-  gymapp:
-    build: .
-    container_name: gymapp-container
+  # Frontend en producción con Nginx
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile
+      target: frontend-production
+    container_name: gymapp-frontend
     ports:
       - "3000:80"
     restart: unless-stopped
@@ -11,20 +15,63 @@ services:
       - NODE_ENV=production
     networks:
       - gymapp-network
+    depends_on:
+      - backend
 
-  # Servicio para desarrollo (opcional)
-  gymapp-dev:
+  # Backend en producción
+  backend:
     build:
       context: .
-      dockerfile: Dockerfile.dev
-    container_name: gymapp-dev-container
+      dockerfile: infra/Dockerfile
+      target: backend-production
+    container_name: gymapp-backend
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    networks:
+      - gymapp-network
+
+  # Frontend para desarrollo
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile
+      target: frontend-development
+    container_name: gymapp-frontend-dev
     ports:
       - "5173:5173"
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/apps/frontend/node_modules
     environment:
       - NODE_ENV=development
+    networks:
+      - gymapp-network
+    profiles:
+      - dev
+    depends_on:
+      - backend-dev
+
+  # Backend para desarrollo
+  backend-dev:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile
+      target: backend-development
+    container_name: gymapp-backend-dev
+    ports:
+      - "3002:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/backend/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
     networks:
       - gymapp-network
     profiles:

@@ -1,0 +1,54 @@
+# Docker Compose para producción
+version: '3.8'
+
+services:
+  # Frontend en producción con Nginx
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile
+      target: frontend-production
+    container_name: gymapp-frontend-prod
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - gymapp-network
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend en producción
+  backend:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile
+      target: backend-production
+    container_name: gymapp-backend-prod
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    networks:
+      - gymapp-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  gymapp-network:
+    driver: bridge
+
+volumes:
+  nginx_cache:
+    driver: local
