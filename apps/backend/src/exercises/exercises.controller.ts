@@ -19,37 +19,37 @@ export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
 
   @Post()
-  create(@Body(ValidationPipe) createExerciseDto: CreateExerciseDto) {
+  async create(@Body(ValidationPipe) createExerciseDto: CreateExerciseDto) {
     return this.exercisesService.create(createExerciseDto);
   }
 
   @Get()
-  findAll(@Query(ValidationPipe) filters: ExerciseFiltersDto) {
+  async findAll(@Query(ValidationPipe) filters: ExerciseFiltersDto) {
     return this.exercisesService.findAll(filters);
   }
 
   @Get('categories')
-  getCategories() {
+  async getCategories() {
     return this.exercisesService.getCategories();
   }
 
   @Get('muscle-groups')
-  getMuscleGroups() {
+  async getMuscleGroups() {
     return this.exercisesService.getMuscleGroups();
   }
 
   @Get('equipment')
-  getEquipment() {
+  async getEquipment() {
     return this.exercisesService.getEquipment();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.exercisesService.findOne(id);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body(ValidationPipe) updateExerciseDto: UpdateExerciseDto,
   ) {
@@ -57,8 +57,8 @@ export class ExercisesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    this.exercisesService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.exercisesService.remove(id);
     return { message: `Exercise with ID ${id} has been deleted` };
   }
 }
