@@ -1,6 +1,9 @@
 import type { Exercise, ExerciseFilters } from '../types/exercise';
 
-const API_BASE_URL = '/api';
+// Configurar URL base según el entorno
+const API_BASE_URL = import.meta.env.PROD 
+  ? 'https://gym-exercise-backend.herokuapp.com/api'  // Heroku en producción
+  : 'http://localhost:3001/api';  // Desarrollo local
 
 export class ApiService {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T> {

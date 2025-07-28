@@ -5,11 +5,16 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Habilitar CORS para el frontend
+  // Habilitar CORS para el frontend (local y producción)
   app.enableCors({
-    origin: 'http://localhost:5173', // URL del frontend Vite
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    origin: [
+      'http://localhost:5173', // Desarrollo local
+      'https://dmateosc.github.io', // GitHub Pages producción
+      /^https:\/\/.*\.github\.io$/, // Cualquier subdomain de GitHub Pages
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Habilitar validación global
@@ -24,6 +29,10 @@ async function bootstrap() {
   // Configurar prefijo global para la API
   app.setGlobalPrefix('api');
 
-  await app.listen(process.env.PORT ?? 3001); // Puerto diferente al frontend
+  // Usar el puerto de Heroku o el por defecto
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+  
+  console.log(`🚀 Backend running on port ${port}`);
 }
 void bootstrap();
