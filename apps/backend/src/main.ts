@@ -34,5 +34,13 @@ async function bootstrap() {
   await app.listen(port);
   
   console.log(`🚀 Backend running on port ${port}`);
+  console.log(
+    `🌐 Environment: ${process.env.NODE_ENV || 'development'}`,
+  );
+  console.log(
+    `🔗 Database connected: ${process.env.DATABASE_HOST || 'localhost'}`,
+  );
+  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔗 Database connected: ${process.env.DATABASE_HOST || 'localhost'}`);
 }
 void bootstrap();
