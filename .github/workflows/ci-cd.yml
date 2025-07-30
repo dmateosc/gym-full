@@ -36,8 +36,6 @@ jobs:
         
       - name: 🏗️ Build frontend
         run: npm run build --workspace=apps/frontend
-        working-directory: ./apps/frontend
-        run: npm run build
 
   # 🧪 Test Backend
   test-backend:
