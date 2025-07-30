@@ -42,36 +42,38 @@ vercel env add VITE_API_BASE_URL production
 
 ## 🚀 Despliegue
 
-### Opción 1: Desde el directorio frontend
+### ⚠️ IMPORTANTE: Configuración de Proyectos Separados
 
-```bash
-cd apps/frontend
+Para evitar conflictos entre frontend y backend, necesitas crear **dos proyectos separados** en Vercel:
 
-# Despliegue a producción
-npm run deploy
+1. **Backend**: Ya configurado en `gym-exercise-backend.vercel.app`
+2. **Frontend**: Nuevo proyecto en `gym-full.vercel.app`
 
-# Preview deploy
-npm run deploy:preview
-```
+### Paso 1: Crear Proyecto Frontend en Vercel
 
-### Opción 2: Usando Vercel CLI directamente
+1. Ve a [Vercel Dashboard](https://vercel.com/dmateoscanos-projects)
+2. **New Project** → **Import Git Repository**
+3. **Selecciona tu repo**: `dmateosc/gym-full`
+4. **Configure Project**:
+   ```
+   Project Name: gym-full
+   Framework: Vite
+   Root Directory: apps/frontend
+   Build Command: npm run build
+   Output Directory: dist
+   Install Command: npm install
+   ```
 
-```bash
-# Desde el directorio frontend
-cd apps/frontend
+5. **Environment Variables**:
+   ```
+   VITE_API_BASE_URL = https://gym-exercise-backend.vercel.app/api
+   ```
 
-# Producción
-vercel --prod
+6. **Deploy** 🚀
 
-# Preview
-vercel
-```
+### Paso 2: Verificar que el archivo vercel.json del frontend sea correcto
 
-### Opción 3: Git-based deployment (Recomendado)
-
-1. Haz commit de tus cambios
-2. Push a la rama `main`
-3. Vercel desplegará automáticamente
+El archivo `apps/frontend/vercel.json` debe estar así:
 
 ## 🔍 Verificación
 
