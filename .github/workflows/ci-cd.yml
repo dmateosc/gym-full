@@ -24,21 +24,18 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'apps/frontend/package-lock.json'
           
-      - name: 📦 Install frontend dependencies
-        working-directory: ./apps/frontend
+      - name: 📦 Install all dependencies (monorepo)
         run: npm ci
         
       - name: 🔍 Lint frontend code
-        working-directory: ./apps/frontend
-        run: npm run lint
+        run: npm run lint --workspace=apps/frontend
         
       - name: 🧪 Run frontend tests
-        working-directory: ./apps/frontend
-        run: npm test
+        run: npm run test --workspace=apps/frontend
         
       - name: 🏗️ Build frontend
+        run: npm run build --workspace=apps/frontend
         working-directory: ./apps/frontend
         run: npm run build
 
@@ -56,20 +53,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: 'apps/backend/package-lock.json'
           
-      - name: 📦 Install backend dependencies
-        working-directory: ./apps/backend
+      - name: 📦 Install all dependencies (monorepo)
         run: npm ci
         
       - name: 🔍 Lint backend code
-        working-directory: ./apps/backend
-        run: npm run lint
+        run: npm run lint --workspace=apps/backend
         
       - name: 🧪 Run backend tests
-        working-directory: ./apps/backend
-        run: npm run test
+        run: npm run test --workspace=apps/backend
         
       - name: 🏗️ Build backend
-        working-directory: ./apps/backend
-        run: npm run build
+        run: npm run build --workspace=apps/backend

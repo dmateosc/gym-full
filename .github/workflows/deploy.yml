@@ -33,16 +33,13 @@ jobs:
           cache: 'npm'
           
       - name: 📦 Install dependencies
-        working-directory: ./apps/frontend
         run: npm ci
         
       - name: 🔍 Lint
-        working-directory: ./apps/frontend
-        run: npm run lint
+        run: npm run lint --workspace=apps/frontend
         
       - name: 🏗️ Build
-        working-directory: ./apps/frontend
-        run: npm run build
+        run: npm run build --workspace=apps/frontend
         env:
           NODE_ENV: production
           
