@@ -1,9 +1,22 @@
 import type { Exercise, ExerciseFilters } from '../types/exercise';
 
-// Configurar URL base según el entorno
-const API_BASE_URL = import.meta.env.PROD 
-  ? 'https://gym-exercise-backend.herokuapp.com/api'  // Heroku en producción
-  : 'http://localhost:3001/api';  // Desarrollo local
+// Configurar URL base según el entorno de forma dinámica
+function getApiBaseUrl(): string {
+  // En desarrollo local
+  if (import.meta.env.DEV) {
+    return 'http://localhost:3001/api';
+  }
+
+  // Si hay una variable de entorno específica para el backend
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  // Por defecto, usar Vercel en producción
+  return 'https://gym-exercise-backend.vercel.app/api';
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 export class ApiService {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T> {

@@ -1,7 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { ExercisesService } from '../exercises/exercises.service';
-import { ExerciseCategory, Difficulty } from '../exercises/entities/exercise.entity';
+import {
+  ExerciseCategory,
+  Difficulty,
+} from '../exercises/entities/exercise.entity';
 
 async function seed() {
   const app = await NestFactory.createApplicationContext(AppModule);
@@ -20,10 +23,10 @@ async function seed() {
         'Colócate en posición de plancha con las manos en el suelo',
         'Baja el cuerpo hasta que el pecho casi toque el suelo',
         'Empuja hacia arriba hasta la posición inicial',
-        'Mantén el cuerpo en línea recta durante todo el movimiento'
+        'Mantén el cuerpo en línea recta durante todo el movimiento',
       ],
       estimatedDuration: 15,
-      calories: 100
+      calories: 100,
     },
     {
       name: 'Squats',
@@ -36,10 +39,10 @@ async function seed() {
         'Párate con los pies separados al ancho de los hombros',
         'Baja como si fueras a sentarte en una silla',
         'Mantén el peso en los talones',
-        'Regresa a la posición inicial'
+        'Regresa a la posición inicial',
       ],
       estimatedDuration: 20,
-      calories: 150
+      calories: 150,
     },
     {
       name: 'Running',
@@ -52,10 +55,10 @@ async function seed() {
         'Calienta con una caminata de 5 minutos',
         'Comienza a trotar a un ritmo cómodo',
         'Mantén una postura erguida',
-        'Termina con una caminata de enfriamiento'
+        'Termina con una caminata de enfriamiento',
       ],
       estimatedDuration: 30,
-      calories: 300
+      calories: 300,
     },
     {
       name: 'Plancha',
@@ -68,10 +71,10 @@ async function seed() {
         'Colócate en posición de plancha sobre los antebrazos',
         'Mantén el cuerpo en línea recta',
         'Contrae los músculos del core',
-        'Mantén la posición durante el tiempo indicado'
+        'Mantén la posición durante el tiempo indicado',
       ],
       estimatedDuration: 10,
-      calories: 50
+      calories: 50,
     },
     {
       name: 'Yoga Flow',
@@ -84,21 +87,21 @@ async function seed() {
         'Comienza en posición de montaña',
         'Fluye a través de las posturas básicas',
         'Mantén la respiración profunda',
-        'Termina en savasana'
+        'Termina en savasana',
       ],
       estimatedDuration: 25,
-      calories: 80
-    }
+      calories: 80,
+    },
   ];
 
   try {
     console.log('🌱 Iniciando seeding de la base de datos...');
-    
+
     for (const exerciseData of exercisesData) {
       await exercisesService.create(exerciseData);
       console.log(`✅ Ejercicio creado: ${exerciseData.name}`);
     }
-    
+
     console.log('🎉 Seeding completado exitosamente!');
   } catch (error) {
     console.error('❌ Error durante el seeding:', error);
@@ -107,4 +110,4 @@ async function seed() {
   }
 }
 
-seed();
+void seed();

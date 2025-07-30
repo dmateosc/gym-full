@@ -14,32 +14,37 @@ export class ExercisesService {
   ) {}
 
   async findAll(filters?: ExerciseFiltersDto): Promise<Exercise[]> {
-    const queryBuilder = this.exercisesRepository.createQueryBuilder('exercise');
+    const queryBuilder =
+      this.exercisesRepository.createQueryBuilder('exercise');
 
     if (filters?.category) {
-      queryBuilder.andWhere('exercise.category = :category', { category: filters.category });
+      queryBuilder.andWhere('exercise.category = :category', {
+        category: filters.category,
+      });
     }
 
     if (filters?.difficulty) {
-      queryBuilder.andWhere('exercise.difficulty = :difficulty', { difficulty: filters.difficulty });
+      queryBuilder.andWhere('exercise.difficulty = :difficulty', {
+        difficulty: filters.difficulty,
+      });
     }
 
     if (filters?.muscleGroup) {
-      queryBuilder.andWhere(':muscleGroup = ANY(exercise.muscle_groups)', { 
-        muscleGroup: filters.muscleGroup 
+      queryBuilder.andWhere(':muscleGroup = ANY(exercise.muscle_groups)', {
+        muscleGroup: filters.muscleGroup,
       });
     }
 
     if (filters?.equipment) {
-      queryBuilder.andWhere(':equipment = ANY(exercise.equipment)', { 
-        equipment: filters.equipment 
+      queryBuilder.andWhere(':equipment = ANY(exercise.equipment)', {
+        equipment: filters.equipment,
       });
     }
 
     if (filters?.search) {
       queryBuilder.andWhere(
         '(LOWER(exercise.name) LIKE LOWER(:search) OR LOWER(exercise.description) LIKE LOWER(:search))',
-        { search: `%${filters.search}%` }
+        { search: `%${filters.search}%` },
       );
     }
 
@@ -59,7 +64,10 @@ export class ExercisesService {
     return this.exercisesRepository.save(exercise);
   }
 
-  async update(id: string, updateExerciseDto: UpdateExerciseDto): Promise<Exercise> {
+  async update(
+    id: string,
+    updateExerciseDto: UpdateExerciseDto,
+  ): Promise<Exercise> {
     await this.exercisesRepository.update(id, updateExerciseDto);
     const exercise = await this.findOne(id);
     return exercise;
@@ -77,9 +85,9 @@ export class ExercisesService {
     const result = await this.exercisesRepository
       .createQueryBuilder('exercise')
       .select('DISTINCT exercise.category', 'category')
-      .getRawMany();
-    
-    return result.map(item => item.category);
+      .getRawMany<{ category: string }>();
+
+    return result.map((item) => item.category);
   }
 
   async getMuscleGroups(): Promise<string[]> {
@@ -87,9 +95,9 @@ export class ExercisesService {
       .createQueryBuilder('exercise')
       .select('UNNEST(exercise.muscle_groups)', 'muscleGroup')
       .distinct(true)
-      .getRawMany();
-    
-    return result.map(item => item.muscleGroup);
+      .getRawMany<{ muscleGroup: string }>();
+
+    return result.map((item) => item.muscleGroup);
   }
 
   async getEquipment(): Promise<string[]> {
@@ -97,8 +105,8 @@ export class ExercisesService {
       .createQueryBuilder('exercise')
       .select('UNNEST(exercise.equipment)', 'equipment')
       .distinct(true)
-      .getRawMany();
-    
-    return result.map(item => item.equipment);
+      .getRawMany<{ equipment: string }>();
+
+    return result.map((item) => item.equipment);
   }
 }
