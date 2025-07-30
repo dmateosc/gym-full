@@ -75,14 +75,19 @@ async function bootstrap(): Promise<void> {
 }
 
 // Función handler para Vercel serverless
-
-export async function handler(req: any, res: any): Promise<any> {
+async function handler(req: any, res: any): Promise<any> {
   const nestApp = await createNestApp();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const expressApp = nestApp.getHttpAdapter().getInstance();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   return expressApp(req, res);
 }
+
+// Export default para Vercel
+export default handler;
+
+// Export named para compatibilidad
+export { handler };
 
 // Solo ejecutar bootstrap en desarrollo local (no en Vercel)
 if (!process.env.VERCEL && require.main === module) {
