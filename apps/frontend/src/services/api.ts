@@ -7,16 +7,20 @@ function getApiBaseUrl(): string {
     return 'http://localhost:3001/api';
   }
 
-  // Si hay una variable de entorno específica para el backend
+  // Variable de entorno específica para el backend (configurada en Vercel)
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
 
-  // Por defecto, usar Vercel en producción
+  // Fallback: usar Vercel backend en producción
   return 'https://gym-exercise-backend.vercel.app/api';
 }
 
 const API_BASE_URL = getApiBaseUrl();
+
+console.log('🔗 API Base URL:', API_BASE_URL);
+console.log('🌍 Environment:', import.meta.env.DEV ? 'development' : 'production');
+console.log('📝 VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
 
 export class ApiService {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T> {

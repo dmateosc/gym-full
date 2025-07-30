@@ -11,7 +11,10 @@
     "preview": "vite preview",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel",
+    "setup-env": "./setup-vercel-env.sh"
   },
   "dependencies": {
     "react": "^19.1.0",
