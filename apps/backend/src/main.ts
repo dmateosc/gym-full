@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 // Variable global para Vercel serverless
 let app: INestApplication | null = null;
 
+// Test CI/CD integration - Vercel deployment test
 // Función para obtener orígenes CORS permitidos dinámicamente
 function getAllowedOrigins(): (string | RegExp)[] {
   const origins: (string | RegExp)[] = [

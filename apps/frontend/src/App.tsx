@@ -6,6 +6,7 @@ import FiltersPanel from './components/FiltersPanel';
 import ExerciseDetail from './components/ExerciseDetail';
 import ExerciseList from './components/ExerciseList';
 
+// Test CI/CD integration - Vercel deployment test
 function App() {
   const [filters, setFilters] = useState<ExerciseFilters>({});
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
