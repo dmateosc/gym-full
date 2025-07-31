@@ -5,11 +5,11 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "env": {
-    "VITE_API_BASE_URL": "https://gym-exercise-backend.vercel.app/api"
+    "VITE_API_BASE_URL": "https://backend-48ihtvc0d-dmateoscanos-projects.vercel.app/api"
   },
   "build": {
     "env": {
-      "VITE_API_BASE_URL": "https://gym-exercise-backend.vercel.app/api"
+      "VITE_API_BASE_URL": "https://backend-48ihtvc0d-dmateoscanos-projects.vercel.app/api"
     }
   },
   "rewrites": [

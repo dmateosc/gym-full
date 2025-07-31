@@ -29,3 +29,4 @@ src/disabled-supabase/
 *.njsproj
 *.sln
 *.sw?
+.vercel

@@ -13,7 +13,7 @@ function getApiBaseUrl(): string {
   }
 
   // Fallback: usar Vercel backend en producción
-  return 'https://gym-exercise-backend.vercel.app/api';
+  return 'https://backend-48ihtvc0d-dmateoscanos-projects.vercel.app/api';
 }
 
 const API_BASE_URL = getApiBaseUrl();
