@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "gym-exercise-backend",
   "builds": [
     {
       "src": "src/main.ts",

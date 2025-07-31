@@ -10,6 +10,14 @@ let app: INestApplication | null = null;
 function getAllowedOrigins(): (string | RegExp)[] {
   const origins: (string | RegExp)[] = [
     'http://localhost:5173', // Desarrollo local
+    'http://localhost:3000', // Desarrollo local alternativo
+    'https://gym-full.vercel.app', // Producción principal
+    'https://gym-full-jpzg3jdnb-dmateoscanos-projects.vercel.app', // URL específica actual
+    'https://gym-full-aect69c8o-dmateoscanos-projects.vercel.app', // URL anterior
+    'https://gym-full-ppedygzaj-dmateoscanos-projects.vercel.app', // URL anterior 2
+    /^https:\/\/gym-full-.*\.vercel\.app$/, // Cualquier deployment de gym-full en Vercel
+    /^https:\/\/gym-full-.*-dmateoscanos-projects\.vercel\.app$/, // Patrón específico para tu cuenta
+    /^https:\/\/.*-dmateoscanos-projects\.vercel\.app$/, // Cualquier proyecto en tu cuenta
     /^https:\/\/.*\.github\.io$/, // Cualquier subdomain de GitHub Pages
   ];
 
@@ -23,6 +31,15 @@ function getAllowedOrigins(): (string | RegExp)[] {
     origins.push(process.env.GITHUB_PAGES_URL);
   }
 
+  // En desarrollo, permitir cualquier localhost
+  if (process.env.NODE_ENV === 'development') {
+    origins.push(/^http:\/\/localhost:\d+$/);
+  }
+
+  console.log(
+    '🔧 CORS Origins configured:',
+    origins.map((o) => o.toString()),
+  );
   return origins;
 }
 
@@ -32,10 +49,45 @@ async function createNestApp(): Promise<INestApplication> {
 
     // Habilitar CORS para el frontend (local y producción)
     app.enableCors({
-      origin: getAllowedOrigins(),
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+      origin: (
+        origin: string | undefined,
+        callback: (err: Error | null, allow?: boolean) => void,
+      ) => {
+        const allowedOrigins = getAllowedOrigins();
+
+        // Permitir requests sin origin (como Postman, curl, etc.)
+        if (!origin) return callback(null, true);
+
+        // Logging para debugging
+        console.log(`🔍 CORS request from origin: ${origin}`);
+
+        // Verificar si el origin está permitido
+        const isAllowed = allowedOrigins.some((allowedOrigin) => {
+          if (typeof allowedOrigin === 'string') {
+            return allowedOrigin === origin;
+          } else if (allowedOrigin instanceof RegExp) {
+            return allowedOrigin.test(origin);
+          }
+          return false;
+        });
+
+        if (isAllowed) {
+          console.log(`✅ CORS: Origin allowed: ${origin}`);
+          callback(null, true);
+        } else {
+          console.warn(`❌ CORS: Origin not allowed: ${origin}`);
+          console.log(
+            '✅ Allowed origins:',
+            allowedOrigins.map((o) => o.toString()),
+          );
+          callback(new Error('Not allowed by CORS'), false);
+        }
+      },
+      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
       credentials: true,
-      allowedHeaders: ['Content-Type', 'Authorization'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+      preflightContinue: false,
+      optionsSuccessStatus: 204,
     });
 
     // Habilitar validación global

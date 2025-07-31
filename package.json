@@ -23,6 +23,7 @@
     "deploy:frontend": "npm run deploy --workspace=apps/frontend",
     "deploy:backend": "npm run deploy --workspace=apps/backend",
     "deploy:all": "npm run deploy:frontend && npm run deploy:backend",
+    "deploy:frontend:fix": "cd apps/frontend && ./deploy-fix.sh",
     "setup-env:frontend": "npm run setup-env --workspace=apps/frontend",
     "setup-env:backend": "npm run setup-env --workspace=apps/backend",
     "docker:build": "docker build -f infra/Dockerfile --target frontend-production -t gymapp-frontend:latest .",
@@ -44,7 +45,9 @@
     "docker:unified:stop": "./docker-unified.sh stop",
     "docker:unified:clean": "./docker-unified.sh clean",
     "docker:unified:status": "./docker-unified.sh status",
-    "docker:unified:test-build": "./docker-unified.sh test-build"
+    "docker:unified:test-build": "./docker-unified.sh test-build",
+    "vercel:link-frontend": "cd apps/frontend && vercel link",
+    "vercel:link-backend": "cd apps/backend && vercel link"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

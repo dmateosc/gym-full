@@ -1,4 +1,35 @@
-# 🎬 GymApp - Aplicación de Ejercicios con Diseño Netflix
+# 🎬 GymApp - Aplicación de### Paleta de Colores
+- 🔴 **Rojo Netflix**: Acentos principales y header  
+- ⚫ **Negro/Gris**: Fondos y contenedores
+- ⚪ **Blanco**: Texto principal
+
+## 🚀 Despliegue
+
+### 📱 URLs de Producción
+- **Frontend**: https://gym-full.vercel.app
+- **Backend API**: https://gym-exercise-backend.vercel.app/api
+
+### 🔧 Vercel + GitHub Actions
+El proyecto utiliza GitHub Actions para despliegue automático a Vercel:
+
+**Para Preview Deployments:**
+- Cada PR crea un despliegue de preview automáticamente
+
+**Para Production:**
+- Push a `main` despliega automáticamente a producción
+
+**Configuración rápida:**
+```bash
+# 1. Instalar Vercel CLI
+npm install -g vercel@latest
+
+# 2. Enlazar proyectos
+npm run vercel:link-frontend
+npm run vercel:link-backend
+
+# 3. Configurar secrets en GitHub:
+# VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_PROJECT_ID_BACKEND
+```rcicios con Diseño Netflix
 
 Una aplicación web moderna para explorar y gestionar ejercicios de gimnasio, construida con React, TypeScript y Vite. **Ahora con un diseño completamente inspirado en Netflix para una experiencia visual premium.**
 
