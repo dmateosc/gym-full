@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import type { INestApplication } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { LoggingInterceptor } from './interceptors/logging.interceptor';
 
 // Variable global para Vercel serverless
 let app: INestApplication | null = null;
@@ -93,6 +94,9 @@ async function createNestApp(): Promise<INestApplication> {
       preflightContinue: false,
       optionsSuccessStatus: 204,
     });
+
+    // Habilitar interceptor global de logging
+    app.useGlobalInterceptors(new LoggingInterceptor());
 
     // Habilitar validación global
     app.useGlobalPipes(

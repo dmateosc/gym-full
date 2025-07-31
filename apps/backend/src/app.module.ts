@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ExercisesModule } from './exercises/exercises.module';
 import { Exercise } from './exercises/entities/exercise.entity';
+import { DatabaseLogger } from './database/database.logger';
 
 @Module({
   imports: [
@@ -19,7 +20,10 @@ import { Exercise } from './exercises/entities/exercise.entity';
       ssl: {
         rejectUnauthorized: false, // Para Supabase
       },
-      logging: process.env.NODE_ENV === 'development', // Solo en desarrollo
+      // Configuración de logging mejorada
+      logging: ['query', 'error', 'schema', 'warn', 'info', 'log'],
+      logger: new DatabaseLogger(),
+      maxQueryExecutionTime: 1000, // Log queries que tomen más de 1 segundo
     }),
     ExercisesModule,
   ],
