@@ -9,7 +9,6 @@ import {
   Query,
   ValidationPipe,
   Logger,
-  Req,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ExercisesService } from './exercises.service';
@@ -26,12 +25,14 @@ export class ExercisesController {
   @Post()
   async create(@Body(ValidationPipe) createExerciseDto: CreateExerciseDto) {
     const startTime = Date.now();
-    this.logger.log(`📝 POST /exercises - Creating exercise: ${createExerciseDto.name}`);
-    
+    this.logger.log(
+      `📝 POST /exercises - Creating exercise: ${createExerciseDto.name}`,
+    );
     const result = await this.exercisesService.create(createExerciseDto);
     const duration = Date.now() - startTime;
-    
-    this.logger.log(`✅ POST /exercises - Created exercise with ID ${result.id} in ${duration}ms`);
+    this.logger.log(
+      `✅ POST /exercises - Created exercise with ID ${result.id} in ${duration}ms`,
+    );
     return result;
   }
 
