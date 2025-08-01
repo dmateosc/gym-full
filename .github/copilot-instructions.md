@@ -66,6 +66,7 @@ const dbUrl = 'postgresql://user:pass@host:port/db';
 - **Testing**: Jest + Supertest
 - **Deployment**: Vercel Serverless
 - **Authentication**: Environment-based configuration
+- **Design/Architecture**: DDD, TDD 
 
 ### Development Tools
 - **Monorepo**: npm workspaces
@@ -141,3 +142,6 @@ npm run deploy:backend         # Deploy backend to Vercel
 npm run setup-env:frontend     # Configure frontend environment
 npm run setup-env:backend      # Configure backend environment
 ```
+
+
+evitar crear .md innecesarios

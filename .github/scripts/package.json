@@ -1,0 +1,19 @@
+{
+  "name": "gym-routine-generator",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Automated gym routine generator using OpenAI and Supabase",
+  "main": "generate-weekly-routines.js",
+  "scripts": {
+    "generate": "node generate-weekly-routines.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "openai": "^4.72.0",
+    "@supabase/supabase-js": "^2.45.6",
+    "pg": "^8.12.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

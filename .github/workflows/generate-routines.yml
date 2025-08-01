@@ -1,0 +1,92 @@
+name: 'Generate Daily Gym Routines'
+
+on:
+  # Ejecutar diariamente a las 06:00 UTC (para preparar el día siguiente)
+  schedule:
+    - cron: '0 6 * * *'
+  
+  # Permitir ejecución manual
+  workflow_dispatch:
+    inputs:
+      force_regenerate:
+        description: 'Forzar regeneración de rutinas existentes'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+jobs:
+  generate-routines:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '.github/scripts/package.json'
+          
+      - name: Install dependencies
+        working-directory: .github/scripts
+        run: npm ci
+        
+      - name: Validate environment variables
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "❌ OPENAI_API_KEY no está configurado"
+            exit 1
+          fi
+          if [ -z "$DATABASE_URL" ]; then
+            echo "❌ DATABASE_URL no está configurado"
+            exit 1
+          fi
+          echo "✅ Variables de entorno necesarias están configuradas"
+          
+      - name: Generate daily routine with OpenAI
+        working-directory: .github/scripts
+        run: |
+          echo "🚀 Iniciando generación de rutina diaria con OpenAI..."
+          node generate-daily-routine-openai.js
+          
+      - name: Report results
+        if: always()
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "✅ Rutinas generadas exitosamente"
+          else
+            echo "❌ Error generando rutinas"
+            exit 1
+          fi
+          
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## 📊 Resumen de Generación de Rutinas" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Fecha de ejecución**: $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "- **Forzar regeneración**: ${{ github.event.inputs.force_regenerate }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🎯 Objetivo" >> $GITHUB_STEP_SUMMARY
+          echo "Generar rutinas de fuerza inteligentes para la próxima semana usando:" >> $GITHUB_STEP_SUMMARY
+          echo "- **OpenAI GPT-4o-mini** para crear rutinas personalizadas y económicas" >> $GITHUB_STEP_SUMMARY
+          echo "- **Supabase** para almacenar rutinas y ejercicios" >> $GITHUB_STEP_SUMMARY
+          echo "- **Distribución semanal** de grupos musculares" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📅 Cronograma Semanal" >> $GITHUB_STEP_SUMMARY
+          echo "- **Lunes**: Pecho, Tríceps, Deltoides" >> $GITHUB_STEP_SUMMARY
+          echo "- **Martes**: Dorsales, Bíceps" >> $GITHUB_STEP_SUMMARY
+          echo "- **Miércoles**: Cuádriceps, Glúteos, Isquiotibiales" >> $GITHUB_STEP_SUMMARY
+          echo "- **Jueves**: Pecho, Deltoides, Tríceps" >> $GITHUB_STEP_SUMMARY
+          echo "- **Viernes**: Dorsales, Bíceps" >> $GITHUB_STEP_SUMMARY
+          echo "- **Sábado**: Cuádriceps, Glúteos, Isquiotibiales" >> $GITHUB_STEP_SUMMARY
+          echo "- **Domingo**: Descanso 😴" >> $GITHUB_STEP_SUMMARY
