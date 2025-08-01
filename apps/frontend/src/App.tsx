@@ -1,115 +1,54 @@
-import { useState, useEffect, useCallback } from 'react';
-import type { Exercise, ExerciseFilters } from './types/exercise';
-import { ApiService } from './services/api';
-import Header from './components/Header';
-import FiltersPanel from './components/FiltersPanel';
-import ExerciseDetail from './components/ExerciseDetail';
-import ExerciseList from './components/ExerciseList';
+import { useState } from 'react';
+import { 
+  Header, 
+  Navigation,
+  ExercisesContainer,
+  RoutinesContainer,
+  APP_CONFIG
+} from './domains';
 
 // Test CI/CD integration - Vercel deployment test
 function App() {
-  const [filters, setFilters] = useState<ExerciseFilters>({});
-  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [currentView, setCurrentView] = useState<'exercises' | 'routines'>('exercises');
 
-  const loadExercises = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await ApiService.getExercises(filters);
-      setExercises(data);
-    } catch (err) {
-      setError('Error loading exercises: ' + (err as Error).message);
-    } finally {
-      setIsLoading(false);
+  const navigationTabs = [
+    {
+      id: 'exercises' as const,
+      label: 'Catálogo de Ejercicios',
+      icon: '📋'
+    },
+    {
+      id: 'routines' as const,
+      label: 'Rutinas de Entrenamiento',
+      icon: '💪'
     }
-  }, [filters]);
-
-  useEffect(() => {
-    loadExercises();
-  }, [loadExercises]);
-
-  const returnToList = () => setSelectedExercise(null);
-
-  const renderLoadingState = () => (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 flex items-center justify-center">
-      <div className="text-center">
-        <div className="relative mb-8">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-red-600 border-t-transparent mx-auto"></div>
-          <div className="absolute inset-0 rounded-full bg-red-600 opacity-20 animate-pulse"></div>
-        </div>
-        <h2 className="text-3xl font-bold text-white mb-4">GymApp</h2>
-        <p className="text-gray-300 text-lg">Cargando tu catálogo de ejercicios...</p>
-        <div className="mt-6 flex justify-center">
-          <div className="flex space-x-2">
-            <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce"></div>
-            <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-            <div className="w-2 h-2 bg-red-600 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const mostrarEstadoError = () => (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center max-w-md mx-auto p-6">
-        <div className="text-red-500 text-6xl mb-4">⚠️</div>
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Error al cargar</h2>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <button 
-          onClick={() => window.location.reload()}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Recargar página
-        </button>
-      </div>
-    </div>
-  );
+  ];
 
   const renderMainContent = () => {
-    if (selectedExercise) {
-      return (
-        <ExerciseDetail 
-          exercise={selectedExercise} 
-          onBack={returnToList}
-        />
-      );
+    switch (currentView) {
+      case 'routines':
+        return <RoutinesContainer />;
+      case 'exercises':
+      default:
+        return <ExercisesContainer />;
     }
-    
-    return (
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <div className="lg:col-span-1">
-          <FiltersPanel 
-            filters={filters} 
-            onFiltersChange={setFilters}
-          />
-        </div>
-        
-        <div className="lg:col-span-3">
-          <ExerciseList 
-            exercises={exercises}
-            onExerciseSelect={setSelectedExercise}
-          />
-        </div>
-      </div>
-    );
   };
-
-  if (isLoading) return renderLoadingState();
-  if (error) return mostrarEstadoError();
 
   return (
     <div 
       className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black" 
       style={{
-        background: 'linear-gradient(to bottom right, #000000, #111827, #000000)',
+        background: APP_CONFIG.THEME.BACKGROUND_STYLE,
         minHeight: '100vh'
       }}
     >
       <Header />
+      
+      <Navigation 
+        currentView={currentView}
+        onViewChange={setCurrentView}
+        tabs={navigationTabs}
+      />
       
       <div className="container mx-auto px-4 py-8">
         {renderMainContent()}

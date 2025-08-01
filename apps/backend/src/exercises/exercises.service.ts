@@ -82,16 +82,14 @@ export class ExercisesService {
 
   async create(createExerciseDto: CreateExerciseDto): Promise<Exercise> {
     const startTime = Date.now();
-    this.logger.log(
-      `🆕 Creating new exercise: ${createExerciseDto.name}`,
-    );
+    this.logger.log(`🆕 Creating new exercise: ${createExerciseDto.name}`);
 
     const exercise = this.exercisesRepository.create(createExerciseDto);
     const savedExercise = await this.exercisesRepository.save(exercise);
-    
+
     const endTime = Date.now();
     const duration = endTime - startTime;
-    
+
     this.logger.log(
       `✅ Created exercise "${savedExercise.name}" with ID ${savedExercise.id} in ${duration}ms`,
     );
