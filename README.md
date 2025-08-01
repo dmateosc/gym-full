@@ -1,4 +1,4 @@
-# 🎬 GymApp - Aplicació 
+# 🎬 GymApp - Aplicación
 ### Paleta de Colores
 - 🔴 **Rojo Netflix**: Acentos principales y header  
 - ⚫ **Negro/Gris**: Fondos y contenedores
