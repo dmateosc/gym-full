@@ -1,34 +1,49 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { WorkoutRoutine } from '../types/routine';
+import type { DailyRoutine } from '../types/routine';
 import { RoutineService } from '../services/routineService';
 
 /**
  * Hook personalizado para el manejo de rutinas
- * Siguiendo principios DDD
+ * Siguiendo principios DDD - Conectado con backend
  */
 export const useRoutines = () => {
-  const [routines, setRoutines] = useState<WorkoutRoutine[]>([]);
-  const [currentRoutine, setCurrentRoutine] = useState<WorkoutRoutine | null>(null);
+  const [routines, setRoutines] = useState<DailyRoutine[]>([]);
+  const [currentRoutine, setCurrentRoutine] = useState<DailyRoutine | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const loadRoutines = useCallback(async () => {
+  const loadTodayRoutine = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await RoutineService.getAllRoutines();
-      setRoutines(data);
       
-      // Si no hay rutina actual, establecer la primera
-      if (!currentRoutine && data.length > 0) {
-        setCurrentRoutine(data[0]);
+      // Intentar obtener la rutina de hoy
+      const todayRoutine = await RoutineService.getTodayRoutine();
+      
+      if (todayRoutine) {
+        setCurrentRoutine(todayRoutine);
+      } else {
+        // Si no hay rutina para hoy, mostrar la más reciente
+        const allRoutines = await RoutineService.getAllRoutines();
+        setRoutines(allRoutines);
+        
+        if (allRoutines.length > 0) {
+          // Ordenar por fecha y tomar la más reciente
+          const sortedRoutines = allRoutines.sort((a, b) => 
+            new Date(b.routineDate).getTime() - new Date(a.routineDate).getTime()
+          );
+          setCurrentRoutine(sortedRoutines[0]);
+        } else {
+          setCurrentRoutine(null);
+        }
       }
     } catch (err) {
       setError('Error loading routines: ' + (err as Error).message);
+      setCurrentRoutine(null);
     } finally {
       setIsLoading(false);
     }
-  }, [currentRoutine]);
+  }, []);
 
   const loadRoutineById = useCallback(async (id: string) => {
     try {
@@ -47,13 +62,13 @@ export const useRoutines = () => {
     }
   }, []);
 
-  const getRoutineStats = useCallback((routine: WorkoutRoutine) => {
+  const getRoutineStats = useCallback((routine: DailyRoutine) => {
     return RoutineService.calculateRoutineStats(routine);
   }, []);
 
   useEffect(() => {
-    loadRoutines();
-  }, [loadRoutines]);
+    loadTodayRoutine();
+  }, [loadTodayRoutine]);
 
   return {
     // State
@@ -64,6 +79,7 @@ export const useRoutines = () => {
     
     // Actions
     loadRoutineById,
+    loadTodayRoutine,
     getRoutineStats,
     setCurrentRoutine,
   };

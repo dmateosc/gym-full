@@ -1,352 +1,215 @@
-import type { WorkoutRoutine } from '../types/routine';
+import type { DailyRoutine, RoutineStats } from '../types/routine';
 
-// Rutina de ejemplo - más adelante esto vendrá de una API
-export const sampleRoutine: WorkoutRoutine = {
-  id: '1',
-  name: 'Rutina Push/Pull/Legs',
-  description: 'Rutina de fuerza enfocada en desarrollo muscular completo',
-  duration: '8 semanas',
-  level: 'intermedio',
-  daysPerWeek: 6,
-  days: [
-    {
-      day: 'Día 1 - Push (Pecho, Hombros, Tríceps)',
-      exercises: [
-        {
-          id: '1',
-          name: 'Press de banca',
-          sets: 4,
-          reps: '8-10',
-          rest: '2-3 min'
-        },
-        {
-          id: '2',
-          name: 'Press inclinado con mancuernas',
-          sets: 3,
-          reps: '10-12',
-          rest: '90 seg'
-        },
-        {
-          id: '3',
-          name: 'Press militar',
-          sets: 4,
-          reps: '8-10',
-          rest: '2 min'
-        },
-        {
-          id: '4',
-          name: 'Elevaciones laterales',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        },
-        {
-          id: '5',
-          name: 'Fondos en paralelas',
-          sets: 3,
-          reps: '10-12',
-          rest: '90 seg'
-        },
-        {
-          id: '6',
-          name: 'Extensión de tríceps con mancuerna',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        }
-      ]
-    },
-    {
-      day: 'Día 2 - Pull (Espalda, Bíceps)',
-      exercises: [
-        {
-          id: '7',
-          name: 'Dominadas',
-          sets: 4,
-          reps: '6-10',
-          rest: '2-3 min'
-        },
-        {
-          id: '8',
-          name: 'Remo con barra',
-          sets: 4,
-          reps: '8-10',
-          rest: '2 min'
-        },
-        {
-          id: '9',
-          name: 'Remo con mancuerna',
-          sets: 3,
-          reps: '10-12',
-          rest: '90 seg'
-        },
-        {
-          id: '10',
-          name: 'Jalones al pecho',
-          sets: 3,
-          reps: '10-12',
-          rest: '90 seg'
-        },
-        {
-          id: '11',
-          name: 'Curl de bíceps con barra',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        },
-        {
-          id: '12',
-          name: 'Curl martillo',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        }
-      ]
-    },
-    {
-      day: 'Día 3 - Legs (Piernas, Glúteos)',
-      exercises: [
-        {
-          id: '13',
-          name: 'Sentadillas',
-          sets: 4,
-          reps: '8-10',
-          rest: '3 min'
-        },
-        {
-          id: '14',
-          name: 'Peso muerto rumano',
-          sets: 4,
-          reps: '8-10',
-          rest: '2-3 min'
-        },
-        {
-          id: '15',
-          name: 'Prensa de piernas',
-          sets: 3,
-          reps: '12-15',
-          rest: '2 min'
-        },
-        {
-          id: '16',
-          name: 'Zancadas con mancuernas',
-          sets: 3,
-          reps: '10-12 c/u',
-          rest: '90 seg'
-        },
-        {
-          id: '17',
-          name: 'Curl femoral',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        },
-        {
-          id: '18',
-          name: 'Elevación de talones',
-          sets: 4,
-          reps: '15-20',
-          rest: '60 seg'
-        }
-      ]
-    },
-    {
-      day: 'Día 4 - Push (Pecho, Hombros, Tríceps)',
-      exercises: [
-        {
-          id: '19',
-          name: 'Press inclinado con barra',
-          sets: 4,
-          reps: '8-10',
-          rest: '2-3 min'
-        },
-        {
-          id: '20',
-          name: 'Aperturas con mancuernas',
-          sets: 3,
-          reps: '12-15',
-          rest: '90 seg'
-        },
-        {
-          id: '21',
-          name: 'Press con mancuernas sentado',
-          sets: 4,
-          reps: '10-12',
-          rest: '2 min'
-        },
-        {
-          id: '22',
-          name: 'Elevaciones posteriores',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        },
-        {
-          id: '23',
-          name: 'Press francés',
-          sets: 3,
-          reps: '10-12',
-          rest: '90 seg'
-        },
-        {
-          id: '24',
-          name: 'Patadas de tríceps',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        }
-      ]
-    },
-    {
-      day: 'Día 5 - Pull (Espalda, Bíceps)',
-      exercises: [
-        {
-          id: '25',
-          name: 'Peso muerto',
-          sets: 4,
-          reps: '6-8',
-          rest: '3 min'
-        },
-        {
-          id: '26',
-          name: 'Remo en polea baja',
-          sets: 4,
-          reps: '10-12',
-          rest: '2 min'
-        },
-        {
-          id: '27',
-          name: 'Pullover con mancuerna',
-          sets: 3,
-          reps: '12-15',
-          rest: '90 seg'
-        },
-        {
-          id: '28',
-          name: 'Remo al cuello',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        },
-        {
-          id: '29',
-          name: 'Curl con mancuernas alterno',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        },
-        {
-          id: '30',
-          name: 'Curl en polea alta',
-          sets: 3,
-          reps: '12-15',
-          rest: '60 seg'
-        }
-      ]
-    },
-    {
-      day: 'Día 6 - Legs (Piernas, Glúteos)',
-      exercises: [
-        {
-          id: '31',
-          name: 'Sentadilla frontal',
-          sets: 4,
-          reps: '8-10',
-          rest: '3 min'
-        },
-        {
-          id: '32',
-          name: 'Hip thrust',
-          sets: 4,
-          reps: '12-15',
-          rest: '2 min'
-        },
-        {
-          id: '33',
-          name: 'Extensión de cuádriceps',
-          sets: 3,
-          reps: '12-15',
-          rest: '90 seg'
-        },
-        {
-          id: '34',
-          name: 'Peso muerto sumo',
-          sets: 3,
-          reps: '10-12',
-          rest: '2 min'
-        },
-        {
-          id: '35',
-          name: 'Abducción de cadera',
-          sets: 3,
-          reps: '15-20',
-          rest: '60 seg'
-        },
-        {
-          id: '36',
-          name: 'Gemelos en prensa',
-          sets: 4,
-          reps: '20-25',
-          rest: '60 seg'
-        }
-      ]
-    }
-  ]
-};
+// Configuración de la API
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
 
 /**
- * Routine Service - Domain Service para manejo de rutinas
- * Siguiendo principios DDD
+ * Servicio para el manejo de rutinas - Conectado con backend NestJS
  */
 export class RoutineService {
   /**
-   * Obtiene una rutina por ID
-   * En el futuro se conectará a una API
+   * Obtener la rutina de hoy
    */
-  static async getRoutineById(id: string): Promise<WorkoutRoutine | null> {
-    // Por ahora retornamos la rutina de ejemplo
-    if (id === '1') {
-      return sampleRoutine;
+  static async getTodayRoutine(): Promise<DailyRoutine | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/routines/daily/today`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // No hay rutina para hoy
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching today routine:', error);
+      throw new Error('Error al obtener la rutina de hoy');
     }
-    return null;
   }
 
   /**
-   * Obtiene todas las rutinas disponibles
+   * Obtener rutina por fecha específica
    */
-  static async getAllRoutines(): Promise<WorkoutRoutine[]> {
-    // Por ahora retornamos un array con la rutina de ejemplo
-    return [sampleRoutine];
+  static async getRoutineByDate(date: string): Promise<DailyRoutine | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/routines/daily/by-date/${date}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching routine by date:', error);
+      throw new Error(`Error al obtener la rutina para ${date}`);
+    }
   }
 
   /**
-   * Calcula estadísticas de una rutina
+   * Obtener todas las rutinas
    */
-  static calculateRoutineStats(routine: WorkoutRoutine) {
-    const totalExercises = routine.days.reduce((total, day) => total + day.exercises.length, 0);
-    const averageSetsPerDay = Math.round(
-      routine.days.reduce((total, day) => 
-        total + day.exercises.reduce((dayTotal, ex) => dayTotal + ex.sets, 0), 0
-      ) / routine.days.length
-    );
+  static async getAllRoutines(): Promise<DailyRoutine[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/routines/daily`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching all routines:', error);
+      throw new Error('Error al obtener las rutinas');
+    }
+  }
+
+  /**
+   * Obtener rutina por ID
+   */
+  static async getRoutineById(id: string): Promise<DailyRoutine | null> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/routines/daily/${id}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching routine by ID:', error);
+      throw new Error(`Error al obtener la rutina ${id}`);
+    }
+  }
+
+  /**
+   * Calcular estadísticas de una rutina
+   */
+  static calculateRoutineStats(routine: DailyRoutine): RoutineStats {
+    const exercises = routine.routineExercises || [];
+    
+    // Extraer grupos musculares únicos
+    const muscleGroups = new Set<string>();
+    exercises.forEach(exercise => {
+      exercise.exercise.primaryMuscleGroups?.forEach(group => muscleGroups.add(group));
+      exercise.exercise.secondaryMuscleGroups?.forEach(group => muscleGroups.add(group));
+    });
 
     return {
-      totalExercises,
-      averageSetsPerDay,
-      totalDays: routine.days.length,
-      daysPerWeek: routine.daysPerWeek
+      totalExercises: exercises.length,
+      estimatedDuration: routine.estimatedDurationMinutes || 60,
+      estimatedCalories: routine.estimatedCalories || 300,
+      muscleGroups: Array.from(muscleGroups),
     };
   }
 
   /**
-   * Valida si una rutina es válida
+   * Formatear duración en minutos a texto legible
    */
-  static validateRoutine(routine: WorkoutRoutine): boolean {
-    return (
-      !!routine.id &&
-      !!routine.name &&
-      routine.days.length > 0 &&
-      routine.days.every(day => day.exercises.length > 0)
-    );
+  static formatDuration(minutes: number): string {
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
+    
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    
+    if (remainingMinutes === 0) {
+      return `${hours}h`;
+    }
+    
+    return `${hours}h ${remainingMinutes}min`;
+  }
+
+  /**
+   * Obtener el nombre del día en español
+   */
+  static getDayName(date: Date): string {
+    const days = [
+      'Domingo', 'Lunes', 'Martes', 'Miércoles', 
+      'Jueves', 'Viernes', 'Sábado'
+    ];
+    return days[date.getDay()];
+  }
+
+  /**
+   * Formatear fecha para mostrar
+   */
+  static formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Comparar solo las fechas (sin hora)
+    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const tomorrowOnly = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
+
+    if (dateOnly.getTime() === todayOnly.getTime()) {
+      return 'Hoy';
+    } else if (dateOnly.getTime() === tomorrowOnly.getTime()) {
+      return 'Mañana';
+    } else {
+      return `${this.getDayName(date)} ${date.getDate()}/${date.getMonth() + 1}`;
+    }
+  }
+
+  /**
+   * Obtener el color de intensidad
+   */
+  static getIntensityColor(intensity: string): string {
+    switch (intensity) {
+      case 'low': return 'text-green-400';
+      case 'moderate': return 'text-yellow-400';
+      case 'high': return 'text-orange-400';
+      case 'very_high': return 'text-red-400';
+      default: return 'text-gray-400';
+    }
+  }
+
+  /**
+   * Obtener el color de estado
+   */
+  static getStatusColor(status: string): string {
+    switch (status) {
+      case 'planned': return 'text-blue-400';
+      case 'in_progress': return 'text-yellow-400';
+      case 'completed': return 'text-green-400';
+      case 'skipped': return 'text-gray-400';
+      default: return 'text-gray-400';
+    }
+  }
+
+  /**
+   * Traducir textos de intensidad
+   */
+  static translateIntensity(intensity: string): string {
+    switch (intensity) {
+      case 'low': return 'Baja';
+      case 'moderate': return 'Moderada';
+      case 'high': return 'Alta';
+      case 'very_high': return 'Muy Alta';
+      default: return intensity;
+    }
+  }
+
+  /**
+   * Traducir textos de estado
+   */
+  static translateStatus(status: string): string {
+    switch (status) {
+      case 'planned': return 'Planificada';
+      case 'in_progress': return 'En Progreso';
+      case 'completed': return 'Completada';
+      case 'skipped': return 'Omitida';
+      default: return status;
+    }
   }
 }
