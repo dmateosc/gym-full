@@ -9,7 +9,6 @@ import {
 
 describe('RoutinesController', () => {
   let controller: RoutinesController;
-  let service: RoutinesService;
 
   const mockRoutinesService = {
     createDailyRoutine: jest.fn(),
@@ -60,7 +59,6 @@ describe('RoutinesController', () => {
     }).compile();
 
     controller = module.get<RoutinesController>(RoutinesController);
-    service = module.get<RoutinesService>(RoutinesService);
   });
 
   it('should be defined', () => {
@@ -79,12 +77,16 @@ describe('RoutinesController', () => {
         estimatedCalories: 300,
       };
 
-      mockRoutinesService.createDailyRoutine.mockResolvedValue(mockDailyRoutine);
+      mockRoutinesService.createDailyRoutine.mockResolvedValue(
+        mockDailyRoutine,
+      );
 
       const result = await controller.createDailyRoutine(createDto);
 
       expect(result).toEqual(mockDailyRoutine);
-      expect(service.createDailyRoutine).toHaveBeenCalledWith(createDto);
+      expect(mockRoutinesService.createDailyRoutine).toHaveBeenCalledWith(
+        createDto,
+      );
     });
   });
 
@@ -96,29 +98,37 @@ describe('RoutinesController', () => {
       const result = await controller.findAllDailyRoutines();
 
       expect(result).toEqual(routines);
-      expect(service.findAllDailyRoutines).toHaveBeenCalled();
+      expect(mockRoutinesService.findAllDailyRoutines).toHaveBeenCalled();
     });
   });
 
   describe('findDailyRoutineById', () => {
     it('should return a daily routine by ID', async () => {
-      mockRoutinesService.findDailyRoutineById.mockResolvedValue(mockDailyRoutine);
+      mockRoutinesService.findDailyRoutineById.mockResolvedValue(
+        mockDailyRoutine,
+      );
 
       const result = await controller.findDailyRoutineById('1');
 
       expect(result).toEqual(mockDailyRoutine);
-      expect(service.findDailyRoutineById).toHaveBeenCalledWith('1');
+      expect(mockRoutinesService.findDailyRoutineById).toHaveBeenCalledWith(
+        '1',
+      );
     });
   });
 
   describe('findDailyRoutineByDate', () => {
     it('should return a routine by date', async () => {
-      mockRoutinesService.findDailyRoutineByDate.mockResolvedValue(mockDailyRoutine);
+      mockRoutinesService.findDailyRoutineByDate.mockResolvedValue(
+        mockDailyRoutine,
+      );
 
       const result = await controller.findDailyRoutineByDate('2025-08-01');
 
       expect(result).toEqual(mockDailyRoutine);
-      expect(service.findDailyRoutineByDate).toHaveBeenCalledWith('2025-08-01');
+      expect(mockRoutinesService.findDailyRoutineByDate).toHaveBeenCalledWith(
+        '2025-08-01',
+      );
     });
   });
 
@@ -129,43 +139,60 @@ describe('RoutinesController', () => {
       const result = await controller.findTodayRoutine();
 
       expect(result).toEqual(mockDailyRoutine);
-      expect(service.findTodayRoutine).toHaveBeenCalled();
+      expect(mockRoutinesService.findTodayRoutine).toHaveBeenCalled();
     });
   });
 
   describe('startRoutine', () => {
     it('should start a routine', async () => {
-      const startedRoutine = { ...mockDailyRoutine, status: RoutineStatus.IN_PROGRESS };
+      const startedRoutine = {
+        ...mockDailyRoutine,
+        status: RoutineStatus.IN_PROGRESS,
+      };
       mockRoutinesService.startRoutine.mockResolvedValue(startedRoutine);
 
       const result = await controller.startRoutine('1');
 
       expect(result).toEqual(startedRoutine);
-      expect(service.startRoutine).toHaveBeenCalledWith('1');
+      expect(mockRoutinesService.startRoutine).toHaveBeenCalledWith('1');
     });
   });
 
   describe('completeRoutine', () => {
     it('should complete a routine', async () => {
-      const completedRoutine = { ...mockDailyRoutine, status: RoutineStatus.COMPLETED };
+      const completedRoutine = {
+        ...mockDailyRoutine,
+        status: RoutineStatus.COMPLETED,
+      };
       mockRoutinesService.completeRoutine.mockResolvedValue(completedRoutine);
 
-      const result = await controller.completeRoutine('1', { completionNotes: 'Great!' });
+      const result = await controller.completeRoutine('1', {
+        completionNotes: 'Great!',
+      });
 
       expect(result).toEqual(completedRoutine);
-      expect(service.completeRoutine).toHaveBeenCalledWith('1', 'Great!');
+      expect(mockRoutinesService.completeRoutine).toHaveBeenCalledWith(
+        '1',
+        'Great!',
+      );
     });
   });
 
   describe('skipRoutine', () => {
     it('should skip a routine', async () => {
-      const skippedRoutine = { ...mockDailyRoutine, status: RoutineStatus.SKIPPED };
+      const skippedRoutine = {
+        ...mockDailyRoutine,
+        status: RoutineStatus.SKIPPED,
+      };
       mockRoutinesService.skipRoutine.mockResolvedValue(skippedRoutine);
 
       const result = await controller.skipRoutine('1', { reason: 'Too tired' });
 
       expect(result).toEqual(skippedRoutine);
-      expect(service.skipRoutine).toHaveBeenCalledWith('1', 'Too tired');
+      expect(mockRoutinesService.skipRoutine).toHaveBeenCalledWith(
+        '1',
+        'Too tired',
+      );
     });
   });
 
@@ -186,7 +213,7 @@ describe('RoutinesController', () => {
       const result = await controller.getRoutineStats('1');
 
       expect(result).toEqual(stats);
-      expect(service.getRoutineStats).toHaveBeenCalledWith('1');
+      expect(mockRoutinesService.getRoutineStats).toHaveBeenCalledWith('1');
     });
   });
 
@@ -204,10 +231,16 @@ describe('RoutinesController', () => {
 
       mockRoutinesService.getProgressStats.mockResolvedValue(progressStats);
 
-      const result = await controller.getProgressStats('2025-08-01', '2025-08-31');
+      const result = await controller.getProgressStats(
+        '2025-08-01',
+        '2025-08-31',
+      );
 
       expect(result).toEqual(progressStats);
-      expect(service.getProgressStats).toHaveBeenCalledWith('2025-08-01', '2025-08-31');
+      expect(mockRoutinesService.getProgressStats).toHaveBeenCalledWith(
+        '2025-08-01',
+        '2025-08-31',
+      );
     });
   });
 });

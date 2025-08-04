@@ -22,8 +22,8 @@ export enum ExerciseType {
   REPS_ONLY = 'reps_only',
 }
 
-// Tipos de ejercicio según el backend
-export interface Exercise {
+// Tipos de ejercicio según el backend (específico para rutinas)
+export interface RoutineExerciseInfo {
   id: string;
   name: string;
   description?: string;
@@ -39,7 +39,7 @@ export interface Exercise {
 export interface RoutineExercise {
   id: string;
   dailyRoutineId: string;
-  exercise: Exercise;
+  exercise: RoutineExerciseInfo;
   exerciseId: string;
   orderInRoutine: number;
   exerciseType: ExerciseType;
