@@ -82,22 +82,22 @@ const RoutineDateSelector: React.FC<RoutineDateSelectorProps> = ({
   const dateOptions = getDateOptions();
 
   return (
-    <div className="bg-gray-800 rounded-lg p-4 mb-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-1">Seleccionar fecha de rutina</h3>
-          <p className="text-gray-400 text-sm">Elige el día para ver la rutina correspondiente</p>
+    <div className="bg-gray-800 rounded-lg p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="flex-1">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Seleccionar fecha de rutina</h3>
+          <p className="text-gray-400 text-xs sm:text-sm">Elige el día para ver la rutina correspondiente</p>
         </div>
         
-        <div className="flex items-center gap-3">
-          <label htmlFor="routine-date" className="text-gray-300 text-sm font-medium">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+          <label htmlFor="routine-date" className="text-gray-300 text-xs sm:text-sm font-medium">
             Fecha:
           </label>
           <select
             id="routine-date"
             value={selectedDate}
             onChange={(e) => handleDateChange(e.target.value)}
-            className="bg-gray-700 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+            className="bg-gray-700 border border-gray-600 text-white rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none min-w-0 flex-1 sm:flex-none"
           >
             {dateOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -109,10 +109,10 @@ const RoutineDateSelector: React.FC<RoutineDateSelectorProps> = ({
       </div>
       
       {currentRoutine && (
-        <div className="mt-4 pt-4 border-t border-gray-700">
-          <div className="flex items-center gap-2 text-sm text-gray-400">
-            <span className="w-2 h-2 bg-green-400 rounded-full"></span>
-            Mostrando rutina para {RoutineService.formatDate(currentRoutine.routineDate)}
+        <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-700">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-400">
+            <span className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></span>
+            <span className="truncate">Mostrando rutina para {RoutineService.formatDate(currentRoutine.routineDate)}</span>
           </div>
         </div>
       )}
