@@ -11,21 +11,28 @@ let app: INestApplication | null = null;
 // Función para obtener orígenes CORS permitidos dinámicamente
 function getAllowedOrigins(): (string | RegExp)[] {
   const origins: (string | RegExp)[] = [
-    'http://localhost:5173', // Desarrollo local
-    'http://localhost:3000', // Desarrollo local alternativo
-    'https://gym-full.vercel.app', // Producción principal
-    'https://gym-full-ctxgkzave-dmateoscanos-projects.vercel.app', // URL específica nueva
-    'https://gym-full-jpzg3jdnb-dmateoscanos-projects.vercel.app', // URL específica actual
-    'https://gym-full-aect69c8o-dmateoscanos-projects.vercel.app', // URL anterior
-    'https://gym-full-ppedygzaj-dmateoscanos-projects.vercel.app', // URL anterior 2
-    'https://frontend-drab-eight-89.vercel.app', // URL de preview deployment
-    'https://frontend-vpw4wj9cw-dmateoscanos-projects.vercel.app', // URL actual del frontend
-    /^https:\/\/gym-full-.*\.vercel\.app$/, // Cualquier deployment de gym-full en Vercel
-    /^https:\/\/gym-full-.*-dmateoscanos-projects\.vercel\.app$/, // Patrón específico para tu cuenta
-    /^https:\/\/.*-dmateoscanos-projects\.vercel\.app$/, // Cualquier proyecto en tu cuenta
-    /^https:\/\/frontend-.*\.vercel\.app$/, // Preview deployments del frontend
-    /^https:\/\/frontend-.*-dmateoscanos-projects\.vercel\.app$/, // Frontend deployments específicos
-    /^https:\/\/.*\.github\.io$/, // Cualquier subdomain de GitHub Pages
+    // Desarrollo local
+    'http://localhost:5173',
+    'http://localhost:3000',
+    
+    // Dominios de producción fijos (recomendado)
+    'https://gym-exercise-frontend.vercel.app',
+    'https://gym-exercise-backend.vercel.app',
+    
+    // Dominios dinámicos de Vercel (para preview deployments)
+    /^https:\/\/gym-exercise-frontend-.*\.vercel\.app$/,
+    /^https:\/\/gym-exercise-backend-.*\.vercel\.app$/,
+    /^https:\/\/.*-dmateoscanos-projects\.vercel\.app$/,
+    
+    // Patrones de deployment temporal (hasta configurar dominios fijos)
+    'https://frontend-vpw4wj9cw-dmateoscanos-projects.vercel.app',
+    'https://gym-full.vercel.app',
+    /^https:\/\/gym-full-.*\.vercel\.app$/,
+    /^https:\/\/frontend-.*\.vercel\.app$/,
+    /^https:\/\/backend-.*\.vercel\.app$/,
+    
+    // GitHub Pages y otros
+    /^https:\/\/.*\.github\.io$/,
   ];
 
   // Agregar FRONTEND_URL si está configurada (para producción)
