@@ -148,6 +148,9 @@ export default async function handler(
   expressApp(req, res);
 }
 
+// También exportar como named export para compatibilidad
+export { handler };
+
 // Solo ejecutar bootstrap en desarrollo local
 if (require.main === module) {
   void bootstrap();
