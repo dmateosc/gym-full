@@ -2,14 +2,14 @@
   "version": 2,
   "framework": "vite",
   "buildCommand": "npm run frontend:build",
-  "outputDirectory": "dist",
+  "outputDirectory": "dist", 
   "installCommand": "npm install",
   "env": {
-    "VITE_API_BASE_URL": "https://gym-exercise-backend.vercel.app/api"
+    "VITE_API_BASE_URL": "https://centro-wellness-sierra-de-gata-backend.vercel.app/api"
   },
   "build": {
     "env": {
-      "VITE_API_BASE_URL": "https://gym-exercise-backend.vercel.app/api"
+      "VITE_API_BASE_URL": "https://centro-wellness-sierra-de-gata-backend.vercel.app/api"
     }
   },
   "rewrites": [

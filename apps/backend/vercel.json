@@ -1,21 +1,20 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
+  "functions": {
+    "dist/main.vercel.js": {
+      "runtime": "@vercel/node@3.0.23"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "api/index.js"
+      "dest": "dist/main.vercel.js"
     },
     {
       "src": "/(.*)",
-      "dest": "api/index.js"
+      "dest": "dist/main.vercel.js"
     }
   ],
-  "installCommand": "npm install --include=dev",
-  "buildCommand": "npm run build && mkdir -p api && cp dist/main.vercel.js api/index.js"
+  "installCommand": "npm install",
+  "buildCommand": "npm run build"
 }
