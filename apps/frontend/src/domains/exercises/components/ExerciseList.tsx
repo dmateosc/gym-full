@@ -40,11 +40,11 @@ const NoResultsState = () => (
 );
 
 const ListHeader = ({ exerciseCount }: { exerciseCount: number }) => (
-  <div className="flex items-center justify-between mb-6">
-    <h2 className="text-2xl font-bold text-white">
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+    <h2 className="text-xl sm:text-2xl font-bold text-white">
       Ejercicios Disponibles
     </h2>
-    <span className="text-sm text-gray-300 bg-gradient-to-r from-gray-800 to-gray-700 px-4 py-2 rounded-full border border-gray-600">
+    <span className="text-xs sm:text-sm text-gray-300 bg-gradient-to-r from-gray-800 to-gray-700 px-3 sm:px-4 py-1 sm:py-2 rounded-full border border-gray-600 self-start sm:self-auto">
       {exerciseCount} ejercicio{exerciseCount !== 1 ? 's' : ''}
     </span>
   </div>
@@ -66,7 +66,7 @@ const CategoryTag = ({ category }: { category: string }) => {
   const capitalizedCategory = category.charAt(0).toUpperCase() + category.slice(1);
   
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-medium shadow-lg ${categoryColor}`}>
+    <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium shadow-lg ${categoryColor}`}>
       {capitalizedCategory}
     </span>
   );
@@ -95,7 +95,7 @@ const CaloriesInfo = ({ calories }: { calories?: number }) => {
 };
 
 const MuscleGroupTags = ({ groups }: { groups: string[] }) => (
-  <div className="flex flex-wrap gap-1 mb-4">
+  <div className="flex flex-wrap gap-1 mb-3 sm:mb-4">
     {groups.slice(0, MAX_VISIBLE_GROUPS).map((group, index) => (
       <span
         key={index}
@@ -121,29 +121,34 @@ const ExerciseCard = ({
 }) => (
   <div
     onClick={() => onSelect(exercise)}
-    className="group bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-xl shadow-2xl hover:shadow-red-500/10 transition-all duration-300 cursor-pointer border border-gray-700 hover:border-red-500/50 hover:scale-105 overflow-hidden"
+    className="group bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-lg sm:rounded-xl shadow-xl sm:shadow-2xl hover:shadow-red-500/10 transition-all duration-300 cursor-pointer border border-gray-700 hover:border-red-500/50 hover:scale-[1.02] sm:hover:scale-105 overflow-hidden"
   >
-    <div className="p-6">
-      <div className="flex items-start justify-between mb-3">
-        <h3 className="text-lg font-semibold text-white line-clamp-2 group-hover:text-red-300 transition-colors duration-200">
+    <div className="p-4 sm:p-6">
+      {/* Header section with title and difficulty */}
+      <div className="flex items-start justify-between mb-2 sm:mb-3">
+        <h3 className="text-base sm:text-lg font-semibold text-white line-clamp-2 group-hover:text-red-300 transition-colors duration-200 flex-1 pr-2">
           {exercise.name}
         </h3>
         <DifficultyIndicator difficulty={exercise.difficulty} />
       </div>
 
-      <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+      {/* Description */}
+      <p className="text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
         {exercise.description}
       </p>
 
-      <div className="flex items-center justify-between mb-4">
+      {/* Category and Duration */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4 space-y-2 sm:space-y-0">
         <CategoryTag category={exercise.category} />
         <DurationInfo duration={exercise.estimatedDuration} />
       </div>
 
+      {/* Muscle Groups */}
       <MuscleGroupTags groups={exercise.muscleGroups} />
 
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-gray-400">
+      {/* Footer with equipment and calories */}
+      <div className="flex items-center justify-between text-xs sm:text-sm">
+        <span className="text-gray-400 truncate flex-1 mr-2">
           {exercise.equipment[0]}
         </span>
         <CaloriesInfo calories={exercise.calories} />
@@ -161,7 +166,7 @@ const ExerciseList = ({ exercises, onExerciseSelect }: ExerciseListProps) => {
     <div>
       <ListHeader exerciseCount={exercises.length} />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {exercises.map((exercise) => (
           <ExerciseCard
             key={exercise.id}

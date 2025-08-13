@@ -12,6 +12,13 @@ import { UpdateDailyRoutineDto } from './dto/update-daily-routine.dto';
 import { CreateRoutineExerciseDto } from './dto/create-routine-exercise.dto';
 import { UpdateRoutineExerciseDto } from './dto/update-routine-exercise.dto';
 
+// Interface para tipar correctamente las relaciones
+interface RoutineExerciseWithExercise {
+  exercise?: {
+    category?: string;
+    muscleGroups?: string[];
+  };
+}
 
 @Injectable()
 export class RoutinesService {
@@ -315,8 +322,8 @@ export class RoutinesService {
     const categories = [
       ...new Set(
         routine.routineExercises
-          .filter((re: any) => re.exercise)
-          .map((re: any) => re.exercise.category)
+          .filter((re: RoutineExerciseWithExercise) => re.exercise)
+          .map((re: RoutineExerciseWithExercise) => re.exercise?.category)
           .filter(Boolean),
       ),
     ];
@@ -332,8 +339,13 @@ export class RoutinesService {
       muscleGroups: [
         ...new Set(
           routine.routineExercises
-            .filter((re: any) => re.exercise && re.exercise.muscleGroups)
-            .flatMap((re: any) => re.exercise.muscleGroups)
+            .filter(
+              (re: RoutineExerciseWithExercise) =>
+                re.exercise && re.exercise.muscleGroups,
+            )
+            .flatMap(
+              (re: RoutineExerciseWithExercise) => re.exercise?.muscleGroups,
+            )
             .filter(Boolean),
         ),
       ],

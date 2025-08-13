@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "package.json",
+      "src": "src/main.ts",
       "use": "@vercel/node",
       "config": {
         "includeFiles": ["dist/**"]
@@ -12,19 +12,13 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "dist/main.js"
+      "dest": "src/main.ts"
     },
     {
       "src": "/(.*)",
-      "dest": "dist/main.js"
+      "dest": "src/main.ts"
     }
   ],
-  "functions": {
-    "dist/main.js": {
-      "includeFiles": "dist/**"
-    }
-  },
   "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "buildCommand": "npm run build"
 }

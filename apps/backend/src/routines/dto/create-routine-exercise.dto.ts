@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsEnum, IsNumber, IsUUID, Min } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { ExerciseType } from '../entities/routine-exercise.entity';
 
 export class CreateRoutineExerciseDto {

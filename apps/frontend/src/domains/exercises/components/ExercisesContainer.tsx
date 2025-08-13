@@ -46,15 +46,19 @@ const ExercisesContainer: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      <div className="lg:col-span-1">
-        <FiltersPanel 
-          filters={filters} 
-          onFiltersChange={updateFilters}
-        />
+    <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-1 xl:grid-cols-4 md:gap-4 lg:gap-6 xl:gap-8">
+      {/* Panel de filtros - En mobile aparece arriba */}
+      <div className="xl:col-span-1 order-1 md:order-1">
+        <div className="md:sticky md:top-4">
+          <FiltersPanel 
+            filters={filters} 
+            onFiltersChange={updateFilters}
+          />
+        </div>
       </div>
       
-      <div className="lg:col-span-3">
+      {/* Lista de ejercicios - En mobile aparece debajo de los filtros */}
+      <div className="xl:col-span-3 order-2 md:order-2">
         <ExerciseList 
           exercises={exercises}
           onExerciseSelect={setSelectedExercise}

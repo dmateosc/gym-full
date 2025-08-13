@@ -1,5 +1,17 @@
-import { IsString, IsOptional, IsEnum, IsNumber, IsArray, IsDateString, Min, Max } from 'class-validator';
-import { RoutineIntensity, RoutineStatus } from '../entities/daily-routine.entity';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsNumber,
+  IsArray,
+  IsDateString,
+  Min,
+  Max,
+} from 'class-validator';
+import {
+  RoutineIntensity,
+  RoutineStatus,
+} from '../entities/daily-routine.entity';
 
 export class CreateDailyRoutineDto {
   @IsString()

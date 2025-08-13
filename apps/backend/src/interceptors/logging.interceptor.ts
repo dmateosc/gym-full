@@ -18,28 +18,34 @@ export class LoggingInterceptor implements NestInterceptor {
     const response = context.switchToHttp().getResponse<Response>();
     const { method, url, ip, headers } = request;
     const userAgent = headers['user-agent'] || '';
-    
+
     const startTime = Date.now();
-    
-    this.logger.log(
-      `📥 ${method} ${url} - ${ip} - ${userAgent}`,
-    );
+
+    this.logger.log(`📥 ${method} ${url} - ${ip} - ${userAgent}`);
 
     return next.handle().pipe(
       tap({
-        next: (data) => {
+        next: () => {
           const duration = Date.now() - startTime;
           const contentLength = response.get('Content-Length') || 0;
-          
+
           this.logger.log(
             `📤 ${method} ${url} - ${response.statusCode} - ${contentLength}bytes - ${duration}ms`,
           );
         },
-        error: (error) => {
+        error: (error: unknown) => {
           const duration = Date.now() - startTime;
-          
+          let status = 500;
+          let message = 'Unknown error';
+
+          if (error && typeof error === 'object') {
+            status = (error as { status?: number }).status || 500;
+            message =
+              (error as { message?: string }).message || 'Unknown error';
+          }
+
           this.logger.error(
-            `❌ ${method} ${url} - ${error.status || 500} - ${error.message} - ${duration}ms`,
+            `❌ ${method} ${url} - ${status} - ${message} - ${duration}ms`,
           );
         },
       }),

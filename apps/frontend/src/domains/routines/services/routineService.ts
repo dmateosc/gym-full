@@ -1,7 +1,8 @@
 import type { DailyRoutine, RoutineStats } from '../types/routine';
+import { APP_CONFIG } from '../../shared/config/app.config';
 
-// Configuración de la API - Fallback para entornos de test
-const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+// 🚨 CRITICAL: Use centralized configuration to avoid hardcoded URLs
+const API_BASE_URL = APP_CONFIG.API.BASE_URL;
 
 /**
  * Servicio para el manejo de rutinas - Conectado con backend NestJS

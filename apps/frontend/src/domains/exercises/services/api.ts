@@ -1,27 +1,10 @@
 import type { Exercise, ExerciseFilters } from '../types/exercise';
+import { APP_CONFIG } from '../../shared/config/app.config';
 
-// Configurar URL base según el entorno de forma dinámica
-function getApiBaseUrl(): string {
-  // Verificar si estamos en un entorno de testing (Jest)
-  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'test') {
-    return 'http://localhost:3001/api';
-  }
+// 🚨 CRITICAL: Use centralized configuration to avoid hardcoded URLs
+const API_BASE_URL = APP_CONFIG.API.BASE_URL;
 
-  // Verificar si window está disponible (entorno del navegador)
-  if (typeof window !== 'undefined') {
-    // En producción, usar el backend de Vercel
-    if (window.location.hostname !== 'localhost') {
-      return 'https://backend-48ihtvc0d-dmateoscanos-projects.vercel.app/api';
-    }
-  }
-
-  // Desarrollo local por defecto
-  return 'http://localhost:3001/api';
-}
-
-const API_BASE_URL = getApiBaseUrl();
-
-console.log('🔗 API Base URL:', API_BASE_URL);
+console.log('🔗 Exercises API Base URL:', API_BASE_URL);
 
 export class ApiService {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T> {

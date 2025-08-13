@@ -1,6 +1,7 @@
 /**
  * Configuration constants for the application
  * Following DDD principles - centralized configuration
+ * 🚨 CRITICAL: Uses environment variables to avoid hardcoded URLs
  */
 
 function getApiBaseUrl(): string {
@@ -9,15 +10,27 @@ function getApiBaseUrl(): string {
     return 'http://localhost:3001/api';
   }
 
-  // Verificar si window está disponible (entorno del navegador)
+  // 🔥 PRIORITY 1: Variable de entorno explícita (VITE_API_BASE_URL)
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  // 🔥 PRIORITY 2: Auto-detection para desarrollo vs producción
   if (typeof window !== 'undefined') {
-    // En producción, usar el backend de Vercel
-    if (window.location.hostname !== 'localhost') {
-      return 'https://backend-48ihtvc0d-dmateoscanos-projects.vercel.app/api';
+    // Detección automática: si NO es localhost, asumir producción
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      // Auto-detectar backend de Vercel basado en el frontend URL
+      const isVercelDomain = window.location.hostname.includes('vercel.app');
+      if (isVercelDomain) {
+        // Construir URL del backend dinámicamente
+        return `https://gym-exercise-backend.vercel.app/api`;
+      }
+      // Fallback para otros dominios de producción
+      return `${window.location.protocol}//${window.location.hostname}/api`;
     }
   }
 
-  // Desarrollo local por defecto
+  // 🔥 PRIORITY 3: Desarrollo local por defecto
   return 'http://localhost:3001/api';
 }
 

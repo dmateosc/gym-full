@@ -1,24 +1,10 @@
 import type { Exercise, ExerciseFilters } from '../types/exercise';
+import { APP_CONFIG } from '../domains/shared/config/app.config';
 
-// Configurar URL base según el entorno de forma dinámica
-function getApiBaseUrl(): string {
-  // En desarrollo local
-  if (import.meta.env.DEV) {
-    return 'http://localhost:3001/api';
-  }
+// 🚨 CRITICAL: Use centralized configuration to avoid hardcoded URLs
+const API_BASE_URL = APP_CONFIG.API.BASE_URL;
 
-  // Variable de entorno específica para el backend (configurada en Vercel)
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
-  }
-
-  // Fallback: usar Vercel backend en producción
-  return 'https://backend-48ihtvc0d-dmateoscanos-projects.vercel.app/api';
-}
-
-const API_BASE_URL = getApiBaseUrl();
-
-console.log('🔗 API Base URL:', API_BASE_URL);
+console.log('🔗 General API Base URL:', API_BASE_URL);
 console.log('🌍 Environment:', import.meta.env.DEV ? 'development' : 'production');
 console.log('📝 VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
 

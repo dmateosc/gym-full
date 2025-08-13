@@ -4,31 +4,48 @@
 - ⚫ **Negro/Gris**: Fondos y contenedores
 - ⚪ **Blanco**: Texto principal
 
-## 🚀 Despliegue
+## 🚀 Despliegue Automático
 
 ### 📱 URLs de Producción
-- **Frontend**: https://gym-full.vercel.app
-- **Backend API**: https://gym-exercise-backend.vercel.app/api
+- **🎨 Frontend**: https://gym-full.vercel.app
+- **🔗 Backend API**: https://gym-exercise-backend.vercel.app/api
 
-### 🔧 Vercel + GitHub Actions
-El proyecto utiliza GitHub Actions para despliegue automático a Vercel:
+### ⚡ CI/CD Pipeline Automático
+El proyecto utiliza **GitHub Actions** para deployment 100% automático:
 
-**Para Preview Deployments:**
-- Cada PR crea un despliegue de preview automáticamente
+**✨ Deployment a Producción:**
+- ✅ Push a `main` → Deployment automático a producción
+- 🧪 Tests automáticos antes del deployment
+- 🚀 Backend + Frontend desplegados secuencialmente
 
-**Para Production:**
-- Push a `main` despliega automáticamente a producción
+**🔍 Preview Deployments:**
+- 📋 Cada PR crea un deployment de preview automático
+- 🔧 Tests rápidos + URLs temporales para testing
 
-**Configuración rápida:**
+### 🛠️ Configuración Inicial (Solo una vez)
+
 ```bash
-# 1. Instalar Vercel CLI
-npm install -g vercel@latest
+# 1. Verificar configuración actual
+npm run check-deployment
 
-# 2. Enlazar proyectos
-npm run vercel:link-frontend
-npm run vercel:link-backend
+# 2. Si necesitas configurar secrets en GitHub:
+# Ve a: Settings → Secrets and Variables → Actions
+# Y añade los valores que te muestra el comando anterior
+```
 
-# 3. Configurar secrets en GitHub:
+**🚫 Ya NO necesitas:**
+- ❌ `npm run deploy:frontend`
+- ❌ `npm run deploy:backend`  
+- ❌ `vercel deploy` manual
+- ❌ Configuración manual de deployment
+
+**✅ Workflow automático:**
+1. 💻 Desarrolla tu feature
+2. 📝 Commit y push: `git push origin main`
+3. ⏰ GitHub Actions se encarga del resto
+4. 🎉 App desplegada automáticamente
+
+> 📚 **Más detalles**: Ver [DEPLOYMENT.md](./DEPLOYMENT.md) para configuración avanzada
 # VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, VERCEL_PROJECT_ID_BACKEND
 ```rcicios con Diseño Netflix
 

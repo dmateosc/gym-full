@@ -21,10 +21,10 @@ const RoutinesContainer: React.FC = () => {
 
   if (displayLoading) {
     return (
-      <div className="flex items-center justify-center min-h-64">
+      <div className="flex items-center justify-center min-h-64 px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-red-600 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-300">Cargando rutina...</p>
+          <div className="animate-spin rounded-full h-8 sm:h-10 lg:h-12 w-8 sm:w-10 lg:w-12 border-4 border-red-600 border-t-transparent mx-auto mb-3 sm:mb-4"></div>
+          <p className="text-gray-300 text-sm sm:text-base">Cargando rutina...</p>
         </div>
       </div>
     );

@@ -21,7 +21,8 @@ export class ExercisesService {
       `🔍 Finding exercises with filters: ${JSON.stringify(filters || {})}`,
     );
 
-    const queryBuilder = this.exercisesRepository.createQueryBuilder('exercise');
+    const queryBuilder =
+      this.exercisesRepository.createQueryBuilder('exercise');
 
     if (filters?.category) {
       queryBuilder.andWhere('exercise.category = :category', {
@@ -106,13 +107,11 @@ export class ExercisesService {
 
     await this.exercisesRepository.update(id, updateExerciseDto);
     const exercise = await this.findOne(id);
-    
+
     const endTime = Date.now();
     const duration = endTime - startTime;
-    
-    this.logger.log(
-      `✅ Updated exercise "${exercise.name}" in ${duration}ms`,
-    );
+
+    this.logger.log(`✅ Updated exercise "${exercise.name}" in ${duration}ms`);
 
     return exercise;
   }
@@ -126,7 +125,9 @@ export class ExercisesService {
     const duration = endTime - startTime;
 
     if (result.affected === 0) {
-      this.logger.warn(`❌ Exercise with ID ${id} not found for deletion (${duration}ms)`);
+      this.logger.warn(
+        `❌ Exercise with ID ${id} not found for deletion (${duration}ms)`,
+      );
       throw new NotFoundException(`Exercise with ID ${id} not found`);
     }
 
@@ -147,7 +148,9 @@ export class ExercisesService {
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    this.logger.log(`✅ Found ${categories.length} categories in ${duration}ms: ${categories.join(', ')}`);
+    this.logger.log(
+      `✅ Found ${categories.length} categories in ${duration}ms: ${categories.join(', ')}`,
+    );
 
     return categories;
   }
@@ -166,7 +169,9 @@ export class ExercisesService {
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    this.logger.log(`✅ Found ${muscleGroups.length} muscle groups in ${duration}ms`);
+    this.logger.log(
+      `✅ Found ${muscleGroups.length} muscle groups in ${duration}ms`,
+    );
 
     return muscleGroups;
   }
@@ -185,7 +190,9 @@ export class ExercisesService {
     const endTime = Date.now();
     const duration = endTime - startTime;
 
-    this.logger.log(`✅ Found ${equipment.length} equipment types in ${duration}ms`);
+    this.logger.log(
+      `✅ Found ${equipment.length} equipment types in ${duration}ms`,
+    );
 
     return equipment;
   }
