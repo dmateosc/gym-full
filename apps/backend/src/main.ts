@@ -19,10 +19,12 @@ function getAllowedOrigins(): (string | RegExp)[] {
     'https://gym-full-aect69c8o-dmateoscanos-projects.vercel.app', // URL anterior
     'https://gym-full-ppedygzaj-dmateoscanos-projects.vercel.app', // URL anterior 2
     'https://frontend-drab-eight-89.vercel.app', // URL de preview deployment
+    'https://frontend-vpw4wj9cw-dmateoscanos-projects.vercel.app', // URL actual del frontend
     /^https:\/\/gym-full-.*\.vercel\.app$/, // Cualquier deployment de gym-full en Vercel
     /^https:\/\/gym-full-.*-dmateoscanos-projects\.vercel\.app$/, // Patrón específico para tu cuenta
     /^https:\/\/.*-dmateoscanos-projects\.vercel\.app$/, // Cualquier proyecto en tu cuenta
     /^https:\/\/frontend-.*\.vercel\.app$/, // Preview deployments del frontend
+    /^https:\/\/frontend-.*-dmateoscanos-projects\.vercel\.app$/, // Frontend deployments específicos
     /^https:\/\/.*\.github\.io$/, // Cualquier subdomain de GitHub Pages
   ];
 

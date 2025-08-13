@@ -7,6 +7,7 @@ import {
   RoutineStatus,
 } from './entities/daily-routine.entity';
 import { RoutineExercise } from './entities/routine-exercise.entity';
+import { CreateDailyRoutineDto } from './dto/create-daily-routine.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('RoutinesService', () => {
@@ -104,7 +105,7 @@ describe('RoutinesService', () => {
       mockDailyRoutineRepository.findOne.mockResolvedValue(mockDailyRoutine);
 
       await expect(
-        service.createDailyRoutine(createDto as any),
+        service.createDailyRoutine(createDto as CreateDailyRoutineDto),
       ).rejects.toThrow(BadRequestException);
     });
   });
