@@ -8,53 +8,56 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
 let app: INestApplication | null = null;
 
 // Test CI/CD integration - Vercel deployment test
-// Función para obtener orígenes CORS permitidos dinámicamente
+// Función inteligente para validar orígenes CORS sin hardcodear URLs
+function isOriginAllowed(origin: string): boolean {
+  // 1. Desarrollo local - siempre permitido
+  if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+    return true;
+  }
+
+  // 2. Todos los deployments de la organización en Vercel
+  if (origin.includes('-dmateoscanos-projects.vercel.app')) {
+    return true;
+  }
+
+  // 3. Dominios principales del proyecto (sin hardcodear URLs específicas)
+  const allowedDomains = [
+    '.vercel.app',
+    'centro-wellness-sierra-de-gata.vercel.app',
+    'centrowellnesssierradegata.vercel.app',
+    'gym-exercise-frontend.vercel.app',
+    'gym-exercise-backend.vercel.app',
+    'gym-full.vercel.app'
+  ];
+  
+  const hostname = origin.replace(/^https?:\/\//, '');
+  
+  // Permitir cualquier subdominio de vercel.app que contenga palabras clave del proyecto
+  if (hostname.endsWith('.vercel.app')) {
+    if (
+      hostname.includes('gym') || 
+      hostname.includes('frontend') || 
+      hostname.includes('exercise') ||
+      hostname.includes('wellness') ||
+      hostname.includes('centro')
+    ) {
+      return true;
+    }
+  }
+
+  return allowedDomains.some(domain => hostname.endsWith(domain));
+}
+
 function getAllowedOrigins(): (string | RegExp)[] {
-  const origins: (string | RegExp)[] = [
-    // Desarrollo local
+  // Solo retornamos patrones básicos, la lógica real está en isOriginAllowed
+  return [
     'http://localhost:5173',
     'http://localhost:3000',
-    
-    // Dominios de producción fijos (recomendado)
-    'https://gym-exercise-frontend.vercel.app',
-    'https://gym-exercise-backend.vercel.app',
-    
-    // Dominios dinámicos de Vercel (para preview deployments)
-    /^https:\/\/gym-exercise-frontend-.*\.vercel\.app$/,
-    /^https:\/\/gym-exercise-backend-.*\.vercel\.app$/,
+    /^http:\/\/localhost:\d+$/,
     /^https:\/\/.*-dmateoscanos-projects\.vercel\.app$/,
-    
-    // Patrones de deployment temporal (hasta configurar dominios fijos)
-    'https://frontend-vpw4wj9cw-dmateoscanos-projects.vercel.app',
-    'https://gym-full.vercel.app',
-    /^https:\/\/gym-full-.*\.vercel\.app$/,
-    /^https:\/\/frontend-.*\.vercel\.app$/,
-    /^https:\/\/backend-.*\.vercel\.app$/,
-    
-    // GitHub Pages y otros
-    /^https:\/\/.*\.github\.io$/,
+    /^https:\/\/gym-.*\.vercel\.app$/,
+    /^https:\/\/frontend-.*\.vercel\.app$/
   ];
-
-  // Agregar FRONTEND_URL si está configurada (para producción)
-  if (process.env.FRONTEND_URL) {
-    origins.push(process.env.FRONTEND_URL);
-  }
-
-  // Agregar dominio específico si está configurado
-  if (process.env.GITHUB_PAGES_URL) {
-    origins.push(process.env.GITHUB_PAGES_URL);
-  }
-
-  // En desarrollo, permitir cualquier localhost
-  if (process.env.NODE_ENV === 'development') {
-    origins.push(/^http:\/\/localhost:\d+$/);
-  }
-
-  console.log(
-    '🔧 CORS Origins configured:',
-    origins.map((o) => o.toString()),
-  );
-  return origins;
 }
 
 async function createNestApp(): Promise<INestApplication> {
@@ -75,15 +78,8 @@ async function createNestApp(): Promise<INestApplication> {
         // Logging para debugging
         console.log(`🔍 CORS request from origin: ${origin}`);
 
-        // Verificar si el origin está permitido
-        const isAllowed = allowedOrigins.some((allowedOrigin) => {
-          if (typeof allowedOrigin === 'string') {
-            return allowedOrigin === origin;
-          } else if (allowedOrigin instanceof RegExp) {
-            return allowedOrigin.test(origin);
-          }
-          return false;
-        });
+        // Verificar si el origin está permitido usando función inteligente
+        const isAllowed = isOriginAllowed(origin);
 
         if (isAllowed) {
           console.log(`✅ CORS: Origin allowed: ${origin}`);

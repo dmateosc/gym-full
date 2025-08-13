@@ -84,7 +84,7 @@ jobs:
       - name: 📢 Backend Deployment Success
         run: |
           echo "🎉 Backend deployed successfully to production!"
-          echo "🌐 Backend API: https://gym-exercise-backend.vercel.app/api"
+          echo "🌐 Backend API: https://centro-wellness-sierra-de-gata-backend.vercel.app/api"
 
   # 🎨 Deploy Frontend to Production
   deploy-frontend:
@@ -116,7 +116,7 @@ jobs:
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/frontend
         env:
-          VITE_API_BASE_URL: https://gym-exercise-backend.vercel.app/api
+          VITE_API_BASE_URL: https://centro-wellness-sierra-de-gata-backend.vercel.app/api
           
       - name: 🚀 Deploy Frontend to Vercel
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
@@ -125,7 +125,7 @@ jobs:
       - name: 📢 Frontend Deployment Success
         run: |
           echo "🎉 Frontend deployed successfully to production!"
-          echo "🌐 Frontend URL: https://gym-full.vercel.app"
+          echo "🌐 Frontend URL: https://centro-wellness-sierra-de-gata.vercel.app"
 
   # 📋 Deployment Summary
   summary:
@@ -143,8 +143,8 @@ jobs:
           echo ""
           if [[ "${{ needs.deploy-backend.result }}" == "success" && "${{ needs.deploy-frontend.result }}" == "success" ]]; then
             echo "✅ Full deployment successful!"
-            echo "🌐 App available at: https://gym-full.vercel.app"
-            echo "🔗 API available at: https://gym-exercise-backend.vercel.app/api"
+            echo "🌐 App available at: https://centro-wellness-sierra-de-gata.vercel.app"
+            echo "🔗 API available at: https://centro-wellness-sierra-de-gata-backend.vercel.app/api"
           else
             echo "❌ Deployment failed. Check the logs above."
             exit 1
