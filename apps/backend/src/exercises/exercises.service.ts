@@ -196,4 +196,99 @@ export class ExercisesService {
 
     return equipment;
   }
+
+  async getStatistics(): Promise<{
+    totalExercises: number;
+    byCategory: Record<string, number>;
+    byDifficulty: Record<string, number>;
+    totalEquipment: number;
+    totalMuscleGroups: number;
+  }> {
+    const startTime = Date.now();
+    this.logger.log('📊 Generating system statistics');
+
+    // Total de ejercicios
+    const totalExercises = await this.exercisesRepository.count();
+
+    // Estadísticas por categoría
+    const categoryStats = await this.exercisesRepository
+      .createQueryBuilder('exercise')
+      .select('exercise.category', 'category')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('exercise.category')
+      .getRawMany<{ category: string; count: string }>();
+
+    const byCategory = categoryStats.reduce((acc, item) => {
+      acc[item.category] = parseInt(item.count);
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Estadísticas por dificultad
+    const difficultyStats = await this.exercisesRepository
+      .createQueryBuilder('exercise')
+      .select('exercise.difficulty', 'difficulty')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('exercise.difficulty')
+      .getRawMany<{ difficulty: string; count: string }>();
+
+    const byDifficulty = difficultyStats.reduce((acc, item) => {
+      acc[item.difficulty] = parseInt(item.count);
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Total de equipamiento único
+    const equipmentResult = await this.exercisesRepository
+      .createQueryBuilder('exercise')
+      .select('UNNEST(exercise.equipment)', 'equipment')
+      .distinct(true)
+      .getRawMany();
+    
+    const totalEquipment = equipmentResult.length;
+
+    // Total de grupos musculares únicos
+    const muscleGroupsResult = await this.exercisesRepository
+      .createQueryBuilder('exercise')
+      .select('UNNEST(exercise.muscle_groups)', 'muscleGroup')
+      .distinct(true)
+      .getRawMany();
+    
+    const totalMuscleGroups = muscleGroupsResult.length;
+
+    const stats = {
+      totalExercises,
+      byCategory,
+      byDifficulty,
+      totalEquipment,
+      totalMuscleGroups,
+    };
+
+    const duration = Date.now() - startTime;
+    this.logger.log(`✅ Statistics generated in ${duration}ms: ${JSON.stringify(stats)}`);
+
+    return stats;
+  }
+
+  async searchExercises(searchTerm: string, category?: string): Promise<Exercise[]> {
+    const startTime = Date.now();
+    this.logger.log(`🔍 Searching exercises for: "${searchTerm}"`);
+
+    const queryBuilder = this.exercisesRepository
+      .createQueryBuilder('exercise')
+      .where(
+        '(LOWER(exercise.name) LIKE LOWER(:searchTerm) OR ' +
+        'LOWER(exercise.description) LIKE LOWER(:searchTerm) OR ' +
+        'array_to_string(exercise.instructions, \' \') ILIKE :searchTerm)',
+        { searchTerm: `%${searchTerm}%` }
+      );
+
+    if (category) {
+      queryBuilder.andWhere('exercise.category = :category', { category });
+    }
+
+    const results = await queryBuilder.getMany();
+    const duration = Date.now() - startTime;
+
+    this.logger.log(`✅ Search completed: ${results.length} results in ${duration}ms`);
+    return results;
+  }
 }

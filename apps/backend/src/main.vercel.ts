@@ -3,9 +3,10 @@ import { ValidationPipe } from '@nestjs/common';
 import type { INestApplication } from '@nestjs/common';
 import { AppModule } from './app.module';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-// Para Vercel serverless
-let appInstance: INestApplication | null = null;
+// Cache de la instancia de la aplicación para Vercel
+let cachedApp: INestApplication;
 
 // Función inteligente para validar orígenes CORS sin hardcodear URLs
 function isOriginAllowed(origin: string): boolean {
@@ -28,152 +29,149 @@ function isOriginAllowed(origin: string): boolean {
     'gym-exercise-backend.vercel.app',
     'gym-full.vercel.app'
   ];
-  
-  const hostname = origin.replace(/^https?:\/\//, '');
-  
-  // Permitir cualquier subdominio de vercel.app que contenga palabras clave del proyecto
-  if (hostname.endsWith('.vercel.app')) {
-    if (
-      hostname.includes('gym') || 
-      hostname.includes('frontend') || 
-      hostname.includes('exercise') ||
-      hostname.includes('wellness') ||
-      hostname.includes('centro')
-    ) {
-      return true;
-    }
+
+  // 4. Palabras clave del proyecto (enfoque inteligente)
+  const projectKeywords = ['centro', 'wellness', 'gym', 'exercise', 'frontend'];
+  if (projectKeywords.some(keyword => origin.includes(keyword))) {
+    return true;
   }
 
-  return allowedDomains.some(domain => hostname.endsWith(domain));
+  // 5. Verificar dominios principales
+  return allowedDomains.some(domain => origin.includes(domain));
 }
 
-// Función para obtener orígenes CORS permitidos dinámicamente
-function getAllowedOrigins(): (string | RegExp)[] {
-  const origins: (string | RegExp)[] = [
-    // Desarrollo local
-    'http://localhost:5173',
-    'http://localhost:3000',
-    /^http:\/\/localhost:\d+$/,
-    
-    // Patrones dinámicos de Vercel
-    /^https:\/\/.*-dmateoscanos-projects\.vercel\.app$/,
-    /^https:\/\/gym-.*\.vercel\.app$/,
-    /^https:\/\/frontend-.*\.vercel\.app$/
-  ];
+/**
+ * 🔧 Configuración de Swagger/OpenAPI
+ * Documenta toda la API REST del Centro Wellness Sierra de Gata
+ */
+function setupSwagger(app: INestApplication): void {
+  const config = new DocumentBuilder()
+    .setTitle('Centro Wellness Sierra de Gata API')
+    .setDescription(`
+🏋️ **API REST completa para la gestión del gimnasio**
 
-  // Agregar FRONTEND_URL si está configurada (para producción)
-  if (process.env.FRONTEND_URL) {
-    origins.push(process.env.FRONTEND_URL);
-  }
+Esta API proporciona endpoints para la gestión de ejercicios, rutinas y datos del Centro Wellness Sierra de Gata.
 
-  // Agregar dominio específico si está configurado
-  if (process.env.GITHUB_PAGES_URL) {
-    origins.push(process.env.GITHUB_PAGES_URL);
-  }
+## 🚀 Características principales:
+- **Gestión de ejercicios**: CRUD completo con filtrado por categorías
+- **Sistema de rutinas**: Creación y gestión de rutinas personalizadas  
+- **Estadísticas**: Métricas y análisis de ejercicios
+- **Búsqueda avanzada**: Filtros por nombre, categoría, dificultad y grupos musculares
+- **Documentación interactiva**: Swagger UI para pruebas en tiempo real
 
-  // En desarrollo, permitir cualquier localhost
-  if (process.env.NODE_ENV === 'development') {
-    origins.push(/^http:\/\/localhost:\d+$/);
-  }
+## 📚 Tecnologías:
+- **Backend**: NestJS + TypeScript
+- **Base de datos**: PostgreSQL con TypeORM
+- **Deployment**: Vercel Serverless
+- **Documentación**: OpenAPI 3.0
 
-  console.log(
-    '🔧 CORS Origins configured (Vercel):',
-    origins.map((o) => o.toString()),
-  );
-  return origins;
+## 🔗 Enlaces:
+- **Frontend**: Centro Wellness Sierra de Gata App
+- **Repositorio**: GitHub - Gym Full Stack
+    `)
+    .setVersion('1.0')
+    .addTag('exercises', 'Gestión de ejercicios y categorías')
+    .addTag('routines', 'Sistema de rutinas y entrenamientos')
+    .addTag('health', 'Estado de la API y verificaciones')
+    .setContact(
+      'Centro Wellness Sierra de Gata',
+      'https://centro-wellness-sierra-de-gata.vercel.app',
+      'info@centrowellness.com'
+    )
+    .setLicense('MIT', 'https://opensource.org/licenses/MIT')
+    .addServer('https://centro-wellness-sierra-de-gata-backend.vercel.app', 'Producción')
+    .addServer('http://localhost:3001', 'Desarrollo local')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config, {
+    operationIdFactory: (controllerKey: string, methodKey: string) => methodKey,
+  });
+
+  SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: 'Centro Wellness Sierra de Gata API',
+    customfavIcon: '🏋️',
+    customCss: `
+      .swagger-ui .topbar { background-color: #1f2937; }
+      .swagger-ui .topbar-wrapper img { display: none; }
+      .swagger-ui .topbar-wrapper .link:after { content: '🏋️ Centro Wellness API'; color: white; font-weight: bold; }
+    `,
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+      showExtensions: true,
+      showCommonExtensions: true,
+    }
+  });
+
+  console.log('📚 Swagger documentation available at /api/docs');
 }
 
 async function createApp(): Promise<INestApplication> {
-  if (!appInstance) {
-    appInstance = await NestFactory.create(AppModule);
-
-    // Habilitar CORS para el frontend (local y producción)
-    appInstance.enableCors({
-      origin: (
-        origin: string | undefined,
-        callback: (err: Error | null, allow?: boolean) => void,
-      ) => {
-        // Permitir requests sin origin (como Postman, curl, etc.)
-        if (!origin) return callback(null, true);
-
-        // Logging para debugging
-        console.log(`🔍 CORS request from origin: ${origin}`);
-
-        // Verificar si el origin está permitido usando función inteligente
-        const isAllowed = isOriginAllowed(origin);
-
-        if (isAllowed) {
-          console.log(`✅ CORS: Origin allowed: ${origin}`);
-          callback(null, true);
-        } else {
-          console.warn(`❌ CORS: Origin not allowed: ${origin}`);
-          console.log(
-            '✅ Allowed origins:',
-            getAllowedOrigins().map((o) => o.toString()),
-          );
-          callback(new Error('Not allowed by CORS'), false);
-        }
-      },
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      credentials: true,
-      allowedHeaders: [
-        'Content-Type',
-        'Authorization',
-        'Accept',
-        'Origin',
-        'X-Requested-With',
-      ],
-    });
-
-    // Habilitar validación global
-    appInstance.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
-
-    // Configurar prefijo global para la API
-    appInstance.setGlobalPrefix('api');
-
-    await appInstance.init();
+  if (cachedApp) {
+    return cachedApp;
   }
-  return appInstance;
-}
 
-// Función para desarrollo local
-async function bootstrap(): Promise<void> {
-  const app = await createApp();
+  const app = await NestFactory.create(AppModule);
 
-  // Usar el puerto de Vercel, Heroku o el por defecto
-  const port = process.env.PORT || 3001;
-  await app.listen(port);
+  // 🔐 Configuración CORS inteligente para Centro Wellness
+  app.enableCors({
+    origin: (origin, callback) => {
+      console.log(`🌐 CORS request from origin: ${origin || 'unknown'}`);
+      
+      // Permitir requests sin origin (mobile apps, Postman, etc.)
+      if (!origin) {
+        console.log('✅ CORS: Request without origin allowed');
+        return callback(null, true);
+      }
 
-  console.log(`🚀 Backend running on port ${port}`);
-  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(
-    `🔗 Database connected: ${process.env.DATABASE_HOST || 'localhost'}`,
+      if (isOriginAllowed(origin)) {
+        console.log(`✅ CORS: Origin ${origin} allowed`);
+        callback(null, true);
+      } else {
+        console.log(`❌ CORS: Origin ${origin} blocked`);
+        callback(new Error('Not allowed by CORS'), false);
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true,
+  });
+
+  // 🔍 Configurar validación global
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
   );
+
+  // 📚 Configurar Swagger en producción y desarrollo
+  setupSwagger(app);
+
+  // Configurar prefijo global
+  app.setGlobalPrefix('api');
+
+  await app.init();
+  cachedApp = app;
+  
+  console.log('🚀 Centro Wellness Sierra de Gata API initialized for Vercel');
+  
+  return app;
 }
 
-// Exportar para Vercel
-export default async function handler(
-  req: VercelRequest,
-  res: VercelResponse,
-): Promise<void> {
-  const app = await createApp();
-  const expressApp = app.getHttpAdapter().getInstance() as (
-    req: any,
-    res: any,
-  ) => void;
-  expressApp(req, res);
-}
-
-// También exportar como named export para compatibilidad
-export { handler };
-
-// Solo ejecutar bootstrap en desarrollo local
-if (require.main === module) {
-  void bootstrap();
+// Handler principal para Vercel
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
+    const app = await createApp();
+    const expressApp = app.getHttpAdapter().getInstance();
+    return expressApp(req, res);
+  } catch (error) {
+    console.error('❌ Vercel handler error:', error);
+    res.status(500).json({ 
+      error: 'Internal Server Error',
+      message: 'Failed to initialize application'
+    });
+  }
 }

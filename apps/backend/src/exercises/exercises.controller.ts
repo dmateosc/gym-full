@@ -119,8 +119,90 @@ export class ExercisesController {
   }
 
   @Get('equipment')
+  @ApiOperation({ 
+    summary: 'Obtener equipamiento disponible',
+    description: 'Obtiene lista de todo el equipamiento disponible'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Lista de equipamiento obtenida exitosamente'
+  })
   async getEquipment() {
     return this.exercisesService.getEquipment();
+  }
+
+  @Get('statistics')
+  @ApiOperation({ 
+    summary: 'Obtener estadísticas del sistema',
+    description: 'Obtiene estadísticas completas de ejercicios, categorías y uso del sistema'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Estadísticas obtenidas exitosamente',
+    schema: {
+      type: 'object',
+      properties: {
+        totalExercises: { type: 'number', example: 54 },
+        byCategory: { 
+          type: 'object',
+          example: { 'strength': 25, 'cardio': 15, 'flexibility': 14 }
+        },
+        byDifficulty: { 
+          type: 'object',
+          example: { 'beginner': 18, 'intermediate': 24, 'advanced': 12 }
+        },
+        totalEquipment: { type: 'number', example: 8 },
+        totalMuscleGroups: { type: 'number', example: 12 }
+      }
+    }
+  })
+  async getStatistics() {
+    const startTime = Date.now();
+    this.logger.log('📊 GET /exercises/statistics - Generating statistics');
+    
+    const stats = await this.exercisesService.getStatistics();
+    const duration = Date.now() - startTime;
+    
+    this.logger.log(`✅ GET /exercises/statistics - Generated in ${duration}ms`);
+    return stats;
+  }
+
+  @Get('search')
+  @ApiOperation({ 
+    summary: 'Búsqueda avanzada de ejercicios',
+    description: 'Busca ejercicios por nombre, descripción o instrucciones usando texto libre'
+  })
+  @ApiQuery({ 
+    name: 'q', 
+    required: true, 
+    description: 'Término de búsqueda (nombre, descripción, instrucciones)',
+    example: 'flexiones'
+  })
+  @ApiQuery({ 
+    name: 'category', 
+    required: false, 
+    description: 'Filtrar por categoría adicional'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Resultados de búsqueda obtenidos exitosamente'
+  })
+  async searchExercises(
+    @Query('q') searchTerm: string,
+    @Query('category') category?: string,
+  ) {
+    const startTime = Date.now();
+    this.logger.log(`🔍 GET /exercises/search - Searching for: "${searchTerm}"`);
+    
+    if (!searchTerm || searchTerm.trim().length < 2) {
+      return [];
+    }
+
+    const results = await this.exercisesService.searchExercises(searchTerm, category);
+    const duration = Date.now() - startTime;
+    
+    this.logger.log(`✅ GET /exercises/search - Found ${results.length} results in ${duration}ms`);
+    return results;
   }
 
   @Get(':id')
