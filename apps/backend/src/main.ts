@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import type { INestApplication } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 
@@ -60,6 +61,61 @@ function getAllowedOrigins(): (string | RegExp)[] {
   ];
 }
 
+/**
+ * 📖 Configuración de Swagger API Documentation
+ * Genera documentación automática para Centro Wellness Sierra de Gata
+ */
+function setupSwagger(app: INestApplication): void {
+  const config = new DocumentBuilder()
+    .setTitle('Centro Wellness Sierra de Gata API')
+    .setDescription(`
+      🏋️ API REST completa para la gestión del Centro Wellness Sierra de Gata
+      
+      ## Características:
+      - 💪 Gestión de ejercicios por categorías (fuerza, cardio, flexibilidad)
+      - 📅 Sistema de rutinas personalizadas
+      - 🎯 Filtros avanzados por dificultad y grupo muscular
+      - 📊 Seguimiento de progreso
+      
+      ## Tecnologías:
+      - **Framework**: NestJS + TypeScript
+      - **Base de datos**: PostgreSQL (Supabase)
+      - **Deployment**: Vercel Serverless
+      - **Autenticación**: JWT (próximamente)
+      
+      ## URLs:
+      - **Producción**: https://centro-wellness-sierra-de-gata-backend.vercel.app
+      - **Frontend**: https://centro-wellness-sierra-de-gata.vercel.app
+    `)
+    .setVersion('1.0')
+    .addTag('exercises', 'Gestión de ejercicios y categorías')
+    .addTag('routines', 'Rutinas de entrenamiento')
+    .addTag('health', 'Endpoints de salud y monitoreo')
+    .addServer('https://centro-wellness-sierra-de-gata-backend.vercel.app', 'Producción')
+    .addServer('http://localhost:3001', 'Desarrollo local')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  
+  // Configurar Swagger UI en /api/docs
+  SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: 'Centro Wellness Sierra de Gata - API Docs',
+    customfavIcon: '/favicon.ico',
+    customCss: `
+      .topbar-wrapper img { content: url('/logo.png'); height: 40px; }
+      .swagger-ui .topbar { background-color: #dc2626; }
+    `,
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+      showRequestHeaders: true,
+    },
+  });
+
+  console.log('📖 Swagger documentation available at: /api/docs');
+}
+
 async function createNestApp(): Promise<INestApplication> {
   if (!app) {
     app = await NestFactory.create(AppModule);
@@ -102,6 +158,9 @@ async function createNestApp(): Promise<INestApplication> {
 
     // Habilitar interceptor global de logging
     app.useGlobalInterceptors(new LoggingInterceptor());
+
+    // 📖 Configurar Swagger API Documentation
+    setupSwagger(app);
 
     // Habilitar validación global
     app.useGlobalPipes(

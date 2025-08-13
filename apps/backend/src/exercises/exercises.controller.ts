@@ -10,12 +10,21 @@ import {
   ValidationPipe,
   Logger,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { Request } from 'express';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { ExerciseFiltersDto } from './dto/exercise-filters.dto';
 
+@ApiTags('exercises')
 @Controller('exercises')
 export class ExercisesController {
   private readonly logger = new Logger(ExercisesController.name);
@@ -23,6 +32,22 @@ export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
 
   @Post()
+  @ApiOperation({ 
+    summary: 'Crear nuevo ejercicio',
+    description: 'Crea un nuevo ejercicio en el sistema con toda la información necesaria'
+  })
+  @ApiBody({ 
+    type: CreateExerciseDto,
+    description: 'Datos del ejercicio a crear'
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Ejercicio creado exitosamente'
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Datos inválidos'
+  })
   async create(@Body(ValidationPipe) createExerciseDto: CreateExerciseDto) {
     const startTime = Date.now();
     this.logger.log(
@@ -37,6 +62,29 @@ export class ExercisesController {
   }
 
   @Get()
+  @ApiOperation({ 
+    summary: 'Obtener todos los ejercicios',
+    description: 'Obtiene la lista de ejercicios con filtros opcionales por categoría, dificultad, grupo muscular, etc.'
+  })
+  @ApiQuery({ 
+    name: 'category', 
+    required: false, 
+    description: 'Filtrar por categoría (fuerza, cardio, flexibilidad)' 
+  })
+  @ApiQuery({ 
+    name: 'difficulty', 
+    required: false, 
+    description: 'Filtrar por dificultad (principiante, intermedio, avanzado)' 
+  })
+  @ApiQuery({ 
+    name: 'muscleGroup', 
+    required: false, 
+    description: 'Filtrar por grupo muscular' 
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Lista de ejercicios obtenida exitosamente'
+  })
   async findAll(@Query(ValidationPipe) filters: ExerciseFiltersDto) {
     this.logger.log(`📄 GET /exercises - Filters: ${JSON.stringify(filters)}`);
     const result = await this.exercisesService.findAll(filters);
@@ -45,11 +93,27 @@ export class ExercisesController {
   }
 
   @Get('categories')
+  @ApiOperation({ 
+    summary: 'Obtener categorías de ejercicios',
+    description: 'Obtiene todas las categorías disponibles (fuerza, cardio, flexibilidad, etc.)'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Lista de categorías obtenida exitosamente'
+  })
   async getCategories() {
     return this.exercisesService.getCategories();
   }
 
   @Get('muscle-groups')
+  @ApiOperation({ 
+    summary: 'Obtener grupos musculares',
+    description: 'Obtiene todos los grupos musculares disponibles'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Lista de grupos musculares obtenida exitosamente'
+  })
   async getMuscleGroups() {
     return this.exercisesService.getMuscleGroups();
   }

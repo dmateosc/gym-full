@@ -10,18 +10,39 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { RoutinesService } from './routines.service';
 import { CreateDailyRoutineDto } from './dto/create-daily-routine.dto';
 import { UpdateDailyRoutineDto } from './dto/update-daily-routine.dto';
 import { CreateRoutineExerciseDto } from './dto/create-routine-exercise.dto';
 import { UpdateRoutineExerciseDto } from './dto/update-routine-exercise.dto';
 
+@ApiTags('routines')
 @Controller('routines')
 export class RoutinesController {
   constructor(private readonly routinesService: RoutinesService) {}
 
   // Endpoints para DailyRoutine
   @Post('daily')
+  @ApiOperation({ 
+    summary: 'Crear rutina diaria',
+    description: 'Crea una nueva rutina de ejercicios para un día específico'
+  })
+  @ApiBody({ 
+    type: CreateDailyRoutineDto,
+    description: 'Datos de la rutina diaria'
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Rutina diaria creada exitosamente'
+  })
   createDailyRoutine(@Body() createDto: CreateDailyRoutineDto) {
     return this.routinesService.createDailyRoutine(createDto);
   }
