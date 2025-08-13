@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/main.ts",
+      "src": "src/main.vercel.ts",
       "use": "@vercel/node",
       "config": {
         "includeFiles": ["dist/**"]
@@ -12,13 +12,18 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "src/main.ts"
+      "dest": "src/main.vercel.ts"
     },
     {
       "src": "/(.*)",
-      "dest": "src/main.ts"
+      "dest": "src/main.vercel.ts"
     }
   ],
   "installCommand": "npm install",
-  "buildCommand": "npm run build"
+  "buildCommand": "npm run build",
+  "functions": {
+    "src/main.vercel.ts": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
