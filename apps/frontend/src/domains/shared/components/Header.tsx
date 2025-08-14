@@ -1,7 +1,6 @@
 import { APP_CONFIG } from '../config/app.config';
 
 const GRADIENT_STYLE = APP_CONFIG.THEME.GRADIENT_STYLE;
-const GOLD_GRADIENT_STYLE = APP_CONFIG.THEME.GOLD_GRADIENT_STYLE;
 
 const CentroWellnessLogo = () => (
   <div className="flex items-center justify-center bg-white p-2 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 border-2 border-wellness-gold-500">
