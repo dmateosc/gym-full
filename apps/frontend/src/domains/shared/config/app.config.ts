@@ -49,8 +49,11 @@ export const APP_CONFIG = {
     ROUTINES: 'routines',
   },
   THEME: {
-    GRADIENT_STYLE: 'linear-gradient(to right, #dc2626, #b91c1c, #991b1b)',
-    BACKGROUND_STYLE: 'linear-gradient(to bottom right, #000000, #111827, #000000)',
+    // Gradientes basados en los colores del logo Centro Wellness Sierra de Gata
+    GRADIENT_STYLE: 'linear-gradient(135deg, #0f172a 0%, #0a1015 50%, #050a0c 100%)', // Verde mucho más oscuro
+    GOLD_GRADIENT_STYLE: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)', // Dorado del escudo
+    BACKGROUND_STYLE: 'linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a)', // Fondo oscuro elegante
+    SECONDARY_GRADIENT: 'linear-gradient(135deg, #050a0c 0%, #0f172a 50%, #0a1015 100%)', // Verde secundario más oscuro
   },
 } as const;
 

@@ -98,8 +98,10 @@ export class RoutineService {
     // Extraer grupos musculares únicos
     const muscleGroups = new Set<string>();
     exercises.forEach(exercise => {
-      exercise.exercise.primaryMuscleGroups?.forEach(group => muscleGroups.add(group));
-      exercise.exercise.secondaryMuscleGroups?.forEach(group => muscleGroups.add(group));
+      // Usar muscleGroups que es la estructura real del backend
+      if (exercise.exercise.muscleGroups && Array.isArray(exercise.exercise.muscleGroups)) {
+        exercise.exercise.muscleGroups.forEach((group: string) => muscleGroups.add(group));
+      }
     });
 
     return {
@@ -158,6 +160,7 @@ export class RoutineService {
     } else if (dateOnly.getTime() === tomorrowOnly.getTime()) {
       return 'Mañana';
     } else {
+      // Usar barras en lugar de puntos para las fechas
       return `${this.getDayName(date)} ${date.getDate()}/${date.getMonth() + 1}`;
     }
   }

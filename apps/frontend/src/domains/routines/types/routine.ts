@@ -28,8 +28,7 @@ export interface RoutineExerciseInfo {
   name: string;
   description?: string;
   category: string;
-  primaryMuscleGroups: string[];
-  secondaryMuscleGroups?: string[];
+  muscleGroups: string[]; // Cambiado para coincidir con el backend
   equipment?: string[];
   instructions?: string[];
   difficulty: string;

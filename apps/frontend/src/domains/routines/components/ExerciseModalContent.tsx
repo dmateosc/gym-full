@@ -10,33 +10,33 @@ import {
 } from '../../../assets/icons/index.tsx';
 
 const CATEGORY_COLORS = {
-  strength: 'bg-gradient-to-r from-red-600 to-red-800 text-white border-red-500',
-  cardio: 'bg-gradient-to-r from-orange-600 to-orange-800 text-white border-orange-500',
-  flexibility: 'bg-gradient-to-r from-green-600 to-green-800 text-white border-green-500',
-  endurance: 'bg-gradient-to-r from-blue-600 to-blue-800 text-white border-blue-500',
-  balance: 'bg-gradient-to-r from-purple-600 to-purple-800 text-white border-purple-500',
-  functional: 'bg-gradient-to-r from-yellow-600 to-yellow-800 text-white border-yellow-500'
+  strength: 'bg-wellness-green-gradient text-white border-wellness-green-500',
+  cardio: 'bg-wellness-gold-gradient text-white border-wellness-gold-500',
+  flexibility: 'bg-gradient-to-r from-wellness-green-600 to-wellness-green-800 text-white border-wellness-green-500',
+  endurance: 'bg-gradient-to-r from-wellness-gold-600 to-wellness-gold-800 text-white border-wellness-gold-500',
+  balance: 'bg-gradient-to-r from-wellness-green-500 to-wellness-gold-500 text-white border-wellness-green-500',
+  functional: 'bg-gradient-to-r from-wellness-gold-600 to-wellness-green-600 text-white border-wellness-gold-500'
 };
 
 const DIFFICULTY_CONFIGURATIONS = {
   beginner: { 
-    bg: 'bg-gradient-to-r from-green-600 to-green-800', 
+    bg: 'bg-wellness-green-gradient', 
     text: 'text-white', 
-    border: 'border-green-500' 
+    border: 'border-wellness-green-500' 
   },
   intermediate: { 
-    bg: 'bg-gradient-to-r from-yellow-600 to-yellow-800', 
+    bg: 'bg-wellness-gold-gradient', 
     text: 'text-white', 
-    border: 'border-yellow-500' 
+    border: 'border-wellness-gold-500' 
   },
   advanced: { 
-    bg: 'bg-gradient-to-r from-red-600 to-red-800', 
+    bg: 'bg-gradient-to-r from-wellness-gold-600 to-wellness-green-600', 
     text: 'text-white', 
-    border: 'border-red-500' 
+    border: 'border-wellness-gold-500' 
   }
 };
 
-const DEFAULT_CATEGORY_COLOR = 'bg-gradient-to-r from-gray-600 to-gray-800 text-white border-gray-500';
+const DEFAULT_CATEGORY_COLOR = 'bg-wellness-dark-gradient text-white border-wellness-dark-500';
 
 interface ExerciseModalContentProps {
   exercise: Exercise;
@@ -59,7 +59,7 @@ const capitalize = (text: string): string => {
 const CloseButton = ({ onClose }: { onClose: () => void }) => (
   <button
     onClick={onClose}
-    className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 text-white hover:text-red-300 transition-colors duration-200 p-2"
+    className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 text-white hover:text-wellness-gold-300 transition-colors duration-200 p-2"
     aria-label="Cerrar modal"
   >
     <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,11 +72,11 @@ const ExerciseHeader = ({ exercise }: { exercise: Exercise }) => {
   const difficultyConfig = getDifficultyConfiguration(exercise.difficulty);
   
   return (
-    <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white p-4 sm:p-6">
+    <div className="bg-wellness-gradient text-white p-4 sm:p-6 border-b border-wellness-gold-400">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="mb-4 md:mb-0 pr-8">
           <h2 className="text-xl sm:text-2xl font-bold mb-2">{exercise.name}</h2>
-          <p className="text-red-100 text-sm sm:text-base">{exercise.description}</p>
+          <p className="text-wellness-green-100 text-sm sm:text-base">{exercise.description}</p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-2">
@@ -113,13 +113,13 @@ const QuickStat = ({
 );
 
 const StatsPanel = ({ exercise }: { exercise: Exercise }) => (
-  <div className="grid grid-cols-3 gap-4 p-4 sm:p-6 bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700">
+  <div className="grid grid-cols-3 gap-4 p-4 sm:p-6 bg-wellness-dark-gradient border-b border-wellness-green-700">
     {exercise.estimatedDuration && (
       <QuickStat
         icon={<TimeIcon />}
         label="Duración"
         value={`${exercise.estimatedDuration} min`}
-        backgroundColor="bg-gradient-to-br from-blue-600 to-blue-800"
+        backgroundColor="bg-wellness-green-gradient"
       />
     )}
     
@@ -128,7 +128,7 @@ const StatsPanel = ({ exercise }: { exercise: Exercise }) => (
         icon={<CaloriesIcon />}
         label="Calorías"
         value={`${exercise.calories} cal`}
-        backgroundColor="bg-gradient-to-br from-orange-600 to-orange-800"
+        backgroundColor="bg-wellness-gold-gradient"
       />
     )}
     
@@ -136,7 +136,7 @@ const StatsPanel = ({ exercise }: { exercise: Exercise }) => (
       icon={<EquipmentIcon />}
       label="Equipamiento"
       value={exercise.equipment[0] || 'N/A'}
-      backgroundColor="bg-gradient-to-br from-green-600 to-green-800"
+      backgroundColor="bg-gradient-to-br from-wellness-green-600 to-wellness-gold-600"
     />
   </div>
 );

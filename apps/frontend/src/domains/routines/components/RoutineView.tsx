@@ -40,29 +40,29 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
   return (
     <div className="max-w-6xl mx-auto p-3 sm:p-4 lg:p-6">
       {/* Header de la rutina */}
-      <div className="bg-gradient-to-r from-red-600 to-red-800 rounded-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 text-white">
+      <div className="bg-wellness-gradient rounded-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 text-white shadow-xl border border-wellness-green-400">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="mb-4 md:mb-0">
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2">
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">{routine.name}</h1>
-              <span className="text-red-200 text-sm sm:text-base lg:text-lg">• {formattedDate}</span>
+              <span className="text-wellness-green-200 text-sm sm:text-base lg:text-lg">• {formattedDate}</span>
             </div>
             
             {routine.description && (
-              <p className="text-red-100 text-sm sm:text-base lg:text-lg mb-3 sm:mb-4">{routine.description}</p>
+              <p className="text-wellness-green-100 text-sm sm:text-base lg:text-lg mb-3 sm:mb-4">{routine.description}</p>
             )}
             
             <div className="flex flex-wrap gap-2 sm:gap-3">
-              <span className={`${RoutineService.getIntensityColor(routine.intensity)} bg-white bg-opacity-20 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold`}>
+              <span className={`${RoutineService.getIntensityColor(routine.intensity)} bg-wellness-gold-500 bg-opacity-20 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold border border-wellness-gold-400`}>
                 Intensidad: {RoutineService.translateIntensity(routine.intensity)}
               </span>
               
-              <span className={`${RoutineService.getStatusColor(routine.status)} bg-white bg-opacity-20 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold`}>
+              <span className={`${RoutineService.getStatusColor(routine.status)} bg-white bg-opacity-20 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold border border-white`}>
                 {RoutineService.translateStatus(routine.status)}
               </span>
               
               {routine.estimatedDurationMinutes && (
-                <span className="bg-white bg-opacity-20 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold">
+                <span className="bg-wellness-green-500 bg-opacity-20 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold border border-wellness-green-400">
                   {RoutineService.formatDuration(routine.estimatedDurationMinutes)}
                 </span>
               )}
@@ -78,25 +78,25 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
 
       {/* Estadísticas rápidas */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
-        <div className="bg-gray-800 rounded-lg p-3 sm:p-4 lg:p-6 text-center">
-          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-400 mb-1 sm:mb-2">
+        <div className="bg-wellness-dark-800 rounded-lg p-3 sm:p-4 lg:p-6 text-center border border-wellness-green-500">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-wellness-green-400 mb-1 sm:mb-2">
             {stats.totalExercises}
           </div>
-          <div className="text-gray-400 text-xs sm:text-sm">Ejercicios</div>
+          <div className="text-wellness-dark-400 text-xs sm:text-sm">Ejercicios</div>
         </div>
         
-        <div className="bg-gray-800 rounded-lg p-3 sm:p-4 lg:p-6 text-center">
-          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-400 mb-1 sm:mb-2">
+        <div className="bg-wellness-dark-800 rounded-lg p-3 sm:p-4 lg:p-6 text-center border border-wellness-gold-500">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-wellness-gold-400 mb-1 sm:mb-2">
             {stats.estimatedDuration}
           </div>
-          <div className="text-gray-400 text-xs sm:text-sm">Minutos</div>
+          <div className="text-wellness-dark-400 text-xs sm:text-sm">Minutos</div>
         </div>
         
-        <div className="bg-gray-800 rounded-lg p-3 sm:p-4 lg:p-6 text-center">
-          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-purple-400 mb-1 sm:mb-2">
+        <div className="bg-wellness-dark-800 rounded-lg p-3 sm:p-4 lg:p-6 text-center border border-wellness-green-400">
+          <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-wellness-green-500 mb-1 sm:mb-2">
             {stats.estimatedCalories}
           </div>
-          <div className="text-gray-400 text-xs sm:text-sm">Calorías</div>
+          <div className="text-wellness-dark-400 text-xs sm:text-sm">Calorías</div>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-3 sm:p-4 lg:p-6 text-center">
@@ -109,13 +109,13 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
 
       {/* Grupos musculares trabajados */}
       {stats.muscleGroups.length > 0 && (
-        <div className="bg-gray-800 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
+        <div className="bg-wellness-dark-800 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 border border-wellness-green-600">
           <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Grupos musculares trabajados</h3>
           <div className="flex flex-wrap gap-2">
             {stats.muscleGroups.map((muscle, index) => (
               <span 
                 key={index}
-                className="bg-red-600 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium"
+                className="bg-wellness-green-gradient text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border border-wellness-green-400 shadow-sm"
               >
                 {muscle}
               </span>
@@ -133,11 +133,11 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
             {routine.routineExercises
               .sort((a, b) => a.orderInRoutine - b.orderInRoutine)
               .map((routineExercise) => (
-                <div key={routineExercise.id} className="bg-gray-700 rounded-lg p-3 sm:p-4">
+                <div key={routineExercise.id} className="bg-wellness-dark-700 rounded-lg p-3 sm:p-4 border border-wellness-green-600 hover:border-wellness-gold-500 transition-colors duration-200">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                        <span className="bg-red-600 text-white text-xs sm:text-sm font-bold px-2 py-1 rounded">
+                        <span className="bg-wellness-gold-gradient text-white text-xs sm:text-sm font-bold px-2 py-1 rounded border border-wellness-gold-400">
                           {routineExercise.orderInRoutine}
                         </span>
                         <button
@@ -145,10 +145,10 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
                           disabled={isLoadingExercise}
                           className="text-left flex-1 group"
                         >
-                          <h4 className="text-base sm:text-lg font-semibold text-white line-clamp-2 group-hover:text-red-400 transition-colors duration-200 cursor-pointer">
+                          <h4 className="text-base sm:text-lg font-semibold text-white line-clamp-2 group-hover:text-wellness-green-400 transition-colors duration-200 cursor-pointer">
                             {routineExercise.exercise.name}
                             {isLoadingExercise ? (
-                              <span className="ml-2 text-xs text-gray-400">Cargando...</span>
+                              <span className="ml-2 text-xs text-wellness-dark-400">Cargando...</span>
                             ) : (
                               <span className="ml-2 text-xs text-gray-400 group-hover:text-red-300">👁️ Ver detalles</span>
                             )}
@@ -163,10 +163,10 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
                       )}
                       
                       <div className="flex flex-wrap gap-1 sm:gap-2 mb-2">
-                        <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                        <span className="bg-wellness-green-600 text-white px-2 py-1 rounded text-xs border border-wellness-green-500">
                           {routineExercise.exercise.category}
                         </span>
-                        <span className="bg-purple-600 text-white px-2 py-1 rounded text-xs">
+                        <span className="bg-wellness-gold-600 text-white px-2 py-1 rounded text-xs border border-wellness-gold-500">
                           {routineExercise.exercise.difficulty}
                         </span>
                       </div>
@@ -253,7 +253,10 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
           </p>
           {routine.createdAt && (
             <p className="text-xs text-gray-500 mt-3">
-              Rutina generada el {new Date(routine.createdAt).toLocaleDateString('es-ES')}
+              Rutina generada el {(() => {
+                const date = new Date(routine.createdAt);
+                return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+              })()}
             </p>
           )}
         </div>
