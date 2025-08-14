@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { DailyRoutine } from '../types/routine';
+import type { Exercise } from '../../exercises/types/exercise';
 import { RoutineService } from '../services/routineService';
+import { ApiService } from '../../exercises/services/api';
+import Modal from '../../shared/components/Modal';
+import ExerciseModalContent from './ExerciseModalContent';
 
 interface RoutineViewProps {
   routine: DailyRoutine;
 }
 
 const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoadingExercise, setIsLoadingExercise] = useState(false);
+  
   const stats = RoutineService.calculateRoutineStats(routine);
   const formattedDate = RoutineService.formatDate(routine.routineDate);
+
+  const handleExerciseClick = async (exerciseId: string) => {
+    setIsLoadingExercise(true);
+    try {
+      const exercise = await ApiService.getExercise(exerciseId);
+      setSelectedExercise(exercise);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error('Error loading exercise details:', error);
+      // Aquí podrías mostrar una notificación de error
+    } finally {
+      setIsLoadingExercise(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedExercise(null);
+  };
   
   return (
     <div className="max-w-6xl mx-auto p-3 sm:p-4 lg:p-6">
@@ -113,9 +140,20 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
                         <span className="bg-red-600 text-white text-xs sm:text-sm font-bold px-2 py-1 rounded">
                           {routineExercise.orderInRoutine}
                         </span>
-                        <h4 className="text-base sm:text-lg font-semibold text-white line-clamp-2">
-                          {routineExercise.exercise.name}
-                        </h4>
+                        <button
+                          onClick={() => handleExerciseClick(routineExercise.exercise.id)}
+                          disabled={isLoadingExercise}
+                          className="text-left flex-1 group"
+                        >
+                          <h4 className="text-base sm:text-lg font-semibold text-white line-clamp-2 group-hover:text-red-400 transition-colors duration-200 cursor-pointer">
+                            {routineExercise.exercise.name}
+                            {isLoadingExercise ? (
+                              <span className="ml-2 text-xs text-gray-400">Cargando...</span>
+                            ) : (
+                              <span className="ml-2 text-xs text-gray-400 group-hover:text-red-300">👁️ Ver detalles</span>
+                            )}
+                          </h4>
+                        </button>
                       </div>
                       
                       {routineExercise.exercise.description && (
@@ -148,13 +186,6 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
                       <div className="text-center">
                         <div className="text-sm sm:text-lg font-bold text-blue-400">{routineExercise.reps}</div>
                         <div className="text-xs text-gray-300">Repeticiones</div>
-                      </div>
-                    )}
-                    
-                    {routineExercise.weight && (
-                      <div className="text-center">
-                        <div className="text-sm sm:text-lg font-bold text-yellow-400">{routineExercise.weight}kg</div>
-                        <div className="text-xs text-gray-300">Peso</div>
                       </div>
                     )}
                     
@@ -227,6 +258,16 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
           )}
         </div>
       </div>
+
+      {/* Modal para mostrar detalles del ejercicio */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+        {selectedExercise && (
+          <ExerciseModalContent 
+            exercise={selectedExercise} 
+            onClose={handleCloseModal} 
+          />
+        )}
+      </Modal>
     </div>
   );
 };

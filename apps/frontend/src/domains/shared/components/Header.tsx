@@ -2,20 +2,22 @@ import { APP_CONFIG } from '../config/app.config';
 
 const GRADIENT_STYLE = APP_CONFIG.THEME.GRADIENT_STYLE;
 
-const GymIcon = () => (
-  <div className="bg-white text-red-600 p-3 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
-    <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
-    </svg>
+const CentroWellnessLogo = () => (
+  <div className="flex items-center justify-center bg-white p-2 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+    <img 
+      src="/logo-centro-wellness.jpeg" 
+      alt="Centro Wellness Sierra de Gata" 
+      className="w-12 h-12 object-cover rounded-lg"
+    />
   </div>
 );
 
 const TitleAndSubtitle = () => (
   <div>
-    <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
-      GymApp
+    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
+      Centro Wellness Sierra de Gata
     </h1>
-    <p className="text-red-100 text-lg font-medium mt-1">
+    <p className="text-red-100 text-sm sm:text-base lg:text-lg font-medium mt-1">
       Tu catálogo de ejercicios personalizado
     </p>
   </div>
@@ -45,7 +47,7 @@ const Header = () => {
       <div className="container mx-auto px-6 py-8 relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <GymIcon />
+            <CentroWellnessLogo />
             <TitleAndSubtitle />
           </div>
           

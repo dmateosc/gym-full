@@ -1,7 +1,7 @@
 {
-  "name": "backend",
+  "name": "centro-wellness-backend",
   "version": "0.0.1",
-  "description": "",
+  "description": "Centro Wellness Sierra de Gata - API Backend",
   "author": "",
   "private": true,
   "license": "UNLICENSED",

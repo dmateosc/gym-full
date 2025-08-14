@@ -8,7 +8,7 @@ describe('App Component', () => {
     render(<App />)
     
     // Verificar que el header se renderiza inmediatamente
-    expect(screen.getByText('GymApp')).toBeInTheDocument()
+    expect(screen.getByText('Centro Wellness Sierra de Gata')).toBeInTheDocument()
     
     // Esperar a que el loading termine y aparezcan ejercicios
     await waitFor(() => {

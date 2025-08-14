@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react'
 import Header from '../components/Header'
 
 describe('Header Component', () => {
-  it('renders gym app title', () => {
+  it('renders Centro Wellness Sierra de Gata title', () => {
     render(<Header />)
-    expect(screen.getByText('GymApp')).toBeInTheDocument()
+    expect(screen.getByText('Centro Wellness Sierra de Gata')).toBeInTheDocument()
   })
 
   it('has Netflix-style red gradient styling', () => {

@@ -143,5 +143,5 @@ npm run setup-env:frontend     # Configure frontend environment
 npm run setup-env:backend      # Configure backend environment
 ```
 
-
+evitar crear documentación cada vez que se hace algo a menos que lo especifique
 evitar crear .md innecesarios
