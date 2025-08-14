@@ -21,7 +21,8 @@ export class CreateExerciseDto {
 
   @ApiProperty({
     description: 'Descripción detallada del ejercicio',
-    example: 'Ejercicio para fortalecer el pecho, tríceps y deltoides anteriores',
+    example:
+      'Ejercicio para fortalecer el pecho, tríceps y deltoides anteriores',
   })
   @IsNotEmpty()
   @IsString()
@@ -71,7 +72,7 @@ export class CreateExerciseDto {
     example: [
       'Colócate en posición de plancha con los brazos extendidos',
       'Baja el cuerpo doblando los codos',
-      'Empuja hacia arriba hasta la posición inicial'
+      'Empuja hacia arriba hasta la posición inicial',
     ],
   })
   @IsNotEmpty()

@@ -218,10 +218,13 @@ export class ExercisesService {
       .groupBy('exercise.category')
       .getRawMany<{ category: string; count: string }>();
 
-    const byCategory = categoryStats.reduce((acc, item) => {
-      acc[item.category] = parseInt(item.count);
-      return acc;
-    }, {} as Record<string, number>);
+    const byCategory = categoryStats.reduce(
+      (acc, item) => {
+        acc[item.category] = parseInt(item.count);
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     // Estadísticas por dificultad
     const difficultyStats = await this.exercisesRepository
@@ -231,10 +234,13 @@ export class ExercisesService {
       .groupBy('exercise.difficulty')
       .getRawMany<{ difficulty: string; count: string }>();
 
-    const byDifficulty = difficultyStats.reduce((acc, item) => {
-      acc[item.difficulty] = parseInt(item.count);
-      return acc;
-    }, {} as Record<string, number>);
+    const byDifficulty = difficultyStats.reduce(
+      (acc, item) => {
+        acc[item.difficulty] = parseInt(item.count);
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     // Total de equipamiento único
     const equipmentResult = await this.exercisesRepository
@@ -242,7 +248,7 @@ export class ExercisesService {
       .select('UNNEST(exercise.equipment)', 'equipment')
       .distinct(true)
       .getRawMany();
-    
+
     const totalEquipment = equipmentResult.length;
 
     // Total de grupos musculares únicos
@@ -251,7 +257,7 @@ export class ExercisesService {
       .select('UNNEST(exercise.muscle_groups)', 'muscleGroup')
       .distinct(true)
       .getRawMany();
-    
+
     const totalMuscleGroups = muscleGroupsResult.length;
 
     const stats = {
@@ -263,12 +269,17 @@ export class ExercisesService {
     };
 
     const duration = Date.now() - startTime;
-    this.logger.log(`✅ Statistics generated in ${duration}ms: ${JSON.stringify(stats)}`);
+    this.logger.log(
+      `✅ Statistics generated in ${duration}ms: ${JSON.stringify(stats)}`,
+    );
 
     return stats;
   }
 
-  async searchExercises(searchTerm: string, category?: string): Promise<Exercise[]> {
+  async searchExercises(
+    searchTerm: string,
+    category?: string,
+  ): Promise<Exercise[]> {
     const startTime = Date.now();
     this.logger.log(`🔍 Searching exercises for: "${searchTerm}"`);
 
@@ -276,9 +287,9 @@ export class ExercisesService {
       .createQueryBuilder('exercise')
       .where(
         '(LOWER(exercise.name) LIKE LOWER(:searchTerm) OR ' +
-        'LOWER(exercise.description) LIKE LOWER(:searchTerm) OR ' +
-        'array_to_string(exercise.instructions, \' \') ILIKE :searchTerm)',
-        { searchTerm: `%${searchTerm}%` }
+          'LOWER(exercise.description) LIKE LOWER(:searchTerm) OR ' +
+          "array_to_string(exercise.instructions, ' ') ILIKE :searchTerm)",
+        { searchTerm: `%${searchTerm}%` },
       );
 
     if (category) {
@@ -288,7 +299,9 @@ export class ExercisesService {
     const results = await queryBuilder.getMany();
     const duration = Date.now() - startTime;
 
-    this.logger.log(`✅ Search completed: ${results.length} results in ${duration}ms`);
+    this.logger.log(
+      `✅ Search completed: ${results.length} results in ${duration}ms`,
+    );
     return results;
   }
 }

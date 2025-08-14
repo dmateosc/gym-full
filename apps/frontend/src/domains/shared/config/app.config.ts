@@ -23,7 +23,7 @@ function getApiBaseUrl(): string {
       const isVercelDomain = window.location.hostname.includes('vercel.app');
       if (isVercelDomain) {
         // Construir URL del backend dinámicamente
-        return `https://centro-wellness-sierra-de-gata-backend.vercel.app/api`;
+        return `https://centro-wellness-sierra-de-gata-back.vercel.app/api`;
       }
       // Fallback para otros dominios de producción
       return `${window.location.protocol}//${window.location.hostname}/api`;

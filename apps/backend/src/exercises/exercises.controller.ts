@@ -14,7 +14,6 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiParam,
   ApiQuery,
   ApiBody,
 } from '@nestjs/swagger';
@@ -32,21 +31,22 @@ export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
 
   @Post()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Crear nuevo ejercicio',
-    description: 'Crea un nuevo ejercicio en el sistema con toda la información necesaria'
+    description:
+      'Crea un nuevo ejercicio en el sistema con toda la información necesaria',
   })
-  @ApiBody({ 
+  @ApiBody({
     type: CreateExerciseDto,
-    description: 'Datos del ejercicio a crear'
+    description: 'Datos del ejercicio a crear',
   })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Ejercicio creado exitosamente'
+  @ApiResponse({
+    status: 201,
+    description: 'Ejercicio creado exitosamente',
   })
-  @ApiResponse({ 
-    status: 400, 
-    description: 'Datos inválidos'
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos',
   })
   async create(@Body(ValidationPipe) createExerciseDto: CreateExerciseDto) {
     const startTime = Date.now();
@@ -62,28 +62,29 @@ export class ExercisesController {
   }
 
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Obtener todos los ejercicios',
-    description: 'Obtiene la lista de ejercicios con filtros opcionales por categoría, dificultad, grupo muscular, etc.'
+    description:
+      'Obtiene la lista de ejercicios con filtros opcionales por categoría, dificultad, grupo muscular, etc.',
   })
-  @ApiQuery({ 
-    name: 'category', 
-    required: false, 
-    description: 'Filtrar por categoría (fuerza, cardio, flexibilidad)' 
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    description: 'Filtrar por categoría (fuerza, cardio, flexibilidad)',
   })
-  @ApiQuery({ 
-    name: 'difficulty', 
-    required: false, 
-    description: 'Filtrar por dificultad (principiante, intermedio, avanzado)' 
+  @ApiQuery({
+    name: 'difficulty',
+    required: false,
+    description: 'Filtrar por dificultad (principiante, intermedio, avanzado)',
   })
-  @ApiQuery({ 
-    name: 'muscleGroup', 
-    required: false, 
-    description: 'Filtrar por grupo muscular' 
+  @ApiQuery({
+    name: 'muscleGroup',
+    required: false,
+    description: 'Filtrar por grupo muscular',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Lista de ejercicios obtenida exitosamente'
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de ejercicios obtenida exitosamente',
   })
   async findAll(@Query(ValidationPipe) filters: ExerciseFiltersDto) {
     this.logger.log(`📄 GET /exercises - Filters: ${JSON.stringify(filters)}`);
@@ -93,115 +94,127 @@ export class ExercisesController {
   }
 
   @Get('categories')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Obtener categorías de ejercicios',
-    description: 'Obtiene todas las categorías disponibles (fuerza, cardio, flexibilidad, etc.)'
+    description:
+      'Obtiene todas las categorías disponibles (fuerza, cardio, flexibilidad, etc.)',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Lista de categorías obtenida exitosamente'
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de categorías obtenida exitosamente',
   })
   async getCategories() {
     return this.exercisesService.getCategories();
   }
 
   @Get('muscle-groups')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Obtener grupos musculares',
-    description: 'Obtiene todos los grupos musculares disponibles'
+    description: 'Obtiene todos los grupos musculares disponibles',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Lista de grupos musculares obtenida exitosamente'
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de grupos musculares obtenida exitosamente',
   })
   async getMuscleGroups() {
     return this.exercisesService.getMuscleGroups();
   }
 
   @Get('equipment')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Obtener equipamiento disponible',
-    description: 'Obtiene lista de todo el equipamiento disponible'
+    description: 'Obtiene lista de todo el equipamiento disponible',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Lista de equipamiento obtenida exitosamente'
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de equipamiento obtenida exitosamente',
   })
   async getEquipment() {
     return this.exercisesService.getEquipment();
   }
 
   @Get('statistics')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Obtener estadísticas del sistema',
-    description: 'Obtiene estadísticas completas de ejercicios, categorías y uso del sistema'
+    description:
+      'Obtiene estadísticas completas de ejercicios, categorías y uso del sistema',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Estadísticas obtenidas exitosamente',
     schema: {
       type: 'object',
       properties: {
         totalExercises: { type: 'number', example: 54 },
-        byCategory: { 
+        byCategory: {
           type: 'object',
-          example: { 'strength': 25, 'cardio': 15, 'flexibility': 14 }
+          example: { strength: 25, cardio: 15, flexibility: 14 },
         },
-        byDifficulty: { 
+        byDifficulty: {
           type: 'object',
-          example: { 'beginner': 18, 'intermediate': 24, 'advanced': 12 }
+          example: { beginner: 18, intermediate: 24, advanced: 12 },
         },
         totalEquipment: { type: 'number', example: 8 },
-        totalMuscleGroups: { type: 'number', example: 12 }
-      }
-    }
+        totalMuscleGroups: { type: 'number', example: 12 },
+      },
+    },
   })
   async getStatistics() {
     const startTime = Date.now();
     this.logger.log('📊 GET /exercises/statistics - Generating statistics');
-    
+
     const stats = await this.exercisesService.getStatistics();
     const duration = Date.now() - startTime;
-    
-    this.logger.log(`✅ GET /exercises/statistics - Generated in ${duration}ms`);
+
+    this.logger.log(
+      `✅ GET /exercises/statistics - Generated in ${duration}ms`,
+    );
     return stats;
   }
 
   @Get('search')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Búsqueda avanzada de ejercicios',
-    description: 'Busca ejercicios por nombre, descripción o instrucciones usando texto libre'
+    description:
+      'Busca ejercicios por nombre, descripción o instrucciones usando texto libre',
   })
-  @ApiQuery({ 
-    name: 'q', 
-    required: true, 
+  @ApiQuery({
+    name: 'q',
+    required: true,
     description: 'Término de búsqueda (nombre, descripción, instrucciones)',
-    example: 'flexiones'
+    example: 'flexiones',
   })
-  @ApiQuery({ 
-    name: 'category', 
-    required: false, 
-    description: 'Filtrar por categoría adicional'
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    description: 'Filtrar por categoría adicional',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Resultados de búsqueda obtenidos exitosamente'
+  @ApiResponse({
+    status: 200,
+    description: 'Resultados de búsqueda obtenidos exitosamente',
   })
   async searchExercises(
     @Query('q') searchTerm: string,
     @Query('category') category?: string,
   ) {
     const startTime = Date.now();
-    this.logger.log(`🔍 GET /exercises/search - Searching for: "${searchTerm}"`);
-    
+    this.logger.log(
+      `🔍 GET /exercises/search - Searching for: "${searchTerm}"`,
+    );
+
     if (!searchTerm || searchTerm.trim().length < 2) {
       return [];
     }
 
-    const results = await this.exercisesService.searchExercises(searchTerm, category);
+    const results = await this.exercisesService.searchExercises(
+      searchTerm,
+      category,
+    );
     const duration = Date.now() - startTime;
-    
-    this.logger.log(`✅ GET /exercises/search - Found ${results.length} results in ${duration}ms`);
+
+    this.logger.log(
+      `✅ GET /exercises/search - Found ${results.length} results in ${duration}ms`,
+    );
     return results;
   }
 

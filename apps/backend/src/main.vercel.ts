@@ -27,17 +27,17 @@ function isOriginAllowed(origin: string): boolean {
     'centrowellnesssierradegata.vercel.app',
     'gym-exercise-frontend.vercel.app',
     'gym-exercise-backend.vercel.app',
-    'gym-full.vercel.app'
+    'gym-full.vercel.app',
   ];
 
   // 4. Palabras clave del proyecto (enfoque inteligente)
   const projectKeywords = ['centro', 'wellness', 'gym', 'exercise', 'frontend'];
-  if (projectKeywords.some(keyword => origin.includes(keyword))) {
+  if (projectKeywords.some((keyword) => origin.includes(keyword))) {
     return true;
   }
 
   // 5. Verificar dominios principales
-  return allowedDomains.some(domain => origin.includes(domain));
+  return allowedDomains.some((domain) => origin.includes(domain));
 }
 
 /**
@@ -47,7 +47,8 @@ function isOriginAllowed(origin: string): boolean {
 function setupSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
     .setTitle('Centro Wellness Sierra de Gata API')
-    .setDescription(`
+    .setDescription(
+      `
 🏋️ **API REST completa para la gestión del gimnasio**
 
 Esta API proporciona endpoints para la gestión de ejercicios, rutinas y datos del Centro Wellness Sierra de Gata.
@@ -68,7 +69,8 @@ Esta API proporciona endpoints para la gestión de ejercicios, rutinas y datos d
 ## 🔗 Enlaces:
 - **Frontend**: Centro Wellness Sierra de Gata App
 - **Repositorio**: GitHub - Gym Full Stack
-    `)
+    `,
+    )
     .setVersion('1.0')
     .addTag('exercises', 'Gestión de ejercicios y categorías')
     .addTag('routines', 'Sistema de rutinas y entrenamientos')
@@ -76,10 +78,13 @@ Esta API proporciona endpoints para la gestión de ejercicios, rutinas y datos d
     .setContact(
       'Centro Wellness Sierra de Gata',
       'https://centro-wellness-sierra-de-gata.vercel.app',
-      'info@centrowellness.com'
+      'info@centrowellness.com',
     )
     .setLicense('MIT', 'https://opensource.org/licenses/MIT')
-    .addServer('https://centro-wellness-sierra-de-gata-backend.vercel.app', 'Producción')
+    .addServer(
+      'https://centro-wellness-sierra-de-gata-backend.vercel.app',
+      'Producción',
+    )
     .addServer('http://localhost:3001', 'Desarrollo local')
     .build();
 
@@ -101,7 +106,7 @@ Esta API proporciona endpoints para la gestión de ejercicios, rutinas y datos d
       filter: true,
       showExtensions: true,
       showCommonExtensions: true,
-    }
+    },
   });
 
   console.log('📚 Swagger documentation available at /api/docs');
@@ -118,7 +123,7 @@ async function createApp(): Promise<INestApplication> {
   app.enableCors({
     origin: (origin, callback) => {
       console.log(`🌐 CORS request from origin: ${origin || 'unknown'}`);
-      
+
       // Permitir requests sin origin (mobile apps, Postman, etc.)
       if (!origin) {
         console.log('✅ CORS: Request without origin allowed');
@@ -155,23 +160,31 @@ async function createApp(): Promise<INestApplication> {
 
   await app.init();
   cachedApp = app;
-  
+
   console.log('🚀 Centro Wellness Sierra de Gata API initialized for Vercel');
-  
+
   return app;
 }
 
 // Handler principal para Vercel
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse,
+): Promise<void> {
   try {
     const app = await createApp();
-    const expressApp = app.getHttpAdapter().getInstance();
-    return expressApp(req, res);
-  } catch (error) {
+    const expressApp = app.getHttpAdapter().getInstance() as (
+      req: VercelRequest,
+      res: VercelResponse,
+    ) => void;
+    expressApp(req, res);
+  } catch (error: unknown) {
     console.error('❌ Vercel handler error:', error);
-    res.status(500).json({ 
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+    res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to initialize application'
+      message: errorMessage,
     });
   }
 }

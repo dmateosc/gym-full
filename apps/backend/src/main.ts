@@ -28,16 +28,16 @@ function isOriginAllowed(origin: string): boolean {
     'centrowellnesssierradegata.vercel.app',
     'gym-exercise-frontend.vercel.app',
     'gym-exercise-backend.vercel.app',
-    'gym-full.vercel.app'
+    'gym-full.vercel.app',
   ];
-  
+
   const hostname = origin.replace(/^https?:\/\//, '');
-  
+
   // Permitir cualquier subdominio de vercel.app que contenga palabras clave del proyecto
   if (hostname.endsWith('.vercel.app')) {
     if (
-      hostname.includes('gym') || 
-      hostname.includes('frontend') || 
+      hostname.includes('gym') ||
+      hostname.includes('frontend') ||
       hostname.includes('exercise') ||
       hostname.includes('wellness') ||
       hostname.includes('centro')
@@ -46,7 +46,7 @@ function isOriginAllowed(origin: string): boolean {
     }
   }
 
-  return allowedDomains.some(domain => hostname.endsWith(domain));
+  return allowedDomains.some((domain) => hostname.endsWith(domain));
 }
 
 function getAllowedOrigins(): (string | RegExp)[] {
@@ -57,7 +57,7 @@ function getAllowedOrigins(): (string | RegExp)[] {
     /^http:\/\/localhost:\d+$/,
     /^https:\/\/.*-dmateoscanos-projects\.vercel\.app$/,
     /^https:\/\/gym-.*\.vercel\.app$/,
-    /^https:\/\/frontend-.*\.vercel\.app$/
+    /^https:\/\/frontend-.*\.vercel\.app$/,
   ];
 }
 
@@ -68,7 +68,8 @@ function getAllowedOrigins(): (string | RegExp)[] {
 function setupSwagger(app: INestApplication): void {
   const config = new DocumentBuilder()
     .setTitle('Centro Wellness Sierra de Gata API')
-    .setDescription(`
+    .setDescription(
+      `
       🏋️ API REST completa para la gestión del Centro Wellness Sierra de Gata
       
       ## Características:
@@ -86,17 +87,21 @@ function setupSwagger(app: INestApplication): void {
       ## URLs:
       - **Producción**: https://centro-wellness-sierra-de-gata-backend.vercel.app
       - **Frontend**: https://centro-wellness-sierra-de-gata.vercel.app
-    `)
+    `,
+    )
     .setVersion('1.0')
     .addTag('exercises', 'Gestión de ejercicios y categorías')
     .addTag('routines', 'Rutinas de entrenamiento')
     .addTag('health', 'Endpoints de salud y monitoreo')
-    .addServer('https://centro-wellness-sierra-de-gata-backend.vercel.app', 'Producción')
+    .addServer(
+      'https://centro-wellness-sierra-de-gata-backend.vercel.app',
+      'Producción',
+    )
     .addServer('http://localhost:3001', 'Desarrollo local')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  
+
   // Configurar Swagger UI en /api/docs
   SwaggerModule.setup('api/docs', app, document, {
     customSiteTitle: 'Centro Wellness Sierra de Gata - API Docs',

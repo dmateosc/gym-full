@@ -8,25 +8,25 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Mensaje de bienvenida',
-    description: 'Endpoint raíz que devuelve un mensaje de bienvenida'
+    description: 'Endpoint raíz que devuelve un mensaje de bienvenida',
   })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'Mensaje de bienvenida exitoso'
+  @ApiResponse({
+    status: 200,
+    description: 'Mensaje de bienvenida exitoso',
   })
   getHello(): string {
     return this.appService.getHello();
   }
 
   @Get('health')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Health check del API',
-    description: 'Verificar el estado de salud del servidor'
+    description: 'Verificar el estado de salud del servidor',
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Servidor funcionando correctamente',
     schema: {
       type: 'object',
@@ -34,8 +34,8 @@ export class AppController {
         status: { type: 'string', example: 'ok' },
         timestamp: { type: 'string', example: '2025-08-14T10:30:00.000Z' },
         swagger: { type: 'string', example: '/api/docs' },
-      }
-    }
+      },
+    },
   })
   getHealth(): { status: string; timestamp: string; swagger: string } {
     return {
