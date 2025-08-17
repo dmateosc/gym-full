@@ -12,22 +12,37 @@ function getApiBaseUrl(): string {
 
   // 🔥 PRIORITY 1: Variable de entorno explícita (VITE_API_BASE_URL)
   if (import.meta.env.VITE_API_BASE_URL) {
+    console.log('✅ Usando VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
     return import.meta.env.VITE_API_BASE_URL;
   }
+
+  console.log('⚠️ VITE_API_BASE_URL no definida, usando detección automática...');
 
   // 🔥 PRIORITY 2: Auto-detection para desarrollo vs producción
   if (typeof window !== 'undefined') {
     // Detección automática: si NO es localhost, asumir producción
     if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      
       // Auto-detectar backend de Vercel basado en el frontend URL
       const isVercelDomain = window.location.hostname.includes('vercel.app');
       if (isVercelDomain) {
-        // Construir URL del backend dinámicamente basado en la URL actual
         const frontendUrl = window.location.hostname;
-        // Intentar construir URL del backend reemplazando nombres conocidos
+        console.log('🔍 Frontend URL detectada:', frontendUrl);
+        
+        // Mapeo específico de URLs conocidas
+        if (frontendUrl.includes('centro-wellness-sierra-de-gata-c5sm38vog')) {
+          const backendUrl = 'https://centro-wellness-sierra-de-gata-backend-gt26ngi86.vercel.app/api';
+          console.log('🎯 Backend URL mapeada:', backendUrl);
+          return backendUrl;
+        }
+        
+        // Fallback: intentar construir URL del backend dinámicamente
         const backendUrl = frontendUrl.replace('-frontend', '-backend').replace('sierra-de-gata', 'sierra-de-gata-backend');
-        return `https://${backendUrl}/api`;
+        const fullBackendUrl = `https://${backendUrl}/api`;
+        console.log('🔄 Backend URL construida:', fullBackendUrl);
+        return fullBackendUrl;
       }
+      
       // Fallback para otros dominios de producción
       return `${window.location.protocol}//${window.location.hostname}/api`;
     }
