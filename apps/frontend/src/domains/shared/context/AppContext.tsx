@@ -320,9 +320,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       
       if (routine) {
         dispatch({ type: 'ADD_ROUTINE_TO_CACHE', payload: routine });
+        dispatch({ type: 'SET_ROUTINES_LOADED', payload: true });
       } else {
         // NO cachear resultados null - permitir reintentos
         dispatch({ type: 'SET_CURRENT_ROUTINE', payload: null });
+        // NO marcar como "loaded" para permitir nuevas peticiones
       }
     } catch (error) {
       console.error('Error loading today routine:', error);
