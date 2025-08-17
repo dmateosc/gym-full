@@ -45,6 +45,7 @@ export const useRoutinesWithCache = () => {
     routinesError,
     loadTodayRoutine,
     loadRoutineById,
+    loadRoutineByDate,
     getRoutineFromCache,
   } = useAppContext();
 
@@ -55,6 +56,7 @@ export const useRoutinesWithCache = () => {
     error: routinesError,
     loadTodayRoutine,
     loadRoutineById,
+    loadRoutineByDate,
     getRoutineFromCache,
     refreshTodayRoutine: () => loadTodayRoutine(true),
   };

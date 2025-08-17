@@ -21,10 +21,11 @@ function isOriginAllowed(origin: string): boolean {
     return true;
   }
 
-  // 3. Dominios principales del proyecto (sin hardcodear URLs específicas)
+  // 3. Dominios principales del proyecto (usando variables de entorno cuando sea posible)
   const allowedDomains = [
     '.vercel.app',
-    'centro-wellness-sierra-de-gata.vercel.app',
+    // Usar variables de entorno para dominios específicos
+    process.env.FRONTEND_DOMAIN || 'centro-wellness-sierra-de-gata.vercel.app',
     'centrowellnesssierradegata.vercel.app',
     'gym-exercise-frontend.vercel.app',
     'gym-exercise-backend.vercel.app',
@@ -85,8 +86,8 @@ function setupSwagger(app: INestApplication): void {
       - **Autenticación**: JWT (próximamente)
       
       ## URLs:
-      - **Producción**: https://centro-wellness-sierra-de-gata-backend.vercel.app
-      - **Frontend**: https://centro-wellness-sierra-de-gata.vercel.app
+      - **Producción**: Configurado automáticamente según deployment
+      - **Frontend**: Configurado automáticamente según variables de entorno
     `,
     )
     .setVersion('1.0')
@@ -94,8 +95,8 @@ function setupSwagger(app: INestApplication): void {
     .addTag('routines', 'Rutinas de entrenamiento')
     .addTag('health', 'Endpoints de salud y monitoreo')
     .addServer(
-      'https://centro-wellness-sierra-de-gata-backend.vercel.app',
-      'Producción',
+      process.env.API_BASE_URL || 'http://localhost:3001',
+      'Servidor principal',
     )
     .addServer('http://localhost:3001', 'Desarrollo local')
     .build();

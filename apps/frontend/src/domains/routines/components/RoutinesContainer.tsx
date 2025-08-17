@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useRoutinesWithCache } from '../../shared';
 import RoutineView from './RoutineView';
 import EmptyRoutineState from './EmptyRoutineState';
@@ -11,16 +11,8 @@ import RoutineDateSelector from './RoutineDateSelector';
  */
 const RoutinesContainer: React.FC = () => {
   const { currentRoutine, isLoading, error } = useRoutinesWithCache();
-  const [overrideRoutine, setOverrideRoutine] = useState<typeof currentRoutine>(null);
-  const [overrideLoading, setOverrideLoading] = useState(false);
-  const [overrideError, setOverrideError] = useState<string | null>(null);
 
-  // Usar la rutina override si existe, sino la del contexto
-  const displayRoutine = overrideRoutine || currentRoutine;
-  const displayLoading = overrideLoading || isLoading;
-  const displayError = overrideError || error;
-
-  if (displayLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-64 px-4">
         <div className="text-center">
@@ -35,17 +27,17 @@ const RoutinesContainer: React.FC = () => {
     <div>
       {/* Selector de fecha - siempre visible */}
       <RoutineDateSelector
-        currentRoutine={displayRoutine}
-        onRoutineChange={setOverrideRoutine}
-        onLoadingChange={setOverrideLoading}
-        onErrorChange={setOverrideError}
+        currentRoutine={currentRoutine}
+        onRoutineChange={() => {}} // No necesario ya que el contexto maneja el estado
+        onLoadingChange={() => {}} // No necesario ya que el contexto maneja el loading
+        onErrorChange={() => {}} // No necesario ya que el contexto maneja los errores
       />
 
-      {displayError ? (
+      {error ? (
         <div className="text-center p-8">
           <div className="text-red-500 text-4xl mb-4">⚠️</div>
           <h3 className="text-xl font-semibold text-white mb-2">Error al cargar rutina</h3>
-          <p className="text-gray-400">{displayError}</p>
+          <p className="text-gray-400">{error}</p>
           
           <div className="mt-6 p-4 bg-gray-800 rounded-lg border-l-4 border-red-500">
             <div className="flex items-start">
@@ -61,8 +53,8 @@ const RoutinesContainer: React.FC = () => {
             </div>
           </div>
         </div>
-      ) : displayRoutine ? (
-        <RoutineView routine={displayRoutine} />
+      ) : currentRoutine ? (
+        <RoutineView routine={currentRoutine} />
       ) : (
         <EmptyRoutineState />
       )}

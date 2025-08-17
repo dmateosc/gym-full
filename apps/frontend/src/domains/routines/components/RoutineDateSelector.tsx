@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { RoutineService } from '../services/routineService';
+import { useRoutinesWithCache } from '../../shared';
 import type { DailyRoutine } from '../types/routine';
 
 interface RoutineDateSelectorProps {
@@ -15,6 +16,7 @@ const RoutineDateSelector: React.FC<RoutineDateSelectorProps> = ({
   onLoadingChange,
   onErrorChange
 }) => {
+  const { loadTodayRoutine, loadRoutineByDate } = useRoutinesWithCache();
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     // Verificar que currentRoutine y routineDate son válidos antes de usarlos
     if (currentRoutine?.routineDate) {
@@ -38,14 +40,16 @@ const RoutineDateSelector: React.FC<RoutineDateSelectorProps> = ({
       onErrorChange(null);
       
       if (date === new Date().toISOString().split('T')[0]) {
-        // Si es hoy, usar el endpoint específico
-        const routine = await RoutineService.getTodayRoutine();
-        onRoutineChange(routine);
+        // Si es hoy, usar el contexto para cargar la rutina de hoy
+        await loadTodayRoutine(true); // Forzar recarga
       } else {
-        // Para otras fechas, usar el endpoint por fecha
-        const routine = await RoutineService.getRoutineByDate(date);
-        onRoutineChange(routine);
+        // Para otras fechas, usar el contexto para cargar por fecha
+        await loadRoutineByDate(date, true); // Forzar recarga
       }
+      
+      // El contexto se encarga de actualizar el estado global
+      // El RoutinesContainer detectará automáticamente el cambio
+      
     } catch (err) {
       console.error('Error loading routine for date:', err);
       

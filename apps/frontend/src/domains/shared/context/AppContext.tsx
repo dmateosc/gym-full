@@ -214,6 +214,7 @@ interface AppContextType extends AppState {
   // Routine methods
   loadTodayRoutine: (forceReload?: boolean) => Promise<void>;
   loadRoutineById: (id: string, forceReload?: boolean) => Promise<void>;
+  loadRoutineByDate: (date: string, forceReload?: boolean) => Promise<void>;
   getRoutineFromCache: (id: string) => DailyRoutine | null;
 }
 
@@ -363,6 +364,44 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return state.routineCache.get(id) || null;
   };
 
+  // 📅 Cargar rutina por fecha específica
+  const loadRoutineByDate = async (date: string, forceReload = false) => {
+    // Usar la fecha como clave de cache
+    const cacheKey = `date:${date}`;
+    const cachedRoutine = state.routineCache.get(cacheKey);
+    
+    if (cachedRoutine && !forceReload) {
+      dispatch({ type: 'SET_CURRENT_ROUTINE', payload: cachedRoutine });
+      return;
+    }
+
+    dispatch({ type: 'SET_ROUTINES_LOADING', payload: true });
+    dispatch({ type: 'SET_ROUTINES_ERROR', payload: null });
+
+    try {
+      const routine = await RoutineService.getRoutineByDate(date);
+      
+      if (routine) {
+        // Usar fecha como clave de cache especial
+        const newRoutineCache = new Map(state.routineCache);
+        newRoutineCache.set(cacheKey, routine);
+        newRoutineCache.set(routine.id, routine); // También por ID
+        
+        dispatch({ type: 'ADD_ROUTINE_TO_CACHE', payload: routine });
+      } else {
+        dispatch({ type: 'SET_CURRENT_ROUTINE', payload: null });
+      }
+    } catch (error) {
+      console.error(`Error loading routine for date ${date}:`, error);
+      dispatch({ 
+        type: 'SET_ROUTINES_ERROR', 
+        payload: `Error al cargar rutina para ${date}: ${(error as Error).message}` 
+      });
+    } finally {
+      dispatch({ type: 'SET_ROUTINES_LOADING', payload: false });
+    }
+  };
+
   // 🚀 Carga inicial de datos esenciales
   useEffect(() => {
     const initializeApp = async () => {
@@ -388,6 +427,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     loadFilterOptions,
     loadTodayRoutine,
     loadRoutineById,
+    loadRoutineByDate,
     getRoutineFromCache,
   };
 
