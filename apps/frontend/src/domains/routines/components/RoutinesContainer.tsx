@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRoutines } from '../hooks/useRoutines';
+import { useRoutinesWithCache } from '../../shared';
 import RoutineView from './RoutineView';
 import EmptyRoutineState from './EmptyRoutineState';
 import RoutineDateSelector from './RoutineDateSelector';
@@ -7,14 +7,15 @@ import RoutineDateSelector from './RoutineDateSelector';
 /**
  * Container Component para el dominio de Routines
  * Maneja la lógica de estado y coordina los componentes de presentación
+ * Ahora usa el contexto global para cachear datos y evitar peticiones innecesarias
  */
 const RoutinesContainer: React.FC = () => {
-  const { currentRoutine, isLoading, error } = useRoutines();
+  const { currentRoutine, isLoading, error } = useRoutinesWithCache();
   const [overrideRoutine, setOverrideRoutine] = useState<typeof currentRoutine>(null);
   const [overrideLoading, setOverrideLoading] = useState(false);
   const [overrideError, setOverrideError] = useState<string | null>(null);
 
-  // Usar la rutina override si existe, sino la del hook
+  // Usar la rutina override si existe, sino la del contexto
   const displayRoutine = overrideRoutine || currentRoutine;
   const displayLoading = overrideLoading || isLoading;
   const displayError = overrideError || error;

@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
 import type { ExerciseFilters } from '../types/exercise';
-import { ApiService } from '../services/api';
+import { useFilterOptionsWithCache } from '../../shared';
 
 const DIFFICULTIES = ['beginner', 'intermediate', 'advanced'];
 
@@ -10,32 +9,7 @@ interface FiltersPanelProps {
 }
 
 export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelProps) {
-  const [categories, setCategories] = useState<string[]>([]);
-  const [muscleGroups, setMuscleGroups] = useState<string[]>([]);
-  const [equipment, setEquipment] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const loadFilterOptions = async () => {
-      try {
-        const [categoriesData, muscleGroupsData, equipmentData] = await Promise.all([
-          ApiService.getCategories(),
-          ApiService.getMuscleGroups(),
-          ApiService.getEquipment(),
-        ]);
-        
-        setCategories(categoriesData);
-        setMuscleGroups(muscleGroupsData);
-        setEquipment(equipmentData);
-      } catch (error) {
-        console.error('Error loading filter options:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadFilterOptions();
-  }, []);
+  const { categories, muscleGroups, equipment, isLoaded } = useFilterOptionsWithCache();
 
   const handleFilterChange = (key: keyof ExerciseFilters, value: string) => {
     onFiltersChange({
@@ -69,7 +43,7 @@ export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelP
     return labels[value] || value;
   };
 
-  if (isLoading) {
+  if (!isLoaded) {
     return (
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
         <div className="animate-pulse">

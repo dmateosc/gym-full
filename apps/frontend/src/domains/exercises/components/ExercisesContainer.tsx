@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Exercise } from '../types/exercise';
-import { useExercises } from '../hooks/useExercises';
+import { useExercisesWithCache } from '../../shared';
 import FiltersPanel from './FiltersPanel';
 import ExerciseList from './ExerciseList';
 import ExerciseDetail from './ExerciseDetail';
@@ -8,10 +8,11 @@ import ExerciseDetail from './ExerciseDetail';
 /**
  * Container Component para el dominio de Exercises
  * Maneja la lógica de estado y coordina los componentes de presentación
+ * Ahora usa el contexto global para cachear datos y evitar peticiones innecesarias
  */
 const ExercisesContainer: React.FC = () => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
-  const { exercises, isLoading, error, filters, updateFilters } = useExercises();
+  const { exercises, isLoading, error, filters, updateFilters } = useExercisesWithCache();
 
   const handleBack = () => setSelectedExercise(null);
 

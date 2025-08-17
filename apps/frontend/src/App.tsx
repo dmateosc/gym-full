@@ -4,12 +4,14 @@ import {
   Navigation,
   ExercisesContainer,
   RoutinesContainer,
-  APP_CONFIG
+  APP_CONFIG,
+  AppProvider
 } from './domains';
+import CachingDemo from './components/CachingDemo';
 
 // Test CI/CD integration - Vercel deployment test
 function App() {
-  const [currentView, setCurrentView] = useState<'exercises' | 'routines'>('exercises');
+  const [currentView, setCurrentView] = useState<'exercises' | 'routines' | 'demo'>('exercises');
 
   const navigationTabs = [
     {
@@ -21,6 +23,11 @@ function App() {
       id: 'routines' as const,
       label: 'Rutinas de Entrenamiento',
       icon: '💪'
+    },
+    {
+      id: 'demo' as const,
+      label: 'Caching Demo',
+      icon: '🚀'
     }
   ];
 
@@ -28,6 +35,8 @@ function App() {
     switch (currentView) {
       case 'routines':
         return <RoutinesContainer />;
+      case 'demo':
+        return <CachingDemo />;
       case 'exercises':
       default:
         return <ExercisesContainer />;
@@ -35,25 +44,27 @@ function App() {
   };
 
   return (
-    <div 
-      className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black" 
-      style={{
-        background: APP_CONFIG.THEME.BACKGROUND_STYLE,
-        minHeight: '100vh'
-      }}
-    >
-      <Header />
-      
-      <Navigation 
-        currentView={currentView}
-        onViewChange={setCurrentView}
-        tabs={navigationTabs}
-      />
-      
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
-        {renderMainContent()}
+    <AppProvider>
+      <div 
+        className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black" 
+        style={{
+          background: APP_CONFIG.THEME.BACKGROUND_STYLE,
+          minHeight: '100vh'
+        }}
+      >
+        <Header />
+        
+        <Navigation 
+          currentView={currentView}
+          onViewChange={setCurrentView}
+          tabs={navigationTabs}
+        />
+        
+        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 md:py-8">
+          {renderMainContent()}
+        </div>
       </div>
-    </div>
+    </AppProvider>
   );
 }
 

@@ -22,6 +22,13 @@ export class RoutineService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
+      // Verificar si la respuesta tiene contenido
+      const contentLength = response.headers.get('content-length');
+      if (contentLength === '0' || contentLength === null) {
+        console.log('No hay rutina programada para hoy');
+        return null;
+      }
+      
       const data = await response.json();
       
       // Verificar que la respuesta tiene formato válido
@@ -37,6 +44,12 @@ export class RoutineService {
       // Si es un error de red, no lanzar error sino retornar null
       if (error instanceof TypeError && error.message.includes('fetch')) {
         console.warn('Error de conexión, no hay rutina de hoy disponible');
+        return null;
+      }
+      
+      // Si es un error de parsing JSON (respuesta vacía), retornar null
+      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+        console.log('Respuesta vacía del servidor, no hay rutina para hoy');
         return null;
       }
       
@@ -58,6 +71,13 @@ export class RoutineService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
+      // Verificar si la respuesta tiene contenido
+      const contentLength = response.headers.get('content-length');
+      if (contentLength === '0' || contentLength === null) {
+        console.log(`No hay rutina programada para ${date}`);
+        return null;
+      }
+      
       const data = await response.json();
       
       // Verificar que la respuesta tiene formato válido
@@ -73,6 +93,12 @@ export class RoutineService {
       // Si es un error de red, no lanzar error sino retornar null
       if (error instanceof TypeError && error.message.includes('fetch')) {
         console.warn(`Error de conexión, no hay rutina disponible para ${date}`);
+        return null;
+      }
+      
+      // Si es un error de parsing JSON (respuesta vacía), retornar null
+      if (error instanceof SyntaxError && error.message.includes('JSON')) {
+        console.log(`Respuesta vacía del servidor, no hay rutina para ${date}`);
         return null;
       }
       
