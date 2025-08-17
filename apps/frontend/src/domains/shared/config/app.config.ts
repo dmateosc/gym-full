@@ -29,16 +29,11 @@ function getApiBaseUrl(): string {
         const frontendUrl = window.location.hostname;
         console.log('🔍 Frontend URL detectada:', frontendUrl);
         
-        // Mapeo específico de URLs conocidas
-        if (frontendUrl.includes('centro-wellness-sierra-de-gata-c5sm38vog')) {
-          const backendUrl = 'https://centro-wellness-sierra-de-gata-backend-gt26ngi86.vercel.app/api';
-          console.log('🎯 Backend URL mapeada:', backendUrl);
-          return backendUrl;
-        }
-        
-        // Fallback: intentar construir URL del backend dinámicamente
-        const backendUrl = frontendUrl.replace('-frontend', '-backend').replace('sierra-de-gata', 'sierra-de-gata-backend');
+        // Fallback genérico: intentar construir URL del backend dinámicamente
+        const backendUrl = frontendUrl.replace('centro-wellness-sierra-de-gata', 'centro-wellness-sierra-de-gata-backend');
         const fullBackendUrl = `https://${backendUrl}/api`;
+        console.log('🎯 Backend URL construida dinámicamente:', fullBackendUrl);
+        return fullBackendUrl;
         console.log('🔄 Backend URL construida:', fullBackendUrl);
         return fullBackendUrl;
       }
