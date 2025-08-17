@@ -307,11 +307,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // 💪 Métodos para rutinas
   const loadTodayRoutine = async (forceReload = false) => {
-    if (state.routinesLoaded && state.currentRoutine && !forceReload) {
+    // ⚠️ IMPORTANTE: Solo usar cache para rutinas exitosas, no para null/vacías
+    if (!forceReload && state.routinesLoaded && state.currentRoutine) {
       return;
     }
 
     dispatch({ type: 'SET_ROUTINES_LOADING', payload: true });
+    dispatch({ type: 'SET_ROUTINES_ERROR', payload: null });
 
     try {
       const routine = await RoutineService.getTodayRoutine();
@@ -319,6 +321,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       if (routine) {
         dispatch({ type: 'ADD_ROUTINE_TO_CACHE', payload: routine });
       } else {
+        // NO cachear resultados null - permitir reintentos
         dispatch({ type: 'SET_CURRENT_ROUTINE', payload: null });
       }
     } catch (error) {
@@ -368,11 +371,15 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const loadRoutineByDate = async (date: string, forceReload = false) => {
     // Usar la fecha como clave de cache
     const cacheKey = `date:${date}`;
-    const cachedRoutine = state.routineCache.get(cacheKey);
     
-    if (cachedRoutine && !forceReload) {
-      dispatch({ type: 'SET_CURRENT_ROUTINE', payload: cachedRoutine });
-      return;
+    // ⚠️ IMPORTANTE: Solo usar cache para rutinas exitosas, no para null/vacías
+    if (!forceReload) {
+      const cachedRoutine = state.routineCache.get(cacheKey);
+      if (cachedRoutine) {
+        // Solo usar cache si hay una rutina válida
+        dispatch({ type: 'SET_CURRENT_ROUTINE', payload: cachedRoutine });
+        return;
+      }
     }
 
     dispatch({ type: 'SET_ROUTINES_LOADING', payload: true });
@@ -382,13 +389,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       const routine = await RoutineService.getRoutineByDate(date);
       
       if (routine) {
-        // Usar fecha como clave de cache especial
+        // Solo cachear rutinas exitosas
         const newRoutineCache = new Map(state.routineCache);
         newRoutineCache.set(cacheKey, routine);
         newRoutineCache.set(routine.id, routine); // También por ID
         
         dispatch({ type: 'ADD_ROUTINE_TO_CACHE', payload: routine });
       } else {
+        // NO cachear resultados null - siempre permitir reintentos
         dispatch({ type: 'SET_CURRENT_ROUTINE', payload: null });
       }
     } catch (error) {

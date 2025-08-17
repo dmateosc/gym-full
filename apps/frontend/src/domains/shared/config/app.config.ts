@@ -34,8 +34,6 @@ function getApiBaseUrl(): string {
         const fullBackendUrl = `https://${backendUrl}/api`;
         console.log('🎯 Backend URL construida dinámicamente:', fullBackendUrl);
         return fullBackendUrl;
-        console.log('🔄 Backend URL construida:', fullBackendUrl);
-        return fullBackendUrl;
       }
       
       // Fallback para otros dominios de producción
