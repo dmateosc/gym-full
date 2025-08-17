@@ -58,6 +58,7 @@ type AppAction =
   | { type: 'SET_CURRENT_ROUTINE'; payload: DailyRoutine | null }
   | { type: 'ADD_ROUTINE_TO_CACHE'; payload: DailyRoutine }
   | { type: 'SET_ROUTINES_LOADING'; payload: boolean }
+  | { type: 'SET_ROUTINES_LOADED'; payload: boolean }
   | { type: 'SET_ROUTINES_ERROR'; payload: string | null };
 
 // 📦 Estado inicial
@@ -187,6 +188,12 @@ function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         isLoadingRoutines: action.payload,
+      };
+    
+    case 'SET_ROUTINES_LOADED':
+      return {
+        ...state,
+        routinesLoaded: action.payload,
       };
     
     case 'SET_ROUTINES_ERROR':
