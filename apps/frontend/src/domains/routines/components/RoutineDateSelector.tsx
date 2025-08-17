@@ -15,9 +15,20 @@ const RoutineDateSelector: React.FC<RoutineDateSelectorProps> = ({
   onLoadingChange,
   onErrorChange
 }) => {
-  const [selectedDate, setSelectedDate] = useState<string>(
-    currentRoutine?.routineDate || new Date().toISOString().split('T')[0]
-  );
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    // Verificar que currentRoutine y routineDate son válidos antes de usarlos
+    if (currentRoutine?.routineDate) {
+      try {
+        const routineDate = new Date(currentRoutine.routineDate);
+        if (!isNaN(routineDate.getTime())) {
+          return routineDate.toISOString().split('T')[0];
+        }
+      } catch (error) {
+        console.warn('Error parsing routine date:', error);
+      }
+    }
+    return new Date().toISOString().split('T')[0];
+  });
 
   const handleDateChange = async (date: string) => {
     setSelectedDate(date);
@@ -37,7 +48,18 @@ const RoutineDateSelector: React.FC<RoutineDateSelectorProps> = ({
       }
     } catch (err) {
       console.error('Error loading routine for date:', err);
-      onErrorChange('Error loading routine for selected date');
+      
+      // Mejor manejo de errores específicos
+      if (err instanceof Error) {
+        if (err.message.includes('Failed to fetch') || err.message.includes('fetch')) {
+          onErrorChange('No se puede conectar al servidor. Verifica tu conexión a internet.');
+        } else {
+          onErrorChange('No se pudo cargar la rutina para la fecha seleccionada.');
+        }
+      } else {
+        onErrorChange('Ocurrió un error inesperado al cargar la rutina.');
+      }
+      
       onRoutineChange(null);
     } finally {
       onLoadingChange(false);

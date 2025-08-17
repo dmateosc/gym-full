@@ -22,9 +22,24 @@ export class RoutineService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      return await response.json();
+      const data = await response.json();
+      
+      // Verificar que la respuesta tiene formato válido
+      if (!data || typeof data !== 'object') {
+        console.warn('Respuesta inesperada del servidor para rutina de hoy:', data);
+        return null;
+      }
+      
+      return data;
     } catch (error) {
       console.error('Error fetching today routine:', error);
+      
+      // Si es un error de red, no lanzar error sino retornar null
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.warn('Error de conexión, no hay rutina de hoy disponible');
+        return null;
+      }
+      
       throw new Error('Error al obtener la rutina de hoy');
     }
   }
@@ -43,9 +58,24 @@ export class RoutineService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      return await response.json();
+      const data = await response.json();
+      
+      // Verificar que la respuesta tiene formato válido
+      if (!data || typeof data !== 'object') {
+        console.warn('Respuesta inesperada del servidor para rutina por fecha:', data);
+        return null;
+      }
+      
+      return data;
     } catch (error) {
       console.error('Error fetching routine by date:', error);
+      
+      // Si es un error de red, no lanzar error sino retornar null
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.warn(`Error de conexión, no hay rutina disponible para ${date}`);
+        return null;
+      }
+      
       throw new Error(`Error al obtener la rutina para ${date}`);
     }
   }
@@ -58,12 +88,30 @@ export class RoutineService {
       const response = await fetch(`${API_BASE_URL}/routines/daily`);
       
       if (!response.ok) {
+        if (response.status === 404) {
+          return []; // Retorna array vacío si no hay rutinas
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      return await response.json();
+      const data = await response.json();
+      
+      // Verificar que data es un array, si no, retornar array vacío
+      if (!Array.isArray(data)) {
+        console.warn('Respuesta inesperada del servidor:', data);
+        return [];
+      }
+      
+      return data;
     } catch (error) {
       console.error('Error fetching all routines:', error);
+      
+      // Si es un error de red o de respuesta, retornar array vacío en lugar de lanzar error
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.warn('Error de conexión, retornando array vacío');
+        return [];
+      }
+      
       throw new Error('Error al obtener las rutinas');
     }
   }
