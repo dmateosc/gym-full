@@ -7,11 +7,10 @@ import {
   APP_CONFIG,
   AppProvider
 } from './domains';
-import CachingDemo from './components/CachingDemo';
 
 // Test CI/CD integration - Vercel deployment test
 function App() {
-  const [currentView, setCurrentView] = useState<'exercises' | 'routines' | 'demo'>('exercises');
+  const [currentView, setCurrentView] = useState<'exercises' | 'routines'>('exercises');
 
   const navigationTabs = [
     {
@@ -23,11 +22,6 @@ function App() {
       id: 'routines' as const,
       label: 'Rutinas de Entrenamiento',
       icon: '💪'
-    },
-    {
-      id: 'demo' as const,
-      label: 'Caching Demo',
-      icon: '🚀'
     }
   ];
 
@@ -35,8 +29,6 @@ function App() {
     switch (currentView) {
       case 'routines':
         return <RoutinesContainer />;
-      case 'demo':
-        return <CachingDemo />;
       case 'exercises':
       default:
         return <ExercisesContainer />;

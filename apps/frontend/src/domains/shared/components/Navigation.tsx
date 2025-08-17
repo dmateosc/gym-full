@@ -1,14 +1,14 @@
 import React from 'react';
 
 interface NavigationTab {
-  id: 'exercises' | 'routines' | 'demo';
+  id: 'exercises' | 'routines';
   label: string;
   icon: string;
 }
 
 interface NavigationProps {
   currentView: string;
-  onViewChange: (view: 'exercises' | 'routines' | 'demo') => void;
+  onViewChange: (view: 'exercises' | 'routines') => void;
   tabs: NavigationTab[];
 }
 
