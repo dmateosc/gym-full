@@ -9,6 +9,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { RoutinesService } from './routines.service';
@@ -46,8 +47,14 @@ export class RoutinesController {
   }
 
   @Get('daily/by-date/:date')
-  findDailyRoutineByDate(@Param('date') date: string) {
-    return this.routinesService.findDailyRoutineByDate(date);
+  async findDailyRoutineByDate(@Param('date') date: string) {
+    const routine = await this.routinesService.findDailyRoutineByDate(date);
+    if (!routine) {
+      throw new NotFoundException(
+        `No se encontró rutina para la fecha ${date}`,
+      );
+    }
+    return routine;
   }
 
   @Get('daily/date-range')
@@ -62,8 +69,12 @@ export class RoutinesController {
   }
 
   @Get('daily/today')
-  findTodayRoutine() {
-    return this.routinesService.findTodayRoutine();
+  async findTodayRoutine() {
+    const routine = await this.routinesService.findTodayRoutine();
+    if (!routine) {
+      throw new NotFoundException('No se encontró rutina para hoy');
+    }
+    return routine;
   }
 
   @Get('daily/upcoming')
