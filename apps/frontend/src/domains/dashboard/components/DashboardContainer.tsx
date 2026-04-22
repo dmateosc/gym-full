@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { APP_CONFIG } from '../../shared/config/app.config';
 
@@ -42,9 +42,22 @@ const DashboardContainer: React.FC<{
   const [stats, setStats] = useState<Stats | null>(null);
   const [loadingStats, setLoadingStats] = useState(true);
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
   const displayName = user?.profile?.fullName ?? user?.email?.split('@')[0] ?? 'Usuario';
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    return hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
+  }, []);
+
+  const today = useMemo(
+    () => new Date().toLocaleDateString('es-ES', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }),
+    [],
+  );
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -61,13 +74,6 @@ const DashboardContainer: React.FC<{
     };
     fetchStats();
   }, []);
-
-  const today = new Date().toLocaleDateString('es-ES', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">

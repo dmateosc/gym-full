@@ -1,8 +1,11 @@
-// Test para verificar el manejo de errores en routineService
 import { RoutineService } from '../services/routineService';
 
-// Mock global fetch
 global.fetch = jest.fn();
+
+const mockResponse = (overrides: object) => ({
+  headers: { get: () => null },
+  ...overrides,
+});
 
 describe('RoutineService Error Handling', () => {
   beforeEach(() => {
@@ -53,22 +56,18 @@ describe('RoutineService Error Handling', () => {
 
   describe('getTodayRoutine', () => {
     it('should return null when response is 404', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        headers: { get: () => null },
-      });
+      (global.fetch as jest.Mock).mockResolvedValueOnce(
+        mockResponse({ ok: false, status: 404 }),
+      );
 
       const result = await RoutineService.getTodayRoutine();
       expect(result).toBeNull();
     });
 
     it('should return null when response is invalid', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        headers: { get: () => null },
-        json: async () => null,
-      });
+      (global.fetch as jest.Mock).mockResolvedValueOnce(
+        mockResponse({ ok: true, json: async () => null }),
+      );
 
       const result = await RoutineService.getTodayRoutine();
       expect(result).toBeNull();
@@ -86,22 +85,18 @@ describe('RoutineService Error Handling', () => {
 
   describe('getRoutineByDate', () => {
     it('should return null when response is 404', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-        headers: { get: () => null },
-      });
+      (global.fetch as jest.Mock).mockResolvedValueOnce(
+        mockResponse({ ok: false, status: 404 }),
+      );
 
       const result = await RoutineService.getRoutineByDate('2025-08-17');
       expect(result).toBeNull();
     });
 
     it('should return null when response is invalid', async () => {
-      (global.fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        headers: { get: () => null },
-        json: async () => 'not an object',
-      });
+      (global.fetch as jest.Mock).mockResolvedValueOnce(
+        mockResponse({ ok: true, json: async () => 'not an object' }),
+      );
 
       const result = await RoutineService.getRoutineByDate('2025-08-17');
       expect(result).toBeNull();

@@ -5,9 +5,6 @@ import { APP_CONFIG } from '../../shared/config/app.config';
 const BACKEND_URL = APP_CONFIG.API.BACKEND_URL;
 
 export const AuthService = {
-  /**
-   * Registrar nuevo usuario con email y contraseña
-   */
   async signUp(email: string, password: string, fullName?: string) {
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -20,9 +17,6 @@ export const AuthService = {
     return data;
   },
 
-  /**
-   * Iniciar sesión con email y contraseña
-   */
   async signIn(email: string, password: string) {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -32,9 +26,6 @@ export const AuthService = {
     return data;
   },
 
-  /**
-   * Iniciar sesión con Google
-   */
   async signInWithGoogle() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -46,26 +37,16 @@ export const AuthService = {
     return data;
   },
 
-  /**
-   * Cerrar sesión
-   */
   async signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw new Error(error.message);
   },
 
-  /**
-   * Obtener sesión actual
-   */
   async getSession() {
     const { data: { session } } = await supabase.auth.getSession();
     return session;
   },
 
-  /**
-   * Sincronizar perfil con el backend después del login
-   * Crea el perfil si es la primera vez, lo actualiza si ya existe
-   */
   async syncProfile(token: string, fullName?: string): Promise<UserProfile | null> {
     try {
       const response = await fetch(`${BACKEND_URL}/users/me/sync`, {
@@ -84,9 +65,6 @@ export const AuthService = {
     }
   },
 
-  /**
-   * Obtener perfil del usuario autenticado desde el backend
-   */
   async getMyProfile(token: string): Promise<UserProfile | null> {
     try {
       const response = await fetch(`${BACKEND_URL}/users/me`, {

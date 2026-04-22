@@ -4,11 +4,11 @@ import '@testing-library/jest-dom';
 import RoutineView from '../components/RoutineView';
 import { ApiService } from '../../exercises/services/api';
 import { AppProvider } from '../../shared/context/AppContext';
+import type { DailyRoutine } from '../types/routine';
+import type { Exercise } from '../../exercises/types/exercise';
 
 const renderWithProvider = (ui: React.ReactElement) =>
   render(<AppProvider>{ui}</AppProvider>);
-import type { DailyRoutine } from '../types/routine';
-import type { Exercise } from '../../exercises/types/exercise';
 
 // Mock del ApiService
 jest.mock('../../exercises/services/api');
