@@ -1,61 +1,119 @@
+import React, { useState } from 'react';
+import { useAuth } from '../../auth/hooks/useAuth';
 import { APP_CONFIG } from '../config/app.config';
 
-const GRADIENT_STYLE = APP_CONFIG.THEME.GRADIENT_STYLE;
+interface HeaderProps {
+  onNavigate?: (page: string) => void;
+}
 
-const CentroWellnessLogo = () => (
-  <div className="flex items-center justify-center bg-white p-2 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 border-2 border-wellness-gold-500">
-    <img 
-      src="/logo-centro-wellness.jpeg" 
-      alt="Centro Wellness Sierra de Gata" 
-      className="w-12 h-12 object-cover rounded-lg"
-    />
-  </div>
-);
+const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
+  const { user, isAuthenticated, isAdmin, signOut } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
 
-const TitleAndSubtitle = () => (
-  <div>
-    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight bg-gradient-to-r from-white via-wellness-green-100 to-wellness-gold-200 bg-clip-text text-transparent">
-      Centro Wellness Sierra de Gata
-    </h1>
-    <p className="text-wellness-green-100 text-sm sm:text-base lg:text-lg font-medium mt-1">
-      Tu catálogo de ejercicios personalizado
-    </p>
-  </div>
-);
+  const displayName = user?.profile?.fullName ?? user?.email?.split('@')[0] ?? '';
 
-const MotivationalSection = () => (
-  <div className="hidden md:flex items-center space-x-8">
-    <div className="text-right">
-      <p className="text-wellness-green-100 text-sm font-medium">¡Entrena como un profesional!</p>
-      <p className="text-white text-xl font-bold">Transforma tu rutina</p>
-    </div>
-    <div className="w-12 h-12 bg-wellness-gold-gradient rounded-full flex items-center justify-center shadow-lg border-2 border-wellness-gold-400">
-      <span className="text-2xl">💪</span>
-    </div>
-  </div>
-);
-
-const Header = () => {
   return (
-    <header 
-      className="bg-wellness-gradient text-white shadow-2xl relative overflow-hidden" 
-      style={{background: GRADIENT_STYLE}}
+    <header
+      className="sticky top-0 z-50 w-full shadow-2xl"
+      style={{
+        background: APP_CONFIG.THEME.GRADIENT_STYLE,
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+      }}
     >
-      <div className="absolute inset-0 bg-black opacity-15"></div>
-      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-wellness-green-600/10 to-wellness-green-900/20"></div>
-      
-      <div className="container mx-auto px-6 py-8 relative z-10">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <CentroWellnessLogo />
-            <TitleAndSubtitle />
+      <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <button
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          onClick={() => isAuthenticated ? onNavigate?.('dashboard') : undefined}
+        >
+          <span className="text-2xl">🏋️</span>
+          <div>
+            <p className="font-bold text-white text-lg leading-none hidden sm:block">
+              Centro Wellness
+            </p>
+            <p className="text-gray-400 text-xs hidden sm:block">Sierra de Gata</p>
           </div>
-          
-          <MotivationalSection />
-        </div>
-      </div>
+        </button>
 
-      <div className="absolute bottom-0 left-0 right-0 h-2 bg-wellness-gold-gradient"></div>
+        {/* Usuario autenticado */}
+        {isAuthenticated && user ? (
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors hover:bg-white/10"
+            >
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white flex-shrink-0"
+                style={{ background: isAdmin ? '#e50914' : '#4b5563' }}
+              >
+                {displayName.charAt(0).toUpperCase()}
+              </div>
+              <div className="hidden sm:block text-left">
+                <p className="text-white text-sm font-medium leading-none">{displayName}</p>
+                <p className="text-gray-400 text-xs mt-0.5">
+                  {isAdmin ? '👑 Admin' : '👤 Usuario'}
+                </p>
+              </div>
+              <span className="text-gray-500 text-xs">▾</span>
+            </button>
+
+            {/* Dropdown */}
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                <div
+                  className="absolute right-0 top-full mt-2 w-54 rounded-xl shadow-2xl z-20 py-1.5"
+                  style={{ background: '#1c1c1c', border: '1px solid rgba(255,255,255,0.1)', minWidth: '210px' }}
+                >
+                  <div className="px-4 py-3 border-b border-white/10">
+                    <p className="text-white text-sm font-semibold">{displayName}</p>
+                    <p className="text-gray-500 text-xs truncate">{user.email}</p>
+                  </div>
+
+                  {[
+                    { page: 'dashboard', icon: '🏠', label: 'Mi Dashboard' },
+                    { page: 'exercises', icon: '📋', label: 'Ejercicios' },
+                    { page: 'routines', icon: '💪', label: 'Rutinas' },
+                  ].map(({ page, icon, label }) => (
+                    <button
+                      key={page}
+                      className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 flex items-center gap-2.5"
+                      onClick={() => { onNavigate?.(page); setMenuOpen(false); }}
+                    >
+                      <span>{icon}</span> {label}
+                    </button>
+                  ))}
+
+                  {isAdmin && (
+                    <div className="border-t border-white/10 mt-1 pt-1">
+                      <button
+                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-red-900/20 flex items-center gap-2.5"
+                        style={{ color: '#fca5a5' }}
+                        onClick={() => { onNavigate?.('admin'); setMenuOpen(false); }}
+                      >
+                        <span>👑</span> Panel Admin
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="border-t border-white/10 mt-1 pt-1">
+                    <button
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-900/20 flex items-center gap-2.5"
+                      onClick={async () => { setMenuOpen(false); await signOut(); }}
+                    >
+                      <span>🚪</span> Cerrar sesión
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400 text-sm hidden sm:block">Tu centro de entrenamiento</span>
+          </div>
+        )}
+      </div>
     </header>
   );
 };

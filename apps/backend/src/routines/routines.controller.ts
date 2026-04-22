@@ -10,21 +10,30 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { RoutinesService } from './routines.service';
 import { CreateDailyRoutineDto } from './dto/create-daily-routine.dto';
 import { UpdateDailyRoutineDto } from './dto/update-daily-routine.dto';
 import { CreateRoutineExerciseDto } from './dto/create-routine-exercise.dto';
 import { UpdateRoutineExerciseDto } from './dto/update-routine-exercise.dto';
+import { JwtAuthGuard, Public } from '../auth/application/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/application/guards/roles.guard';
+import { Roles, UserRole } from '../auth/application/decorators/roles.decorator';
+import { CurrentUser } from '../auth/application/decorators/current-user.decorator';
+import { JwtPayload } from '../shared/infrastructure/jwt/jwt-verifier';
 
 @ApiTags('routines')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('routines')
 export class RoutinesController {
   constructor(private readonly routinesService: RoutinesService) {}
 
   // Endpoints para DailyRoutine
   @Post('daily')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Crear rutina diaria',
     description: 'Crea una nueva rutina de ejercicios para un día específico',
@@ -42,11 +51,13 @@ export class RoutinesController {
   }
 
   @Get('daily')
+  @Public()
   findAllDailyRoutines() {
     return this.routinesService.findAllDailyRoutines();
   }
 
   @Get('daily/by-date/:date')
+  @Public()
   async findDailyRoutineByDate(@Param('date') date: string) {
     const routine = await this.routinesService.findDailyRoutineByDate(date);
     if (!routine) {

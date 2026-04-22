@@ -9,6 +9,7 @@ import {
   Query,
   ValidationPipe,
   Logger,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,14 +17,19 @@ import {
   ApiResponse,
   ApiQuery,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
-import { Request } from 'express';
 import { ExercisesService } from './exercises.service';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { ExerciseFiltersDto } from './dto/exercise-filters.dto';
+import { JwtAuthGuard, Public } from '../auth/application/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/application/guards/roles.guard';
+import { Roles, UserRole } from '../auth/application/decorators/roles.decorator';
 
 @ApiTags('exercises')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('exercises')
 export class ExercisesController {
   private readonly logger = new Logger(ExercisesController.name);
@@ -31,6 +37,7 @@ export class ExercisesController {
   constructor(private readonly exercisesService: ExercisesService) {}
 
   @Post()
+  @Roles(UserRole.ADMIN)
   @ApiOperation({
     summary: 'Crear nuevo ejercicio',
     description:
@@ -62,6 +69,7 @@ export class ExercisesController {
   }
 
   @Get()
+  @Public()
   @ApiOperation({
     summary: 'Obtener todos los ejercicios',
     description:
@@ -94,6 +102,7 @@ export class ExercisesController {
   }
 
   @Get('categories')
+  @Public()
   @ApiOperation({
     summary: 'Obtener categorías de ejercicios',
     description:
@@ -108,6 +117,7 @@ export class ExercisesController {
   }
 
   @Get('muscle-groups')
+  @Public()
   @ApiOperation({
     summary: 'Obtener grupos musculares',
     description: 'Obtiene todos los grupos musculares disponibles',
@@ -121,6 +131,7 @@ export class ExercisesController {
   }
 
   @Get('equipment')
+  @Public()
   @ApiOperation({
     summary: 'Obtener equipamiento disponible',
     description: 'Obtiene lista de todo el equipamiento disponible',
@@ -134,6 +145,7 @@ export class ExercisesController {
   }
 
   @Get('statistics')
+  @Public()
   @ApiOperation({
     summary: 'Obtener estadísticas del sistema',
     description:
@@ -173,6 +185,7 @@ export class ExercisesController {
   }
 
   @Get('search')
+  @Public()
   @ApiOperation({
     summary: 'Búsqueda avanzada de ejercicios',
     description:
@@ -219,6 +232,7 @@ export class ExercisesController {
   }
 
   @Get(':id')
+  @Public()
   async findOne(@Param('id') id: string) {
     this.logger.log(`🔍 GET /exercises/${id}`);
     const result = await this.exercisesService.findOne(id);
@@ -227,6 +241,7 @@ export class ExercisesController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.ADMIN)
   async update(
     @Param('id') id: string,
     @Body(ValidationPipe) updateExerciseDto: UpdateExerciseDto,
@@ -235,6 +250,7 @@ export class ExercisesController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN)
   async remove(@Param('id') id: string) {
     await this.exercisesService.remove(id);
     return { message: `Exercise with ID ${id} has been deleted` };

@@ -1,0 +1,47 @@
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { ROLES_KEY, UserRole } from '../decorators/roles.decorator';
+
+/**
+ * Guard de roles. Se usa junto con JwtAuthGuard.
+ * Compara el rol del usuario (guardado en user_profiles) con los roles requeridos.
+ * El campo appRole se adjunta al request por el JwtAuthGuard tras consultar el perfil.
+ */
+@Injectable()
+export class RolesGuard implements CanActivate {
+  constructor(private readonly reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
+      ROLES_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (!requiredRoles || requiredRoles.length === 0) return true;
+
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    if (!user) {
+      throw new ForbiddenException('Sin autenticación');
+    }
+
+    // El rol de la app se guarda en user_metadata o en el profile
+    // request.userProfile es inyectado por un interceptor/middleware de perfil
+    const userRole: string = request.userProfile?.role ?? UserRole.USER;
+
+    const hasRole = requiredRoles.some((role) => role === userRole);
+    if (!hasRole) {
+      throw new ForbiddenException(
+        `Acceso denegado. Roles requeridos: ${requiredRoles.join(', ')}`,
+      );
+    }
+
+    return true;
+  }
+}

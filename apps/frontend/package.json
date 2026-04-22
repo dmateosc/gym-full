@@ -18,6 +18,7 @@
     "setup-env": "./setup-vercel-env.sh"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.53.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
