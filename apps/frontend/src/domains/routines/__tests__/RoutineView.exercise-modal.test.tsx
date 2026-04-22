@@ -3,6 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import RoutineView from '../components/RoutineView';
 import { ApiService } from '../../exercises/services/api';
+import { AppProvider } from '../../shared/context/AppContext';
+
+const renderWithProvider = (ui: React.ReactElement) =>
+  render(<AppProvider>{ui}</AppProvider>);
 import type { DailyRoutine } from '../types/routine';
 import type { Exercise } from '../../exercises/types/exercise';
 
@@ -78,7 +82,7 @@ describe('RoutineView - Exercise Detail Modal', () => {
   });
 
   it('should render exercise name as clickable', () => {
-    render(<RoutineView routine={mockRoutine} />);
+    renderWithProvider(<RoutineView routine={mockRoutine} />);
     
     const exerciseButton = screen.getByText('Press de banca');
     expect(exerciseButton).toBeInTheDocument();
@@ -86,7 +90,7 @@ describe('RoutineView - Exercise Detail Modal', () => {
   });
 
   it('should show "Ver detalles" text on hover', () => {
-    render(<RoutineView routine={mockRoutine} />);
+    renderWithProvider(<RoutineView routine={mockRoutine} />);
     
     const detailsText = screen.getByText('👁️ Ver detalles');
     expect(detailsText).toBeInTheDocument();
@@ -95,7 +99,7 @@ describe('RoutineView - Exercise Detail Modal', () => {
   it('should open modal when exercise is clicked', async () => {
     mockApiService.getExercise.mockResolvedValue(mockExercise);
     
-    render(<RoutineView routine={mockRoutine} />);
+    renderWithProvider(<RoutineView routine={mockRoutine} />);
     
     const exerciseButton = screen.getByText('Press de banca').closest('button');
     fireEvent.click(exerciseButton!);
@@ -115,7 +119,7 @@ describe('RoutineView - Exercise Detail Modal', () => {
       new Promise(resolve => setTimeout(() => resolve(mockExercise), 100))
     );
     
-    render(<RoutineView routine={mockRoutine} />);
+    renderWithProvider(<RoutineView routine={mockRoutine} />);
     
     const exerciseButton = screen.getByText('Press de banca').closest('button');
     fireEvent.click(exerciseButton!);
@@ -131,7 +135,7 @@ describe('RoutineView - Exercise Detail Modal', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     mockApiService.getExercise.mockRejectedValue(new Error('Network error'));
     
-    render(<RoutineView routine={mockRoutine} />);
+    renderWithProvider(<RoutineView routine={mockRoutine} />);
     
     const exerciseButton = screen.getByText('Press de banca').closest('button');
     fireEvent.click(exerciseButton!);
@@ -146,7 +150,7 @@ describe('RoutineView - Exercise Detail Modal', () => {
   it('should close modal when close button is clicked', async () => {
     mockApiService.getExercise.mockResolvedValue(mockExercise);
     
-    render(<RoutineView routine={mockRoutine} />);
+    renderWithProvider(<RoutineView routine={mockRoutine} />);
     
     // Abrir modal
     const exerciseButton = screen.getByText('Press de banca').closest('button');
@@ -170,7 +174,7 @@ describe('RoutineView - Exercise Detail Modal', () => {
       new Promise(resolve => setTimeout(() => resolve(mockExercise), 100))
     );
     
-    render(<RoutineView routine={mockRoutine} />);
+    renderWithProvider(<RoutineView routine={mockRoutine} />);
     
     const exerciseButton = screen.getByText('Press de banca').closest('button');
     fireEvent.click(exerciseButton!);

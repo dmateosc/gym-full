@@ -1,7 +1,8 @@
 import { supabase } from './supabase';
 import { UserProfile } from '../types/auth.types';
+import { APP_CONFIG } from '../../shared/config/app.config';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? 'https://gym-exercise-backend.vercel.app/api';
+const BACKEND_URL = APP_CONFIG.API.BACKEND_URL;
 
 export const AuthService = {
   /**

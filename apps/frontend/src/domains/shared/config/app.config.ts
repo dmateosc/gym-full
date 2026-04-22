@@ -45,9 +45,17 @@ function getApiBaseUrl(): string {
   return 'http://localhost:3001/api';
 }
 
+function getBackendUrl(): string {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  return getApiBaseUrl();
+}
+
 export const APP_CONFIG = {
   API: {
     BASE_URL: getApiBaseUrl(),
+    BACKEND_URL: getBackendUrl(),
     TIMEOUT: 10000,
   },
   UI: {

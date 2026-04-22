@@ -26,7 +26,12 @@ const config: Config = {
     // Assets estáticos
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
     '\\.(gif|ttf|eot|svg|png|jpg|jpeg|webp)$': 'identity-obj-proxy',
-    
+
+    // Mocks para módulos que usan import.meta.env (incompatible con Jest/Babel)
+    '.*app\\.config$': '<rootDir>/src/test/mocks/app.config.ts',
+    '.*/supabase$': '<rootDir>/src/test/mocks/supabase.ts',
+    '.*/authService$': '<rootDir>/src/test/mocks/authService.ts',
+
     // Path aliases
     '^@/(.*)$': '<rootDir>/src/$1',
     '^components/(.*)$': '<rootDir>/src/components/$1',

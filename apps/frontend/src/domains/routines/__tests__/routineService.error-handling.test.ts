@@ -56,6 +56,7 @@ describe('RoutineService Error Handling', () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 404,
+        headers: { get: () => null },
       });
 
       const result = await RoutineService.getTodayRoutine();
@@ -65,6 +66,7 @@ describe('RoutineService Error Handling', () => {
     it('should return null when response is invalid', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
+        headers: { get: () => null },
         json: async () => null,
       });
 
@@ -87,6 +89,7 @@ describe('RoutineService Error Handling', () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         status: 404,
+        headers: { get: () => null },
       });
 
       const result = await RoutineService.getRoutineByDate('2025-08-17');
@@ -96,6 +99,7 @@ describe('RoutineService Error Handling', () => {
     it('should return null when response is invalid', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
+        headers: { get: () => null },
         json: async () => 'not an object',
       });
 

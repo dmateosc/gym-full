@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
+import { APP_CONFIG } from '../../shared/config/app.config';
 
 interface Stats {
   totalExercises: number;
@@ -7,7 +8,7 @@ interface Stats {
   byDifficulty: Record<string, number>;
 }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? 'https://gym-exercise-backend.vercel.app/api';
+const BACKEND_URL = APP_CONFIG.API.BACKEND_URL;
 
 const StatCard: React.FC<{
   icon: string;
