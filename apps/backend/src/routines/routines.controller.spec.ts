@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RoutinesController } from './routines.controller';
 import { RoutinesService } from './routines.service';
+import { JwtAuthGuard } from '../auth/application/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/application/guards/roles.guard';
 import { CreateDailyRoutineDto } from './dto/create-daily-routine.dto';
 import {
   RoutineIntensity,
@@ -56,7 +58,12 @@ describe('RoutinesController', () => {
           useValue: mockRoutinesService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(RolesGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<RoutinesController>(RoutinesController);
   });
