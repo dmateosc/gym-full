@@ -28,7 +28,7 @@ function AppContent() {
 
   // Redirigir a login si no está autenticado
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && !isAuthenticated && currentPage !== 'register') {
       setCurrentPage('login');
     } else if (!isLoading && isAuthenticated && (currentPage === 'login' || currentPage === 'register')) {
       setCurrentPage('dashboard');
