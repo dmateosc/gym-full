@@ -30,3 +30,11 @@ src/disabled-supabase/
 *.sln
 *.sw?
 .vercel
+
+# Database backups & exports
+*.backup
+*.backup.gz
+*.storage.zip
+
+# One-off scripts with credentials
+fix-db.js
