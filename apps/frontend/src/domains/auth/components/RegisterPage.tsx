@@ -87,12 +87,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Nombre completo</label>
+              <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1.5">Nombre completo</label>
               <input
+                id="fullName"
+                name="fullName"
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Juan García"
+                autoComplete="name"
                 className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none"
                 style={inputStyle}
                 required
@@ -100,12 +103,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
               <input
+                id="email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@email.com"
+                autoComplete="email"
                 className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none"
                 style={inputStyle}
                 required
@@ -113,12 +119,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Contraseña</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">Contraseña</label>
               <input
+                id="password"
+                name="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Mín. 6 caracteres"
+                autoComplete="new-password"
                 className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none"
                 style={inputStyle}
                 required
@@ -126,12 +135,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">Confirmar contraseña</label>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1.5">Confirmar contraseña</label>
               <input
+                id="confirmPassword"
+                name="confirmPassword"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Repite la contraseña"
+                autoComplete="new-password"
                 className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none"
                 style={inputStyle}
                 required

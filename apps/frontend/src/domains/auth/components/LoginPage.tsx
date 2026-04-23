@@ -44,15 +44,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Email
               </label>
               <input
+                id="email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@email.com"
                 required
+                autoComplete="email"
                 className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none transition-all"
                 style={{
                   background: 'rgba(255,255,255,0.08)',
@@ -65,16 +68,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">
                 Contraseña
               </label>
               <div className="relative">
                 <input
+                  id="password"
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
+                  autoComplete="current-password"
                   className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none transition-all pr-12"
                   style={{
                     background: 'rgba(255,255,255,0.08)',
