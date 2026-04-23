@@ -12,17 +12,27 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { RoutinesService } from './routines.service';
 import { CreateDailyRoutineDto } from './dto/create-daily-routine.dto';
 import { UpdateDailyRoutineDto } from './dto/update-daily-routine.dto';
 import { CreateRoutineExerciseDto } from './dto/create-routine-exercise.dto';
 import { UpdateRoutineExerciseDto } from './dto/update-routine-exercise.dto';
-import { JwtAuthGuard, Public } from '../auth/application/guards/jwt-auth.guard';
+import {
+  JwtAuthGuard,
+  Public,
+} from '../auth/application/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/application/guards/roles.guard';
-import { Roles, UserRole } from '../auth/application/decorators/roles.decorator';
-import { CurrentUser } from '../auth/application/decorators/current-user.decorator';
-import { JwtPayload } from '../shared/infrastructure/jwt/jwt-verifier';
+import {
+  Roles,
+  UserRole,
+} from '../auth/application/decorators/roles.decorator';
 
 @ApiTags('routines')
 @ApiBearerAuth()
