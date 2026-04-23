@@ -32,8 +32,8 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
       return;
     }
 
-    await signUp(email, password, fullName);
-    if (!error) {
+    const ok = await signUp(email, password, fullName);
+    if (ok) {
       setSuccess(true);
     }
   };

@@ -45,7 +45,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName?: string) => Promise<void>;
+  signUp: (email: string, password: string, fullName?: string) => Promise<boolean>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
@@ -133,14 +133,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
+  const signUp = async (email: string, password: string, fullName?: string): Promise<boolean> => {
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'CLEAR_ERROR' });
     try {
       await AuthService.signUp(email, password, fullName);
-      // El usuario necesita confirmar email antes de poder iniciar sesión
+      return true;
     } catch (err) {
       dispatch({ type: 'SET_ERROR', payload: (err as Error).message });
+      return false;
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }

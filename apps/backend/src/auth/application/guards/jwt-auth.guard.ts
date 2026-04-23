@@ -25,8 +25,7 @@ export class JwtAuthGuard implements CanActivate {
     private readonly configService: ConfigService,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
-    // Permitir rutas marcadas como públicas
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -40,18 +39,24 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Token de autenticación requerido');
     }
 
-    const jwtSecret = this.configService.get<string>('SUPABASE_JWT_SECRET');
-    if (!jwtSecret) {
-      this.logger.error('SUPABASE_JWT_SECRET no está configurado');
-      throw new UnauthorizedException('Error de configuración del servidor');
+    let payload: import('../../../shared/infrastructure/jwt/jwt-verifier').JwtPayload | null = null;
+
+    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
+    if (supabaseUrl) {
+      payload = await JwtVerifier.verifyWithJwks(token, `${supabaseUrl}/.well-known/jwks.json`);
     }
 
-    const payload = JwtVerifier.verify(token, jwtSecret);
+    if (!payload) {
+      const jwtSecret = this.configService.get<string>('SUPABASE_JWT_SECRET');
+      if (jwtSecret) {
+        payload = JwtVerifier.verify(token, jwtSecret);
+      }
+    }
+
     if (!payload) {
       throw new UnauthorizedException('Token inválido o expirado');
     }
 
-    // Adjuntar usuario al request para uso en decoradores y guards posteriores
     request.user = payload;
     return true;
   }
