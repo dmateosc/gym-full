@@ -6,17 +6,15 @@
       "use": "@vercel/node"
     }
   ],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "api/index.js" }
-  ],
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type,Authorization,X-Requested-With" }
-      ]
+      "src": "/(.*)",
+      "dest": "api/index.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization,X-Requested-With"
+      }
     }
   ],
   "installCommand": "npm install",
