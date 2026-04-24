@@ -1,17 +1,21 @@
 import type { Exercise, ExerciseFilters } from '../types/exercise';
 import { APP_CONFIG } from '../../shared/config/app.config';
+import { supabase } from '../../auth/services/supabase';
 
-// 🚨 CRITICAL: Use centralized configuration to avoid hardcoded URLs
 const API_BASE_URL = APP_CONFIG.API.BASE_URL;
-
-console.log('🔗 Exercises API Base URL:', API_BASE_URL);
 
 export class ApiService {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const authHeader = session?.access_token
+        ? { Authorization: `Bearer ${session.access_token}` }
+        : {};
+
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         headers: {
           'Content-Type': 'application/json',
+          ...authHeader,
           ...options?.headers,
         },
         ...options,

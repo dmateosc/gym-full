@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { APP_CONFIG } from '../../shared/config/app.config';
+import { supabase } from '../../auth/services/supabase';
 
 interface Stats {
   totalExercises: number;
@@ -62,7 +63,11 @@ const DashboardContainer: React.FC<{
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/exercises/statistics`);
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: HeadersInit = session?.access_token
+          ? { Authorization: `Bearer ${session.access_token}` }
+          : {};
+        const res = await fetch(`${BACKEND_URL}/exercises/statistics`, { headers });
         if (res.ok) {
           setStats(await res.json());
         }
