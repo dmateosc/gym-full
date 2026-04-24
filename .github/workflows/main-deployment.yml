@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_ORG_ID: team_1yXl7NzFpzpwy7ipONk06sF5
 
 jobs:
   test:
@@ -81,7 +81,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     timeout-minutes: 15
     env:
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_PROJECT_ID: prj_aPZJEUTleWWhI5uTYwJXHXYQgMi0
 
     steps:
       - name: 📦 Checkout code
