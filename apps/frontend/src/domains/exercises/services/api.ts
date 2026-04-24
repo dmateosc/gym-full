@@ -8,7 +8,7 @@ export class ApiService {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const authHeader = session?.access_token
+      const authHeader: Record<string, string> = session?.access_token
         ? { Authorization: `Bearer ${session.access_token}` }
         : {};
 
