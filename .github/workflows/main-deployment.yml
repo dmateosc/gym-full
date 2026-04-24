@@ -109,8 +109,8 @@ jobs:
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
           VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: https://vlpqpblyfqxucsobmuep.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZscHFwYmx5ZnF4dWNzb2JtdWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4Njk4MDQsImV4cCI6MjA5MjQ0NTgwNH0.cISlsXx84PoWWmM5sG4cYSfNb0FEE-B-thiZSVkFfzI
 
       - name: 🚀 Deploy to Vercel
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
