@@ -119,30 +119,6 @@ async function createApp(): Promise<INestApplication> {
 
   const app = await NestFactory.create(AppModule);
 
-  // 🔐 Configuración CORS inteligente para Centro Wellness
-  app.enableCors({
-    origin: (origin, callback) => {
-      console.log(`🌐 CORS request from origin: ${origin || 'unknown'}`);
-
-      // Permitir requests sin origin (mobile apps, Postman, etc.)
-      if (!origin) {
-        console.log('✅ CORS: Request without origin allowed');
-        return callback(null, true);
-      }
-
-      if (isOriginAllowed(origin)) {
-        console.log(`✅ CORS: Origin ${origin} allowed`);
-        callback(null, true);
-      } else {
-        console.log(`❌ CORS: Origin ${origin} blocked`);
-        callback(new Error('Not allowed by CORS'), false);
-      }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true,
-  });
-
   // 🔍 Configurar validación global
   app.useGlobalPipes(
     new ValidationPipe({
@@ -171,6 +147,21 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ): Promise<void> {
+  const origin = (req.headers.origin as string) || '';
+
+  if (isOriginAllowed(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+
   try {
     const app = await createApp();
     const expressApp = app.getHttpAdapter().getInstance() as (
