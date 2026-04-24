@@ -8,37 +8,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 // Cache de la instancia de la aplicación para Vercel
 let cachedApp: INestApplication;
 
-// Función inteligente para validar orígenes CORS sin hardcodear URLs
-function isOriginAllowed(origin: string): boolean {
-  // 1. Desarrollo local - siempre permitido
-  if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
-    return true;
-  }
-
-  // 2. Todos los deployments de la organización en Vercel
-  if (origin.includes('-dmateoscanos-projects.vercel.app')) {
-    return true;
-  }
-
-  // 3. Dominios principales del proyecto (sin hardcodear URLs específicas)
-  const allowedDomains = [
-    '.vercel.app',
-    'centro-wellness-sierra-de-gata.vercel.app',
-    'centrowellnesssierradegata.vercel.app',
-    'gym-exercise-frontend.vercel.app',
-    'gym-exercise-backend.vercel.app',
-    'gym-full.vercel.app',
-  ];
-
-  // 4. Palabras clave del proyecto (enfoque inteligente)
-  const projectKeywords = ['centro', 'wellness', 'gym', 'exercise', 'frontend'];
-  if (projectKeywords.some((keyword) => origin.includes(keyword))) {
-    return true;
-  }
-
-  // 5. Verificar dominios principales
-  return allowedDomains.some((domain) => origin.includes(domain));
-}
 
 /**
  * 🔧 Configuración de Swagger/OpenAPI
@@ -143,20 +112,11 @@ async function createApp(): Promise<INestApplication> {
 }
 
 // Handler principal para Vercel
+// CORS headers are injected by vercel.json headers config at infra level
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ): Promise<void> {
-  const origin = (req.headers.origin as string) || '';
-
-  if (isOriginAllowed(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Vary', 'Origin');
-  }
-  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
   if (req.method === 'OPTIONS') {
     res.status(204).end();
     return;
