@@ -129,7 +129,16 @@ export default async function handler(
   }
 
   try {
-    const app = await createApp();
+    const app = await Promise.race([
+      createApp(),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () =>
+            reject(new Error('App init timeout after 8s — check DATABASE_URL')),
+          8000,
+        ),
+      ),
+    ]);
     const expressApp = app.getHttpAdapter().getInstance() as (
       req: VercelRequest,
       res: VercelResponse,
