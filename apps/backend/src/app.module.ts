@@ -44,9 +44,8 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
       logging: ['error', 'warn'],
       logger: new DatabaseLogger(),
       maxQueryExecutionTime: 1000,
-      // Serverless: fail fast instead of retrying for 30s (Vercel timeout is 10s)
-      retryAttempts: 2,
-      retryDelay: 1000,
+      // Fail immediately on DB error so Vercel's 10s timeout isn't hit
+      retryAttempts: 0,
       connectTimeoutMS: 5000,
     }),
     // Módulos de la aplicación
