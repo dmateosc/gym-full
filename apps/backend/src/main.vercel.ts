@@ -111,6 +111,12 @@ async function createApp(): Promise<INestApplication> {
   return app;
 }
 
+// Catch unhandled promise rejections (e.g. TypeORM connection errors emitted
+// as events instead of thrown) so they don't crash the Lambda silently.
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection:', reason);
+});
+
 // Handler principal para Vercel
 // CORS headers are injected by vercel.json headers config at infra level
 export default async function handler(
