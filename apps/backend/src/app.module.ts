@@ -44,9 +44,12 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
       logging: ['error', 'warn'],
       logger: new DatabaseLogger(),
       maxQueryExecutionTime: 1000,
-      // Fail immediately on DB error so Vercel's 10s timeout isn't hit
+      // Fail fast — Vercel's timeout is 10s
       retryAttempts: 0,
-      connectTimeoutMS: 5000,
+      // Pass connection timeout directly to the pg driver
+      extra: {
+        connectionTimeoutMillis: 5000,
+      },
     }),
     // Módulos de la aplicación
     AuthModule,
