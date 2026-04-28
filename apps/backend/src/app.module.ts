@@ -39,11 +39,15 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
       ],
       synchronize: false,
       ssl: {
-        rejectUnauthorized: false, // Para Supabase
+        rejectUnauthorized: false,
       },
       logging: ['error', 'warn'],
       logger: new DatabaseLogger(),
       maxQueryExecutionTime: 1000,
+      // Serverless: fail fast instead of retrying for 30s (Vercel timeout is 10s)
+      retryAttempts: 2,
+      retryDelay: 1000,
+      connectTimeoutMS: 5000,
     }),
     // Módulos de la aplicación
     AuthModule,
