@@ -1,0 +1,35 @@
+name: Deploy to Homelab
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to gym.3dmc.lab
+    runs-on: self-hosted
+    steps:
+      - name: Pull latest code
+        run: |
+          cd /opt/gym-full
+          git pull origin main
+
+      - name: Rebuild and restart containers
+        run: |
+          cd /opt/stacks/gym-full
+          docker compose up --build -d
+
+      - name: Wait for backend health
+        run: |
+          for i in $(seq 1 30); do
+            status=$(docker inspect gymapp-backend --format='{{.State.Health.Status}}' 2>/dev/null)
+            if [ "$status" = "healthy" ]; then
+              echo "Backend healthy"
+              exit 0
+            fi
+            echo "Waiting... ($status)"
+            sleep 10
+          done
+          docker logs gymapp-backend --tail 20
+          exit 1
