@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { Public } from './auth/application/guards/jwt-auth.guard';
 
 @ApiTags('health')
 @Controller()
@@ -21,6 +22,7 @@ export class AppController {
   }
 
   @Get('health')
+  @Public()
   @ApiOperation({
     summary: 'Health check del API',
     description: 'Verificar el estado de salud del servidor',
