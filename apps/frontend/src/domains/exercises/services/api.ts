@@ -1,15 +1,15 @@
 import type { Exercise, ExerciseFilters } from '../types/exercise';
 import { APP_CONFIG } from '../../shared/config/app.config';
-import { supabase } from '../../auth/services/supabase';
+import { AuthService } from '../../auth/services/authService';
 
 const API_BASE_URL = APP_CONFIG.API.BASE_URL;
 
 export class ApiService {
   private static async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const authHeader: Record<string, string> = session?.access_token
-        ? { Authorization: `Bearer ${session.access_token}` }
+      const token = AuthService.getToken();
+      const authHeader: Record<string, string> = token
+        ? { Authorization: `Bearer ${token}` }
         : {};
 
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {

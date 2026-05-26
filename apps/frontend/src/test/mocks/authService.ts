@@ -1,9 +1,13 @@
+export const TokenStorage = {
+  get: jest.fn().mockReturnValue(null),
+  set: jest.fn(),
+  clear: jest.fn(),
+};
+
 export const AuthService = {
-  signUp: jest.fn().mockResolvedValue({}),
-  signIn: jest.fn().mockResolvedValue({}),
-  signInWithGoogle: jest.fn().mockResolvedValue({}),
-  signOut: jest.fn().mockResolvedValue(undefined),
-  getSession: jest.fn().mockResolvedValue(null),
-  syncProfile: jest.fn().mockResolvedValue(null),
+  signUp: jest.fn().mockResolvedValue({ token: 'mock-token', user: null }),
+  signIn: jest.fn().mockResolvedValue({ token: 'mock-token', user: null }),
+  signOut: jest.fn(),
   getMyProfile: jest.fn().mockResolvedValue(null),
+  getToken: jest.fn().mockReturnValue(null),
 };

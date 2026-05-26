@@ -29,35 +29,23 @@ export class UserTypeormRepository implements UserRepositoryPort {
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
 
-  async findBySupabaseId(supabaseId: string): Promise<UserEntity | null> {
-    const ormEntity = await this.repo.findOne({ where: { supabaseId } });
-    return ormEntity ? this.toDomain(ormEntity) : null;
-  }
-
   async findByEmail(email: string): Promise<UserEntity | null> {
     const ormEntity = await this.repo.findOne({ where: { email } });
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
 
   async upsert(data: {
-    supabaseId: string;
     email: string;
     fullName?: string;
     avatarUrl?: string;
   }): Promise<UserEntity> {
-    let ormEntity = await this.repo.findOne({
-      where: { supabaseId: data.supabaseId },
-    });
+    let ormEntity = await this.repo.findOne({ where: { email: data.email } });
 
     if (ormEntity) {
-      // Actualizar campos si han cambiado
       if (data.fullName !== undefined) ormEntity.fullName = data.fullName;
       if (data.avatarUrl !== undefined) ormEntity.avatarUrl = data.avatarUrl;
-      if (data.email) ormEntity.email = data.email;
     } else {
-      // Crear nuevo perfil
       ormEntity = this.repo.create({
-        supabaseId: data.supabaseId,
         email: data.email,
         fullName: data.fullName ?? null,
         avatarUrl: data.avatarUrl ?? null,
@@ -65,6 +53,22 @@ export class UserTypeormRepository implements UserRepositoryPort {
       });
     }
 
+    const saved = await this.repo.save(ormEntity);
+    return this.toDomain(saved);
+  }
+
+  async create(data: {
+    email: string;
+    passwordHash: string;
+    fullName?: string;
+  }): Promise<UserEntity> {
+    const ormEntity = this.repo.create({
+      email: data.email,
+      passwordHash: data.passwordHash,
+      fullName: data.fullName ?? null,
+      avatarUrl: null,
+      role: UserRole.USER,
+    });
     const saved = await this.repo.save(ormEntity);
     return this.toDomain(saved);
   }
@@ -87,10 +91,10 @@ export class UserTypeormRepository implements UserRepositoryPort {
   private toDomain(orm: UserProfileOrmEntity): UserEntity {
     return new UserEntity({
       id: orm.id,
-      supabaseId: orm.supabaseId,
       email: orm.email,
       fullName: orm.fullName,
       avatarUrl: orm.avatarUrl,
+      passwordHash: orm.passwordHash,
       role: orm.role,
       createdAt: orm.createdAt,
       updatedAt: orm.updatedAt,

@@ -1,21 +1,19 @@
 import type { DailyRoutine, RoutineStats } from '../types/routine';
 import { APP_CONFIG } from '../../shared/config/app.config';
-import { supabase } from '../../auth/services/supabase';
+import { AuthService } from '../../auth/services/authService';
 
 const API_BASE_URL = APP_CONFIG.API.BASE_URL;
 
-async function authHeaders(): Promise<HeadersInit> {
-  const { data: { session } } = await supabase.auth.getSession();
-  return session?.access_token
-    ? { Authorization: `Bearer ${session.access_token}` }
-    : {};
+function authHeaders(): HeadersInit {
+  const token = AuthService.getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 export class RoutineService {
   static async getTodayRoutine(): Promise<DailyRoutine | null> {
     try {
       const response = await fetch(`${API_BASE_URL}/routines/daily/today`, {
-        headers: await authHeaders(),
+        headers: authHeaders(),
       });
       
       if (!response.ok) {
@@ -66,7 +64,7 @@ export class RoutineService {
   static async getRoutineByDate(date: string): Promise<DailyRoutine | null> {
     try {
       const response = await fetch(`${API_BASE_URL}/routines/daily/by-date/${date}`, {
-        headers: await authHeaders(),
+        headers: authHeaders(),
       });
       
       if (!response.ok) {
@@ -117,7 +115,7 @@ export class RoutineService {
   static async getAllRoutines(): Promise<DailyRoutine[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/routines/daily`, {
-        headers: await authHeaders(),
+        headers: authHeaders(),
       });
       
       if (!response.ok) {
@@ -155,7 +153,7 @@ export class RoutineService {
   static async getRoutineById(id: string): Promise<DailyRoutine | null> {
     try {
       const response = await fetch(`${API_BASE_URL}/routines/daily/${id}`, {
-        headers: await authHeaders(),
+        headers: authHeaders(),
       });
       
       if (!response.ok) {

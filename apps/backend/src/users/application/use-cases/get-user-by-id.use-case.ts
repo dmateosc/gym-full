@@ -16,8 +16,4 @@ export class GetUserByIdUseCase {
     }
     return user;
   }
-
-  async executeBySupabaseId(supabaseId: string): Promise<UserEntity | null> {
-    return this.userRepository.findBySupabaseId(supabaseId);
-  }
 }

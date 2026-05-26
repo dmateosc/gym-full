@@ -10,7 +10,7 @@ import { UserRole } from '../../domain/value-objects/user-role.vo';
 
 /**
  * Entidad TypeORM para la tabla user_profiles.
- * Extiende los usuarios de Supabase Auth con datos de la aplicación.
+ * Gestiona usuarios con autenticación JWT propia.
  */
 @Entity('user_profiles')
 export class UserProfileOrmEntity {
@@ -18,8 +18,8 @@ export class UserProfileOrmEntity {
   id: string;
 
   @Index({ unique: true })
-  @Column({ name: 'supabase_id', type: 'uuid' })
-  supabaseId: string;
+  @Column({ name: 'supabase_id', type: 'uuid', nullable: true })
+  supabaseId: string | null;
 
   @Index({ unique: true })
   @Column({ type: 'varchar', length: 255 })
@@ -30,6 +30,9 @@ export class UserProfileOrmEntity {
 
   @Column({ name: 'avatar_url', type: 'text', nullable: true })
   avatarUrl: string | null;
+
+  @Column({ name: 'password_hash', type: 'varchar', length: 255, nullable: true })
+  passwordHash: string | null;
 
   @Column({
     type: 'varchar',

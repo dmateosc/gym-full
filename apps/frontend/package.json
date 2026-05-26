@@ -12,13 +12,9 @@
     "preview": "vite preview",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "deploy": "vercel --prod",
-    "deploy:preview": "vercel",
-    "setup-env": "./setup-vercel-env.sh"
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.53.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

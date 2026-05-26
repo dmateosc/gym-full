@@ -3,26 +3,32 @@ import {
   CanActivate,
   ExecutionContext,
   UnauthorizedException,
-  Logger,
+  SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
-import { JwtVerifier } from '../../../shared/infrastructure/jwt/jwt-verifier';
+import { JwtService } from '@nestjs/jwt';
 
 export const IS_PUBLIC_KEY = 'isPublic';
+export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+
+export interface JwtPayload {
+  sub: string;
+  email: string;
+  role: string;
+  iat: number;
+  exp: number;
+}
 
 /**
- * Guard principal de autenticación.
- * Verifica el JWT de Supabase en el header Authorization: Bearer <token>
- * Añade el payload decodificado como request.user
+ * Guard principal de autenticación JWT.
+ * Verifica el token JWT firmado por nosotros.
+ * Añade el payload decodificado como request.user.
  */
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  private readonly logger = new Logger(JwtAuthGuard.name);
-
   constructor(
     private readonly reflector: Reflector,
-    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -32,47 +38,22 @@ export class JwtAuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{ headers: Record<string, string>; user?: JwtPayload }>();
     const token = this.extractToken(request);
+    if (!token) throw new UnauthorizedException('Token requerido');
 
-    if (!token) {
-      throw new UnauthorizedException('Token de autenticación requerido');
-    }
-
-    let payload: import('../../../shared/infrastructure/jwt/jwt-verifier').JwtPayload | null = null;
-
-    const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
-    if (supabaseUrl) {
-      payload = await JwtVerifier.verifyWithJwks(token, `${supabaseUrl}/.well-known/jwks.json`);
-    }
-
-    if (!payload) {
-      const jwtSecret = this.configService.get<string>('SUPABASE_JWT_SECRET');
-      if (jwtSecret) {
-        payload = JwtVerifier.verify(token, jwtSecret);
-      }
-    }
-
-    if (!payload) {
+    try {
+      request.user = this.jwtService.verify<JwtPayload>(token);
+      return true;
+    } catch {
       throw new UnauthorizedException('Token inválido o expirado');
     }
-
-    request.user = payload;
-    return true;
   }
 
-  private extractToken(request: { headers?: Record<string, string> }): string | null {
-    const authHeader = request.headers?.['authorization'];
-    if (!authHeader) return null;
-
-    const [type, token] = authHeader.split(' ');
+  private extractToken(request: { headers: Record<string, string> }): string | null {
+    const auth = request.headers['authorization'];
+    if (!auth) return null;
+    const [type, token] = auth.split(' ');
     return type === 'Bearer' ? token : null;
   }
 }
-
-/**
- * Decorador para marcar rutas como públicas (sin autenticación).
- * Uso: @Public()
- */
-import { SetMetadata } from '@nestjs/common';
-export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);

@@ -2,7 +2,6 @@ export type UserRole = 'admin' | 'user';
 
 export interface UserProfile {
   id: string;
-  supabaseId: string;
   email: string;
   fullName: string | null;
   avatarUrl: string | null;
@@ -12,7 +11,7 @@ export interface UserProfile {
 }
 
 export interface AuthUser {
-  id: string;           // Supabase auth user ID
+  id: string;
   email: string | null;
   profile: UserProfile | null;
 }

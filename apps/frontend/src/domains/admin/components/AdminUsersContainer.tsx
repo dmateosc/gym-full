@@ -13,7 +13,7 @@ const AdminUsersContainer: React.FC = () => {
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
-      const token = await getToken();
+      const token = getToken();
       if (!token) return;
       const data = await AdminService.getAllUsers(token);
       setUsers(data);
@@ -30,7 +30,7 @@ const AdminUsersContainer: React.FC = () => {
   }, [fetchUsers]);
 
   const handleRoleChange = async (userId: string, newRole: UserRole) => {
-    const token = await getToken();
+    const token = getToken();
     if (!token) return;
     setUpdatingId(userId);
     try {
@@ -45,7 +45,7 @@ const AdminUsersContainer: React.FC = () => {
 
   const handleDelete = async (userId: string, email: string) => {
     if (!confirm(`¿Eliminar al usuario ${email}? Esta acción no se puede deshacer.`)) return;
-    const token = await getToken();
+    const token = getToken();
     if (!token) return;
     setUpdatingId(userId);
     try {
@@ -109,7 +109,7 @@ const AdminUsersContainer: React.FC = () => {
             </thead>
             <tbody>
               {users.map((user, index) => {
-                const isCurrentUser = user.supabaseId === currentUser?.id;
+                const isCurrentUser = user.id === currentUser?.id;
                 const isUpdating = updatingId === user.id;
 
                 return (

@@ -6,9 +6,6 @@ export class UserResponseDto {
   @ApiProperty({ description: 'ID único del perfil de usuario' })
   id: string;
 
-  @ApiProperty({ description: 'ID del usuario en Supabase Auth' })
-  supabaseId: string;
-
   @ApiProperty({ description: 'Email del usuario' })
   email: string;
 
@@ -30,7 +27,6 @@ export class UserResponseDto {
   static fromDomain(entity: UserEntity): UserResponseDto {
     const dto = new UserResponseDto();
     dto.id = entity.id;
-    dto.supabaseId = entity.supabaseId;
     dto.email = entity.email;
     dto.fullName = entity.fullName;
     dto.avatarUrl = entity.avatarUrl;
