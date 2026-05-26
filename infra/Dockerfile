@@ -19,6 +19,16 @@ RUN npm ci --workspace=apps/frontend
 COPY apps/frontend ./apps/frontend
 COPY tsconfig*.json ./
 
+# Build-time env vars for Vite (baked into the bundle)
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ARG VITE_API_BASE_URL
+ARG VITE_BACKEND_URL
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
 # Construir el frontend
 RUN npm run frontend:build
 
