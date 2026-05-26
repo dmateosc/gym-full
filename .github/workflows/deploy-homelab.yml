@@ -1,21 +1,30 @@
-name: Deploy to Homelab
+name: Preview — gym.3dmc.lab
 
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
     branches: [main]
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy as preview'
+        required: true
+        default: 'main'
 
 jobs:
-  deploy:
-    name: Deploy to gym.3dmc.lab
+  deploy-preview:
+    name: Deploy PR to gym.3dmc.lab
     runs-on: self-hosted
     steps:
-      - name: Pull latest code
+      - name: Checkout PR branch
         run: |
           cd /opt/gym-full
-          git pull origin main
+          git fetch origin
+          BRANCH=${{ github.head_ref || inputs.branch }}
+          git checkout $BRANCH
+          git pull origin $BRANCH
 
-      - name: Rebuild and restart containers
+      - name: Rebuild and restart preview containers
         run: |
           cd /opt/gym-full
           docker compose up --build -d
@@ -34,3 +43,14 @@ jobs:
           echo "Health check failed — last logs:"
           docker logs gymapp-backend --tail 30
           exit 1
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Preview desplegado en **https://gym.3dmc.lab** (red local)'
+            })
