@@ -3,14 +3,12 @@ import { UserRepositoryPort, USER_REPOSITORY } from '../../domain/repositories/u
 import { UserEntity } from '../../domain/entities/user.entity';
 
 export interface UpsertUserProfileCommand {
+  supabaseId: string;
   email: string;
   fullName?: string;
   avatarUrl?: string;
 }
 
-/**
- * Caso de uso: Crear o actualizar perfil de usuario.
- */
 @Injectable()
 export class UpsertUserProfileUseCase {
   constructor(
@@ -20,6 +18,7 @@ export class UpsertUserProfileUseCase {
 
   async execute(command: UpsertUserProfileCommand): Promise<UserEntity> {
     return this.userRepository.upsert({
+      supabaseId: command.supabaseId,
       email: command.email,
       fullName: command.fullName,
       avatarUrl: command.avatarUrl,

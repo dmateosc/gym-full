@@ -6,10 +6,6 @@ import { UserRepositoryPort } from '../../domain/repositories/user.repository.po
 import { UserEntity } from '../../domain/entities/user.entity';
 import { UserRole } from '../../domain/value-objects/user-role.vo';
 
-/**
- * Implementación TypeORM del repositorio de usuarios.
- * Transforma entre ORM entities y domain entities.
- */
 @Injectable()
 export class UserTypeormRepository implements UserRepositoryPort {
   constructor(
@@ -18,9 +14,7 @@ export class UserTypeormRepository implements UserRepositoryPort {
   ) {}
 
   async findAll(): Promise<UserEntity[]> {
-    const ormEntities = await this.repo.find({
-      order: { createdAt: 'DESC' },
-    });
+    const ormEntities = await this.repo.find({ order: { createdAt: 'DESC' } });
     return ormEntities.map(this.toDomain);
   }
 
@@ -34,18 +28,25 @@ export class UserTypeormRepository implements UserRepositoryPort {
     return ormEntity ? this.toDomain(ormEntity) : null;
   }
 
+  async findBySupabaseId(supabaseId: string): Promise<UserEntity | null> {
+    const ormEntity = await this.repo.findOne({ where: { supabaseId } });
+    return ormEntity ? this.toDomain(ormEntity) : null;
+  }
+
   async upsert(data: {
+    supabaseId: string;
     email: string;
     fullName?: string;
     avatarUrl?: string;
   }): Promise<UserEntity> {
-    let ormEntity = await this.repo.findOne({ where: { email: data.email } });
+    let ormEntity = await this.repo.findOne({ where: { supabaseId: data.supabaseId } });
 
     if (ormEntity) {
       if (data.fullName !== undefined) ormEntity.fullName = data.fullName;
       if (data.avatarUrl !== undefined) ormEntity.avatarUrl = data.avatarUrl;
     } else {
       ormEntity = this.repo.create({
+        supabaseId: data.supabaseId,
         email: data.email,
         fullName: data.fullName ?? null,
         avatarUrl: data.avatarUrl ?? null,
@@ -91,6 +92,7 @@ export class UserTypeormRepository implements UserRepositoryPort {
   private toDomain(orm: UserProfileOrmEntity): UserEntity {
     return new UserEntity({
       id: orm.id,
+      supabaseId: orm.supabaseId,
       email: orm.email,
       fullName: orm.fullName,
       avatarUrl: orm.avatarUrl,

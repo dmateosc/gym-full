@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { JwtPayload } from '../guards/jwt-auth.guard';
+import { JwtPayload } from '../../../shared/infrastructure/jwt/jwt-verifier';
 
 /**
  * Decorador para obtener el usuario autenticado del request.

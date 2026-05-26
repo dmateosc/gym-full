@@ -1,12 +1,8 @@
 import { UserRole, UserRoleVO } from '../value-objects/user-role.vo';
 
-/**
- * Entidad de dominio: User
- * Representa un usuario del sistema. Es una entidad pura del dominio,
- * sin dependencias de frameworks (TypeORM, NestJS, etc.)
- */
 export class UserEntity {
   private readonly _id: string;
+  private _supabaseId: string | null;
   private _email: string;
   private _fullName: string | null;
   private _avatarUrl: string | null;
@@ -17,6 +13,7 @@ export class UserEntity {
 
   constructor(props: {
     id: string;
+    supabaseId?: string | null;
     email: string;
     fullName?: string | null;
     avatarUrl?: string | null;
@@ -26,6 +23,7 @@ export class UserEntity {
     updatedAt?: Date;
   }) {
     this._id = props.id;
+    this._supabaseId = props.supabaseId ?? null;
     this._email = props.email;
     this._fullName = props.fullName ?? null;
     this._avatarUrl = props.avatarUrl ?? null;
@@ -35,8 +33,8 @@ export class UserEntity {
     this._updatedAt = props.updatedAt ?? new Date();
   }
 
-  // Getters
   get id(): string { return this._id; }
+  get supabaseId(): string | null { return this._supabaseId; }
   get email(): string { return this._email; }
   get fullName(): string | null { return this._fullName; }
   get avatarUrl(): string | null { return this._avatarUrl; }
@@ -45,10 +43,7 @@ export class UserEntity {
   get createdAt(): Date { return this._createdAt; }
   get updatedAt(): Date { return this._updatedAt; }
 
-  // Métodos de dominio
-  isAdmin(): boolean {
-    return this._role.isAdmin();
-  }
+  isAdmin(): boolean { return this._role.isAdmin(); }
 
   promoteToAdmin(): void {
     this._role = UserRoleVO.admin();
@@ -69,6 +64,7 @@ export class UserEntity {
   toPlainObject() {
     return {
       id: this._id,
+      supabaseId: this._supabaseId,
       email: this._email,
       fullName: this._fullName,
       avatarUrl: this._avatarUrl,

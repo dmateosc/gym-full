@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY, UserRole } from '../decorators/roles.decorator';
-import { JwtPayload } from './jwt-auth.guard';
+import { JwtPayload } from '../../../shared/infrastructure/jwt/jwt-verifier';
 
 /**
  * Guard de roles. Se usa junto con JwtAuthGuard.
