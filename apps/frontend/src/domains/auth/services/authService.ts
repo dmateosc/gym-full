@@ -1,69 +1,79 @@
+import { supabase } from './supabase';
+import { UserProfile } from '../types/auth.types';
 import { APP_CONFIG } from '../../shared/config/app.config';
-import type { UserProfile } from '../types/auth.types';
 
-const API = APP_CONFIG.API.BACKEND_URL;
-
-const TOKEN_KEY = 'auth_token';
-
-export const TokenStorage = {
-  get: () => localStorage.getItem(TOKEN_KEY),
-  set: (token: string) => localStorage.setItem(TOKEN_KEY, token),
-  clear: () => localStorage.removeItem(TOKEN_KEY),
-};
+const BACKEND_URL = APP_CONFIG.API.BACKEND_URL;
 
 export const AuthService = {
-  async signIn(email: string, password: string): Promise<{ token: string; user: UserProfile }> {
-    const res = await fetch(`${API}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+  async signUp(email: string, password: string, fullName?: string) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+      },
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({})) as { message?: string };
-      throw new Error(err.message ?? 'Credenciales inválidas');
-    }
-    const data = await res.json() as { token: string; user: UserProfile };
-    TokenStorage.set(data.token);
+    if (error) throw new Error(error.message);
     return data;
   },
 
-  async signUp(email: string, password: string, fullName?: string): Promise<{ token: string; user: UserProfile }> {
-    const res = await fetch(`${API}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, fullName }),
+  async signIn(email: string, password: string) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({})) as { message?: string };
-      throw new Error(err.message ?? 'Error al registrarse');
-    }
-    const data = await res.json() as { token: string; user: UserProfile };
-    TokenStorage.set(data.token);
+    if (error) throw new Error(error.message);
     return data;
   },
 
-  async getMyProfile(): Promise<UserProfile | null> {
-    const token = TokenStorage.get();
-    if (!token) return null;
+  async signInWithGoogle() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${globalThis.location.origin}/`,
+      },
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  },
+
+  async signOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw new Error(error.message);
+  },
+
+  async getSession() {
+    const { data: { session } } = await supabase.auth.getSession();
+    return session;
+  },
+
+  async syncProfile(token: string, fullName?: string): Promise<UserProfile | null> {
     try {
-      const res = await fetch(`${API}/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await fetch(`${BACKEND_URL}/users/me/sync`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ fullName }),
       });
-      if (!res.ok) {
-        TokenStorage.clear();
-        return null;
-      }
-      return res.json() as Promise<UserProfile>;
+      if (!response.ok) return null;
+      return response.json() as Promise<UserProfile>;
     } catch {
+      console.error('Error sincronizando perfil');
       return null;
     }
   },
 
-  signOut() {
-    TokenStorage.clear();
-  },
-
-  getToken(): string | null {
-    return TokenStorage.get();
+  async getMyProfile(token: string): Promise<UserProfile | null> {
+    try {
+      const response = await fetch(`${BACKEND_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) return null;
+      return response.json() as Promise<UserProfile>;
+    } catch {
+      return null;
+    }
   },
 };

@@ -1,4 +1,5 @@
 import React, { createContext, useEffect, useReducer, ReactNode } from 'react';
+import { supabase } from '../services/supabase';
 import { AuthService } from '../services/authService';
 import { AuthState, AuthUser } from '../types/auth.types';
 
@@ -45,58 +46,88 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName?: string) => Promise<boolean>;
-  signOut: () => void;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
   clearError: () => void;
-  getToken: () => string | null;
+  getToken: () => Promise<string | null>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // ─── Provider ────────────────────────────────────────────────────────────────
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   /**
-   * Restaurar sesión desde el token en localStorage al montar
+   * Inicializa la sesión y sincroniza el perfil con el backend
    */
+  const initializeSession = async () => {
+    try {
+      const session = await AuthService.getSession();
+
+      if (session?.user) {
+        const profile = await AuthService.getMyProfile(session.access_token);
+        // Si no existe perfil aún, sincronizarlo (primer login)
+        const finalProfile = profile ?? await AuthService.syncProfile(
+          session.access_token,
+          session.user.user_metadata?.full_name as string | undefined,
+        );
+
+        dispatch({
+          type: 'SET_USER',
+          payload: {
+            id: session.user.id,
+            email: session.user.email ?? null,
+            profile: finalProfile,
+          },
+        });
+      } else {
+        dispatch({ type: 'SET_USER', payload: null });
+      }
+    } catch {
+      dispatch({ type: 'SET_USER', payload: null });
+    }
+  };
+
   useEffect(() => {
-    const initializeSession = async () => {
-      try {
-        const profile = await AuthService.getMyProfile();
-        if (profile) {
+    void initializeSession();
+
+    // Escuchar cambios de sesión (login, logout, refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event: string, session: { access_token: string; user: { id: string; email?: string; user_metadata?: Record<string, unknown> } } | null) => {
+        if (event === 'SIGNED_OUT' || !session) {
+          dispatch({ type: 'SET_USER', payload: null });
+          return;
+        }
+
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          const profile = await AuthService.syncProfile(
+            session.access_token,
+            session.user.user_metadata?.full_name as string | undefined,
+          );
+
           dispatch({
             type: 'SET_USER',
             payload: {
-              id: profile.id,
-              email: profile.email,
+              id: session.user.id,
+              email: session.user.email ?? null,
               profile,
             },
           });
-        } else {
-          dispatch({ type: 'SET_USER', payload: null });
         }
-      } catch {
-        dispatch({ type: 'SET_USER', payload: null });
       }
-    };
+    );
 
-    initializeSession();
+    return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'CLEAR_ERROR' });
     try {
-      const { user: profile } = await AuthService.signIn(email, password);
-      dispatch({
-        type: 'SET_USER',
-        payload: {
-          id: profile.id,
-          email: profile.email,
-          profile,
-        },
-      });
+      await AuthService.signIn(email, password);
+      // onAuthStateChange se encarga de actualizar el estado
     } catch (err) {
       dispatch({ type: 'SET_ERROR', payload: (err as Error).message });
     }
@@ -106,36 +137,44 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'CLEAR_ERROR' });
     try {
-      const { user: profile } = await AuthService.signUp(email, password, fullName);
-      dispatch({
-        type: 'SET_USER',
-        payload: {
-          id: profile.id,
-          email: profile.email,
-          profile,
-        },
-      });
+      await AuthService.signUp(email, password, fullName);
       return true;
     } catch (err) {
       dispatch({ type: 'SET_ERROR', payload: (err as Error).message });
       return false;
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 
-  const signOut = () => {
-    AuthService.signOut();
-    dispatch({ type: 'SET_USER', payload: null });
+  const signInWithGoogle = async () => {
+    dispatch({ type: 'CLEAR_ERROR' });
+    try {
+      await AuthService.signInWithGoogle();
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', payload: (err as Error).message });
+    }
   };
 
-  const getToken = (): string | null => {
-    return AuthService.getToken();
+  const signOut = async () => {
+    try {
+      await AuthService.signOut();
+      dispatch({ type: 'SET_USER', payload: null });
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', payload: (err as Error).message });
+    }
+  };
+
+  const getToken = async (): Promise<string | null> => {
+    const session = await AuthService.getSession();
+    return session?.access_token ?? null;
   };
 
   const clearError = () => dispatch({ type: 'CLEAR_ERROR' });
 
   return (
     <AuthContext.Provider
-      value={{ ...state, signIn, signUp, signOut, clearError, getToken }}
+      value={{ ...state, signIn, signUp, signInWithGoogle, signOut, clearError, getToken }}
     >
       {children}
     </AuthContext.Provider>
