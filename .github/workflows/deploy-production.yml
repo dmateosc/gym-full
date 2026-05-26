@@ -1,0 +1,37 @@
+name: Production — cwsierradegata.com
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy-production:
+    name: Deploy main to cwsierradegata.com
+    runs-on: self-hosted
+    steps:
+      - name: Pull main branch
+        run: |
+          cd /opt/gym-full-prod
+          git fetch origin
+          git checkout main
+          git pull origin main
+
+      - name: Rebuild and restart production containers
+        run: |
+          cd /opt/stacks/gym-full-prod
+          docker compose up --build -d
+
+      - name: Wait for backend health
+        run: |
+          for i in $(seq 1 30); do
+            status=$(docker inspect gymapp-backend-prod --format='{{.State.Health.Status}}' 2>/dev/null)
+            if [ "$status" = "healthy" ]; then
+              echo "Backend healthy"
+              exit 0
+            fi
+            echo "Waiting... ($status)"
+            sleep 10
+          done
+          docker logs gymapp-backend-prod --tail 20
+          exit 1
