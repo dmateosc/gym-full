@@ -1,4 +1,4 @@
-import type { Exercise, ExerciseFilters } from '../types/exercise';
+import type { Exercise, ExerciseFilters } from '../domains/exercises/types/exercise';
 
 // Mock data para tests
 const mockExercises: Exercise[] = [

@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 
 // Módulos de dominio
 import { ExercisesModule } from './exercises/exercises.module';
@@ -13,9 +12,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/infrastructure/users.module';
 
 // Entidades ORM
-import { Exercise } from './exercises/entities/exercise.entity';
-import { DailyRoutine } from './routines/entities/daily-routine.entity';
-import { RoutineExercise } from './routines/entities/routine-exercise.entity';
+import { ExerciseOrmEntity } from './exercises/infrastructure/persistence/exercise.orm-entity';
+import { DailyRoutineOrmEntity } from './routines/infrastructure/persistence/daily-routine.orm-entity';
+import { RoutineExerciseOrmEntity } from './routines/infrastructure/persistence/routine-exercise.orm-entity';
 import { UserProfileOrmEntity } from './users/infrastructure/persistence/user-profile.orm-entity';
 import { DatabaseLogger } from './database/database.logger';
 
@@ -32,9 +31,9 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [
-        Exercise,
-        DailyRoutine,
-        RoutineExercise,
+        ExerciseOrmEntity,
+        DailyRoutineOrmEntity,
+        RoutineExerciseOrmEntity,
         UserProfileOrmEntity,
       ],
       synchronize: false,
@@ -57,7 +56,6 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
   ],
   controllers: [AppController],
   providers: [
-    AppService,
     // Guard global de autenticación — se aplica a todos los endpoints por defecto
     // Los endpoints pueden marcarse como @Public() para omitirlo
     {

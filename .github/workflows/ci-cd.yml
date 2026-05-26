@@ -1,0 +1,97 @@
+name: 🏋️ Gym App CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ─── Test Frontend ──────────────────────────────────────────────────────────
+  test-frontend:
+    name: 🧪 Frontend Tests y Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install monorepo dependencies
+        run: npm ci
+
+      - name: 📦 Install frontend dependencies
+        run: npm install --workspace=apps/frontend
+
+      - name: 🔍 Lint frontend code
+        run: npm run lint --workspace=apps/frontend
+
+      - name: 🧪 Run frontend tests
+        run: npm run test --workspace=apps/frontend
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+
+      - name: 🏗️ Build frontend
+        run: npm run build --workspace=apps/frontend
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
+
+  # ─── Test Backend ──────────────────────────────────────────────────────────
+  test-backend:
+    name: 🧪 Backend Tests y Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install monorepo dependencies
+        run: npm ci
+
+      - name: 📦 Install backend dependencies
+        run: npm install --workspace=apps/backend
+
+      - name: 🔍 Lint backend code
+        run: npm run lint --workspace=apps/backend
+
+      - name: 🧪 Run backend tests
+        run: npm run test --workspace=apps/backend
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: 🏗️ Build backend
+        run: npm run build --workspace=apps/backend
+
+  # ─── Verificar migración SQL ───────────────────────────────────────────────
+  check-migration:
+    name: 🗃️ Verificar archivos de migración
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar que existen las migraciones necesarias
+        run: |
+          echo "📋 Migraciones presentes:"
+          ls -la *.sql
+          echo "✅ auth-migration.sql presente" && test -f auth-migration.sql
+          echo "✅ supabase-migration.sql presente" && test -f supabase-migration.sql

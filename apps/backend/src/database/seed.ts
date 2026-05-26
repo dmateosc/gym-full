@@ -1,14 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
-import { ExercisesService } from '../exercises/exercises.service';
+import { CreateExerciseUseCase } from '../exercises/application/use-cases/create-exercise.use-case';
 import {
   ExerciseCategory,
   Difficulty,
-} from '../exercises/entities/exercise.entity';
+} from '../exercises/infrastructure/persistence/exercise.orm-entity';
 
 async function seed() {
   const app = await NestFactory.createApplicationContext(AppModule);
-  const exercisesService = app.get(ExercisesService);
+  const exercisesService = app.get(CreateExerciseUseCase);
 
   // Datos de ejemplo para poblar la base de datos
   const exercisesData = [
@@ -98,7 +98,7 @@ async function seed() {
     console.log('🌱 Iniciando seeding de la base de datos...');
 
     for (const exerciseData of exercisesData) {
-      await exercisesService.create(exerciseData);
+      await exercisesService.execute(exerciseData as any);
       console.log(`✅ Ejercicio creado: ${exerciseData.name}`);
     }
 

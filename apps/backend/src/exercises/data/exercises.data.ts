@@ -1,10 +1,10 @@
 import {
-  Exercise,
+  ExerciseOrmEntity,
   ExerciseCategory,
   Difficulty,
-} from '../entities/exercise.entity';
+} from '../infrastructure/persistence/exercise.orm-entity';
 
-export const exercisesData: Exercise[] = [
+export const exercisesData: ExerciseOrmEntity[] = [
   {
     id: 'dumbbell-bench-press',
     name: 'Dumbbell Bench Press',
