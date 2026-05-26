@@ -17,13 +17,13 @@ jobs:
 
       - name: Rebuild and restart containers
         run: |
-          cd /opt/stacks/gym-full
+          cd /opt/gym-full
           docker compose up --build -d
 
       - name: Wait for backend health
         run: |
           for i in $(seq 1 30); do
-            status=$(docker inspect gymapp-backend --format='{{.State.Health.Status}}' 2>/dev/null)
+            status=$(docker inspect gymapp-backend --format='{{.State.Health.Status}}' 2>/dev/null || echo "starting")
             if [ "$status" = "healthy" ]; then
               echo "Backend healthy"
               exit 0
@@ -31,5 +31,6 @@ jobs:
             echo "Waiting... ($status)"
             sleep 10
           done
-          docker logs gymapp-backend --tail 20
+          echo "Health check failed — last logs:"
+          docker logs gymapp-backend --tail 30
           exit 1
