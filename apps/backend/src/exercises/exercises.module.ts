@@ -25,5 +25,6 @@ import { SearchExercisesUseCase } from './application/use-cases/search-exercises
     GetExerciseMetadataUseCase,
     SearchExercisesUseCase,
   ],
+  exports: [{ provide: EXERCISE_REPOSITORY, useClass: ExerciseTypeormRepository }],
 })
 export class ExercisesModule {}
