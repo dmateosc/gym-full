@@ -49,7 +49,7 @@ interface AuthContextType extends AuthState {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
-  getToken: () => Promise<string | null>;
+  getToken: () => string | null;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -165,10 +165,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     }
   };
 
-  const getToken = async (): Promise<string | null> => {
-    const session = await AuthService.getSession();
-    return session?.access_token ?? null;
-  };
+  const getToken = (): string | null => AuthService.getToken();
 
   const clearError = () => dispatch({ type: 'CLEAR_ERROR' });
 
