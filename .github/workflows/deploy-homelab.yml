@@ -4,6 +4,12 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy as preview'
+        required: true
+        default: 'main'
 
 jobs:
   deploy-preview:
@@ -14,8 +20,9 @@ jobs:
         run: |
           cd /opt/gym-full
           git fetch origin
-          git checkout ${{ github.head_ref }}
-          git pull origin ${{ github.head_ref }}
+          BRANCH=${{ github.head_ref || inputs.branch }}
+          git checkout $BRANCH
+          git pull origin $BRANCH
 
       - name: Rebuild and restart preview containers
         run: |
