@@ -19,6 +19,8 @@ export class LoggingInterceptor implements NestInterceptor {
     const { method, url, ip, headers } = request;
     const userAgent = headers['user-agent'] || '';
 
+    if (url.includes('/health')) return next.handle();
+
     const startTime = Date.now();
 
     this.logger.log(`📥 ${method} ${url} - ${ip} - ${userAgent}`);
