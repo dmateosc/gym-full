@@ -47,7 +47,7 @@ export class JwtAuthGuard implements CanActivate {
 
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
     if (supabaseUrl) {
-      payload = await JwtVerifier.verifyWithJwks(token, `${supabaseUrl}/.well-known/jwks.json`);
+      payload = await JwtVerifier.verifyWithJwks(token, `${supabaseUrl}/auth/v1/.well-known/jwks.json`);
     }
 
     if (!payload) {
