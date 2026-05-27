@@ -10,9 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
-  UnauthorizedException,
   UseGuards,
-  Headers,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -39,8 +37,6 @@ import { DailyRoutineQueriesUseCase } from '../../application/use-cases/daily-ro
 import { DailyRoutineLifecycleUseCase } from '../../application/use-cases/daily-routine-lifecycle.use-case';
 import { RoutineExerciseManagementUseCase } from '../../application/use-cases/routine-exercise-management.use-case';
 import { RoutineStatsUseCase } from '../../application/use-cases/routine-stats.use-case';
-import { GenerateRoutineUseCase } from '../../application/use-cases/generate-routine.use-case';
-import { GenerateRoutineDto } from './dto/generate-routine.dto';
 
 @ApiTags('routines')
 @ApiBearerAuth()
@@ -53,21 +49,7 @@ export class RoutinesController {
     private readonly lifecycleUseCase: DailyRoutineLifecycleUseCase,
     private readonly exerciseMgmtUseCase: RoutineExerciseManagementUseCase,
     private readonly statsUseCase: RoutineStatsUseCase,
-    private readonly generateRoutineUseCase: GenerateRoutineUseCase,
   ) {}
-
-  @Post('daily/generate')
-  @Public()
-  @ApiOperation({ summary: 'Generar rutina diaria con IA (Ollama)' })
-  generateDailyRoutine(
-    @Body() dto: GenerateRoutineDto,
-    @Headers('x-cron-secret') cronSecret: string,
-  ) {
-    if (!process.env.CRON_SECRET || cronSecret !== process.env.CRON_SECRET) {
-      throw new UnauthorizedException('x-cron-secret inválido');
-    }
-    return this.generateRoutineUseCase.execute(dto);
-  }
 
   // Endpoints para DailyRoutine
   @Post('daily')
