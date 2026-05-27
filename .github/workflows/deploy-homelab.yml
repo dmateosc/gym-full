@@ -13,6 +13,9 @@ on:
         required: true
         default: 'main'
 
+permissions:
+  pull-requests: write
+
 jobs:
   changes:
     name: Detect changed paths
