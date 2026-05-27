@@ -1,13 +1,14 @@
 import type { Exercise } from '../types/exercise';
-import { 
-  ArrowIcon, 
-  TimeIcon, 
-  CaloriesIcon, 
-  EquipmentIcon, 
-  MuscleIcon, 
-  ToolsIcon, 
-  InstructionsIcon 
+import {
+  ArrowIcon,
+  TimeIcon,
+  CaloriesIcon,
+  EquipmentIcon,
+  MuscleIcon,
+  ToolsIcon,
+  InstructionsIcon
 } from '../../../assets/icons/index.tsx';
+import BodyMap from './BodyMap';
 
 const CATEGORY_COLORS = {
   strength: 'bg-gradient-to-r from-red-600 to-red-800 text-white border-red-500',
@@ -145,7 +146,7 @@ const MuscleGroupsSection = ({ groups }: { groups: string[] }) => (
       <MuscleIcon />
       Grupos musculares trabajados
     </h2>
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 mb-4">
       {groups.map((group, index) => (
         <span
           key={index}
@@ -155,6 +156,7 @@ const MuscleGroupsSection = ({ groups }: { groups: string[] }) => (
         </span>
       ))}
     </div>
+    <BodyMap muscleGroups={groups} />
   </div>
 );
 

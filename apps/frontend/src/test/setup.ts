@@ -1,6 +1,19 @@
 import '@testing-library/jest-dom';
 import '../jest-dom.d.ts';
 
+// Mock supabase so AuthContext doesn't fail when env vars are absent in tests
+jest.mock('../domains/auth/services/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: jest.fn().mockResolvedValue({ data: { session: null }, error: null }),
+      onAuthStateChange: jest.fn().mockReturnValue({ data: { subscription: { unsubscribe: jest.fn() } } }),
+      signInWithOAuth: jest.fn().mockResolvedValue({ data: {}, error: null }),
+      signOut: jest.fn().mockResolvedValue({ error: null }),
+      getUser: jest.fn().mockResolvedValue({ data: { user: null }, error: null }),
+    },
+  },
+}));
+
 // Mock data para las pruebas
 const mockExercises = [
   {
@@ -30,7 +43,7 @@ const mockExercises = [
 ];
 
 // Mock del servicio API
-jest.mock('../services/api', () => ({
+jest.mock('../domains/exercises/services/api', () => ({
   ApiService: {
     getExercises: jest.fn().mockResolvedValue(mockExercises),
     getExercise: jest.fn().mockResolvedValue(mockExercises[0]),
