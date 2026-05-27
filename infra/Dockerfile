@@ -58,9 +58,6 @@ RUN npm run backend:build
 # ==========================================
 FROM nginx:alpine as frontend-production
 
-# Instalar curl para health checks
-RUN apk add --no-cache curl
-
 # Copiar archivos construidos del frontend
 COPY --from=frontend-builder /app/apps/frontend/dist /usr/share/nginx/html
 
@@ -70,14 +67,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Crear directorio para logs
 RUN mkdir -p /var/log/nginx
 
-# Exponer puerto 80
 EXPOSE 80
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost/ || exit 1
-
-# Comando para ejecutar Nginx
 CMD ["nginx", "-g", "daemon off;"]
 
 # ==========================================
