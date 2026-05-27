@@ -13,7 +13,8 @@ export class DeleteExerciseUseCase {
 
   async execute(id: string): Promise<void> {
     const existing = await this.exerciseRepo.findById(id);
-    if (!existing) throw new NotFoundException(`Exercise with ID ${id} not found`);
+    if (!existing)
+      throw new NotFoundException(`Exercise with ID ${id} not found`);
     await this.exerciseRepo.delete(id);
   }
 }

@@ -14,7 +14,8 @@ export class UpdateExerciseUseCase {
 
   async execute(id: string, dto: UpdateExerciseDto) {
     const existing = await this.exerciseRepo.findById(id);
-    if (!existing) throw new NotFoundException(`Exercise with ID ${id} not found`);
+    if (!existing)
+      throw new NotFoundException(`Exercise with ID ${id} not found`);
     return this.exerciseRepo.update(id, dto);
   }
 }

@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { UserRepositoryPort, USER_REPOSITORY } from '../../domain/repositories/user.repository.port';
+import {
+  UserRepositoryPort,
+  USER_REPOSITORY,
+} from '../../domain/repositories/user.repository.port';
 import { UserEntity } from '../../domain/entities/user.entity';
 
 export interface UpsertUserProfileCommand {

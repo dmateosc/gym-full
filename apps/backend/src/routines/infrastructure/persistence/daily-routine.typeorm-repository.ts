@@ -8,7 +8,9 @@ import {
 } from './daily-routine.orm-entity';
 
 @Injectable()
-export class DailyRoutineTypeormRepository implements DailyRoutineRepositoryPort {
+export class DailyRoutineTypeormRepository
+  implements DailyRoutineRepositoryPort
+{
   constructor(
     @InjectRepository(DailyRoutineOrmEntity)
     private readonly repo: Repository<DailyRoutineOrmEntity>,

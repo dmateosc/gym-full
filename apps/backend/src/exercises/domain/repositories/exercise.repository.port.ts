@@ -8,13 +8,21 @@ import { ExerciseFiltersDto } from '../../infrastructure/http/dto/exercise-filte
 export abstract class ExerciseRepositoryPort {
   abstract findAll(filters?: ExerciseFiltersDto): Promise<ExerciseOrmEntity[]>;
   abstract findById(id: string): Promise<ExerciseOrmEntity | null>;
-  abstract create(exercise: Partial<ExerciseOrmEntity>): Promise<ExerciseOrmEntity>;
-  abstract update(id: string, exercise: Partial<ExerciseOrmEntity>): Promise<ExerciseOrmEntity>;
+  abstract create(
+    exercise: Partial<ExerciseOrmEntity>,
+  ): Promise<ExerciseOrmEntity>;
+  abstract update(
+    id: string,
+    exercise: Partial<ExerciseOrmEntity>,
+  ): Promise<ExerciseOrmEntity>;
   abstract delete(id: string): Promise<void>;
   abstract getDistinctCategories(): Promise<string[]>;
   abstract getDistinctMuscleGroups(): Promise<string[]>;
   abstract getDistinctEquipment(): Promise<string[]>;
-  abstract search(term: string, category?: string): Promise<ExerciseOrmEntity[]>;
+  abstract search(
+    term: string,
+    category?: string,
+  ): Promise<ExerciseOrmEntity[]>;
   abstract getStatistics(): Promise<{
     totalExercises: number;
     byCategory: Record<string, number>;

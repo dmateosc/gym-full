@@ -10,6 +10,7 @@ import {
 } from '../../domain/repositories/daily-routine.repository.port';
 import { CreateDailyRoutineDto } from '../../infrastructure/http/dto/create-daily-routine.dto';
 import { UpdateDailyRoutineDto } from '../../infrastructure/http/dto/update-daily-routine.dto';
+import { DailyRoutineOrmEntity } from '../../infrastructure/persistence/daily-routine.orm-entity';
 
 @Injectable()
 export class DailyRoutineCrudUseCase {
@@ -37,7 +38,8 @@ export class DailyRoutineCrudUseCase {
 
   async findById(id: string) {
     const routine = await this.routineRepo.findById(id);
-    if (!routine) throw new NotFoundException(`Rutina con ID ${id} no encontrada`);
+    if (!routine)
+      throw new NotFoundException(`Rutina con ID ${id} no encontrada`);
     return routine;
   }
 
@@ -56,10 +58,19 @@ export class DailyRoutineCrudUseCase {
       }
     }
 
-    const updateData: any = { ...dto };
-    if (dto.routineDate) {
-      updateData.routineDate = new Date(dto.routineDate);
-    }
+    const updateData: Partial<DailyRoutineOrmEntity> = {
+      ...(dto.name !== undefined && { name: dto.name }),
+      ...(dto.description !== undefined && { description: dto.description }),
+      ...(dto.routineDate !== undefined && { routineDate: new Date(dto.routineDate) }),
+      ...(dto.intensity !== undefined && { intensity: dto.intensity }),
+      ...(dto.status !== undefined && { status: dto.status }),
+      ...(dto.estimatedDurationMinutes !== undefined && { estimatedDurationMinutes: dto.estimatedDurationMinutes }),
+      ...(dto.estimatedCalories !== undefined && { estimatedCalories: dto.estimatedCalories }),
+      ...(dto.goals !== undefined && { goals: dto.goals }),
+      ...(dto.warmUpNotes !== undefined && { warmUpNotes: dto.warmUpNotes }),
+      ...(dto.coolDownNotes !== undefined && { coolDownNotes: dto.coolDownNotes }),
+      ...(dto.completionNotes !== undefined && { completionNotes: dto.completionNotes }),
+    };
 
     return this.routineRepo.update(id, updateData);
   }

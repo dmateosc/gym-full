@@ -33,17 +33,37 @@ export class UserEntity {
     this._updatedAt = props.updatedAt ?? new Date();
   }
 
-  get id(): string { return this._id; }
-  get supabaseId(): string | null { return this._supabaseId; }
-  get email(): string { return this._email; }
-  get fullName(): string | null { return this._fullName; }
-  get avatarUrl(): string | null { return this._avatarUrl; }
-  get passwordHash(): string | null { return this._passwordHash; }
-  get role(): UserRoleVO { return this._role; }
-  get createdAt(): Date { return this._createdAt; }
-  get updatedAt(): Date { return this._updatedAt; }
+  get id(): string {
+    return this._id;
+  }
+  get supabaseId(): string | null {
+    return this._supabaseId;
+  }
+  get email(): string {
+    return this._email;
+  }
+  get fullName(): string | null {
+    return this._fullName;
+  }
+  get avatarUrl(): string | null {
+    return this._avatarUrl;
+  }
+  get passwordHash(): string | null {
+    return this._passwordHash;
+  }
+  get role(): UserRoleVO {
+    return this._role;
+  }
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
 
-  isAdmin(): boolean { return this._role.isAdmin(); }
+  isAdmin(): boolean {
+    return this._role.isAdmin();
+  }
 
   promoteToAdmin(): void {
     this._role = UserRoleVO.admin();

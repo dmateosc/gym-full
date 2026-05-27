@@ -21,7 +21,8 @@ export class RoutineStatsUseCase {
 
   async getRoutineStats(id: string) {
     const routine = await this.routineRepo.findById(id);
-    if (!routine) throw new NotFoundException(`Rutina con ID ${id} no encontrada`);
+    if (!routine)
+      throw new NotFoundException(`Rutina con ID ${id} no encontrada`);
 
     const totalExercises = routine.routineExercises.length;
     const categories = [

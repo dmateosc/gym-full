@@ -12,26 +12,26 @@ import { DailyRoutineQueriesUseCase } from './application/use-cases/daily-routin
 import { DailyRoutineLifecycleUseCase } from './application/use-cases/daily-routine-lifecycle.use-case';
 import { RoutineExerciseManagementUseCase } from './application/use-cases/routine-exercise-management.use-case';
 import { RoutineStatsUseCase } from './application/use-cases/routine-stats.use-case';
-import { GenerateRoutineUseCase } from './application/use-cases/generate-routine.use-case';
-import { OllamaService } from '../shared/infrastructure/ollama/ollama.service';
-import { ExercisesModule } from '../exercises/exercises.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([DailyRoutineOrmEntity, RoutineExerciseOrmEntity]),
-    ExercisesModule,
   ],
   controllers: [RoutinesController],
   providers: [
-    { provide: DAILY_ROUTINE_REPOSITORY, useClass: DailyRoutineTypeormRepository },
-    { provide: ROUTINE_EXERCISE_REPOSITORY, useClass: RoutineExerciseTypeormRepository },
+    {
+      provide: DAILY_ROUTINE_REPOSITORY,
+      useClass: DailyRoutineTypeormRepository,
+    },
+    {
+      provide: ROUTINE_EXERCISE_REPOSITORY,
+      useClass: RoutineExerciseTypeormRepository,
+    },
     DailyRoutineCrudUseCase,
     DailyRoutineQueriesUseCase,
     DailyRoutineLifecycleUseCase,
     RoutineExerciseManagementUseCase,
     RoutineStatsUseCase,
-    GenerateRoutineUseCase,
-    OllamaService,
   ],
 })
 export class RoutinesModule {}

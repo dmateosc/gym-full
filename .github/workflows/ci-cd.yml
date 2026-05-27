@@ -10,8 +10,30 @@ env:
   NODE_VERSION: '20'
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+      scripts: ${{ steps.filter.outputs.scripts }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'apps/frontend/**'
+            backend:
+              - 'apps/backend/**'
+            scripts:
+              - 'scripts/**'
+
   test-frontend:
     name: Frontend — lint + test + build
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,6 +62,8 @@ jobs:
 
   test-backend:
     name: Backend — lint + test + build
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -61,3 +85,23 @@ jobs:
           DATABASE_SSL: 'false'
 
       - run: npm run build --workspace=apps/backend
+
+  test-scripts:
+    name: Scripts — typecheck
+    needs: changes
+    if: needs.changes.outputs.scripts == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: scripts/generate-routine/package.json
+
+      - run: npm ci
+        working-directory: scripts/generate-routine
+
+      - run: npx tsc --noEmit
+        working-directory: scripts/generate-routine

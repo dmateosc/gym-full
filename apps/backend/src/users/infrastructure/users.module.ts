@@ -26,10 +26,6 @@ import { USER_REPOSITORY } from '../domain/repositories/user.repository.port';
     UpdateUserRoleUseCase,
     UpsertUserProfileUseCase,
   ],
-  exports: [
-    USER_REPOSITORY,
-    GetUserByIdUseCase,
-    UpsertUserProfileUseCase,
-  ],
+  exports: [USER_REPOSITORY, GetUserByIdUseCase, UpsertUserProfileUseCase],
 })
 export class UsersModule {}

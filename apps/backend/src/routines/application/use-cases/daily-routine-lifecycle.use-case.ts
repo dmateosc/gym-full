@@ -14,12 +14,13 @@ export class DailyRoutineLifecycleUseCase {
 
   private async getOrFail(id: string) {
     const routine = await this.routineRepo.findById(id);
-    if (!routine) throw new NotFoundException(`Rutina con ID ${id} no encontrada`);
+    if (!routine)
+      throw new NotFoundException(`Rutina con ID ${id} no encontrada`);
     return routine;
   }
 
   async startRoutine(id: string) {
-    const routine = await this.getOrFail(id);
+    await this.getOrFail(id);
     return this.routineRepo.update(id, {
       status: RoutineStatus.IN_PROGRESS,
       startedAt: new Date(),
