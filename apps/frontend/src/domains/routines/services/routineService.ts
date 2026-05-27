@@ -22,14 +22,7 @@ export class RoutineService {
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      // Verificar si la respuesta tiene contenido
-      const contentLength = response.headers.get('content-length');
-      if (contentLength === '0' || contentLength === null) {
-        console.log('No hay rutina programada para hoy');
-        return null;
-      }
-      
+
       const data = await response.json();
       
       // Verificar que la respuesta tiene formato válido
@@ -73,14 +66,7 @@ export class RoutineService {
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      // Verificar si la respuesta tiene contenido
-      const contentLength = response.headers.get('content-length');
-      if (contentLength === '0' || contentLength === null) {
-        console.log(`No hay rutina programada para ${date}`);
-        return null;
-      }
-      
+
       const data = await response.json();
       
       // Verificar que la respuesta tiene formato válido

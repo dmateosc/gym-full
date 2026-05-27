@@ -115,6 +115,7 @@ export class RoutinesController {
   }
 
   @Get('daily/today')
+  @Public()
   async findTodayRoutine() {
     const routine = await this.queriesUseCase.findToday();
     if (!routine) {
