@@ -212,6 +212,35 @@ const InstructionsSection = ({ instructions }: { instructions: string[] }) => (
   </div>
 );
 
+const getYouTubeEmbedUrl = (url: string): string | null => {
+  const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (!watchMatch) return null;
+  return `https://www.youtube.com/embed/${watchMatch[1]}?rel=0&modestbranding=1`;
+};
+
+const VideoSection = ({ videoUrl }: { videoUrl: string }) => {
+  const embedUrl = getYouTubeEmbedUrl(videoUrl);
+  if (!embedUrl) return null;
+
+  return (
+    <div className="mt-6 sm:mt-8">
+      <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
+        <span className="text-red-400">▶</span>
+        Vídeo explicativo
+      </h2>
+      <div className="relative w-full rounded-xl overflow-hidden border border-gray-700 shadow-2xl" style={{ paddingTop: '56.25%' }}>
+        <iframe
+          src={embedUrl}
+          title="Vídeo explicativo del ejercicio"
+          className="absolute inset-0 w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+    </div>
+  );
+};
+
 const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
   return (
     <div className="max-w-4xl mx-auto">
@@ -228,6 +257,7 @@ const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
           </div>
           
           <InstructionsSection instructions={exercise.instructions} />
+          {exercise.videoUrl && <VideoSection videoUrl={exercise.videoUrl} />}
         </div>
       </div>
     </div>
