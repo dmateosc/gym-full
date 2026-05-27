@@ -16,7 +16,7 @@ const mockApiService = ApiService as jest.Mocked<typeof ApiService>;
 
 // Mock del Modal
 jest.mock('../../shared/components/Modal', () => {
-  return function MockModal({ isOpen, children, onClose }: any) {
+  return function MockModal({ isOpen, children, onClose }: { isOpen: boolean; children: React.ReactNode; onClose: () => void }) {
     if (!isOpen) return null;
     return (
       <div data-testid="modal" onClick={onClose}>
