@@ -231,9 +231,21 @@ async function insertRoutineExercise(client: PoolClient, data: {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const date = process.argv[2] ?? new Date().toISOString().split('T')[0];
+  const dateArg = process.argv[2];
+  const date = dateArg ?? new Date().toISOString().slice(0, 10);
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`))) {
+    console.error(`❌  Invalid date "${date}". Expected YYYY-MM-DD.`);
+    process.exit(1);
+  }
+
   const dayOfWeek = new Date(`${date}T12:00:00Z`).getUTCDay();
   const schedule = WEEKLY_SCHEDULE[dayOfWeek];
+
+  if (schedule === undefined) {
+    console.error(`❌  Unsupported dayOfWeek=${dayOfWeek} for date ${date}`);
+    process.exit(1);
+  }
 
   console.log(`📅  Date: ${date} (day ${dayOfWeek})`);
 
