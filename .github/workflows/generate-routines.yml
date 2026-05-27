@@ -1,92 +1,150 @@
-name: 'Generate Daily Gym Routines'
+name: 'Generate Daily Gym Routine'
 
 on:
-  # Ejecutar diariamente a las 06:00 UTC (para preparar el día siguiente)
   schedule:
-    - cron: '0 6 * * *'
-  
-  # Permitir ejecución manual
+    - cron: '0 6 * * 1-6'  # Mon–Sat at 06:00 UTC (skip Sunday)
   workflow_dispatch:
     inputs:
+      date:
+        description: 'Fecha (YYYY-MM-DD). Vacío = hoy'
+        required: false
+        default: ''
       force_regenerate:
-        description: 'Forzar regeneración de rutinas existentes'
+        description: 'Eliminar rutina existente antes de generar'
         required: false
         default: false
         type: boolean
 
-env:
-  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
 jobs:
-  generate-routines:
-    runs-on: ubuntu-latest
-    
+  generate-routine:
+    runs-on: self-hosted
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: '.github/scripts/package.json'
-          
-      - name: Install dependencies
-        working-directory: .github/scripts
-        run: npm ci
-        
-      - name: Validate environment variables
+      - name: Generate routine via backend API
+        id: generate
         run: |
-          if [ -z "$OPENAI_API_KEY" ]; then
-            echo "❌ OPENAI_API_KEY no está configurado"
-            exit 1
+          DATE="${{ github.event.inputs.date }}"
+          if [ -z "$DATE" ]; then
+            DATE=$(date +%Y-%m-%d)
           fi
-          if [ -z "$DATABASE_URL" ]; then
-            echo "❌ DATABASE_URL no está configurado"
-            exit 1
+          echo "date=$DATE" >> $GITHUB_OUTPUT
+
+          DAY_OF_WEEK=$(date -d "$DATE" +%u 2>/dev/null || date -j -f "%Y-%m-%d" "$DATE" +%u 2>/dev/null || python3 -c "import datetime; print(datetime.date.fromisoformat('$DATE').isoweekday())")
+          echo "day_of_week=$DAY_OF_WEEK" >> $GITHUB_OUTPUT
+
+          if [ "${{ github.event.inputs.force_regenerate }}" = "true" ]; then
+            echo "Borrando rutina existente para $DATE..."
+            EXISTING=$(curl -sf http://localhost:3001/api/routines/daily/by-date/$DATE 2>/dev/null || true)
+            if [ -n "$EXISTING" ]; then
+              ROUTINE_ID=$(echo "$EXISTING" | python3 -c "import json,sys; print(json.load(sys.stdin).get('id',''))" 2>/dev/null || true)
+              if [ -n "$ROUTINE_ID" ]; then
+                curl -sf -X DELETE \
+                  -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+                  http://localhost:3001/api/routines/daily/$ROUTINE_ID || true
+              fi
+            fi
           fi
-          echo "✅ Variables de entorno necesarias están configuradas"
-          
-      - name: Generate daily routine with OpenAI
-        working-directory: .github/scripts
-        run: |
-          echo "🚀 Iniciando generación de rutina diaria con OpenAI..."
-          node generate-daily-routine-openai.js
-          
-      - name: Report results
-        if: always()
-        run: |
-          if [ $? -eq 0 ]; then
-            echo "✅ Rutinas generadas exitosamente"
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -d "{\"date\": \"$DATE\"}" \
+            http://localhost:3001/api/routines/daily/generate)
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+          echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
+
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            ROUTINE_NAME=$(echo "$BODY" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('name',''))" 2>/dev/null || echo "")
+            EXERCISE_COUNT=$(echo "$BODY" | python3 -c "import json,sys; d=json.load(sys.stdin); print(len(d.get('routineExercises',[])))" 2>/dev/null || echo "0")
+            INTENSITY=$(echo "$BODY" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('intensity',''))" 2>/dev/null || echo "")
+            EXERCISES=$(echo "$BODY" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+lines = []
+for e in d.get('routineExercises', []):
+  ex = e.get('exercise', {})
+  name = ex.get('name', '?')
+  s = e.get('sets'); r = e.get('reps'); dur = e.get('durationSeconds')
+  detail = f'{s}x{r}' if s and r else (f'{dur}s' if dur else '')
+  lines.append(f'{e[\"orderInRoutine\"]}. {name} — {detail}')
+print('\n'.join(lines))
+" 2>/dev/null || echo "")
+            echo "routine_name=$ROUTINE_NAME" >> $GITHUB_OUTPUT
+            echo "exercise_count=$EXERCISE_COUNT" >> $GITHUB_OUTPUT
+            echo "intensity=$INTENSITY" >> $GITHUB_OUTPUT
+            echo "exercises<<EOF" >> $GITHUB_OUTPUT
+            echo "$EXERCISES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
           else
-            echo "❌ Error generando rutinas"
+            echo "status=error" >> $GITHUB_OUTPUT
+            echo "error=$BODY" >> $GITHUB_OUTPUT
+            echo "ERROR: HTTP $HTTP_CODE — $BODY"
             exit 1
           fi
-          
-      - name: Create summary
+
+      - name: Write step summary
         if: always()
         run: |
-          echo "## 📊 Resumen de Generación de Rutinas" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- **Fecha de ejecución**: $(date -u)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Trigger**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "- **Forzar regeneración**: ${{ github.event.inputs.force_regenerate }}" >> $GITHUB_STEP_SUMMARY
-          fi
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 🎯 Objetivo" >> $GITHUB_STEP_SUMMARY
-          echo "Generar rutinas de fuerza inteligentes para la próxima semana usando:" >> $GITHUB_STEP_SUMMARY
-          echo "- **OpenAI GPT-4o-mini** para crear rutinas personalizadas y económicas" >> $GITHUB_STEP_SUMMARY
-          echo "- **Supabase** para almacenar rutinas y ejercicios" >> $GITHUB_STEP_SUMMARY
-          echo "- **Distribución semanal** de grupos musculares" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📅 Cronograma Semanal" >> $GITHUB_STEP_SUMMARY
-          echo "- **Lunes**: Pecho, Tríceps, Deltoides" >> $GITHUB_STEP_SUMMARY
-          echo "- **Martes**: Dorsales, Bíceps" >> $GITHUB_STEP_SUMMARY
-          echo "- **Miércoles**: Cuádriceps, Glúteos, Isquiotibiales" >> $GITHUB_STEP_SUMMARY
-          echo "- **Jueves**: Pecho, Deltoides, Tríceps" >> $GITHUB_STEP_SUMMARY
-          echo "- **Viernes**: Dorsales, Bíceps" >> $GITHUB_STEP_SUMMARY
-          echo "- **Sábado**: Cuádriceps, Glúteos, Isquiotibiales" >> $GITHUB_STEP_SUMMARY
-          echo "- **Domingo**: Descanso 😴" >> $GITHUB_STEP_SUMMARY
+          DATE="${{ steps.generate.outputs.date }}"
+          DAY="${{ steps.generate.outputs.day_of_week }}"
+
+          declare -A DAY_NAMES=([1]="Lunes" [2]="Martes" [3]="Miércoles" [4]="Jueves" [5]="Viernes" [6]="Sábado" [7]="Domingo")
+          declare -A DAY_MUSCLES=(
+            [1]="Pecho, Tríceps, Deltoides"
+            [2]="Dorsales, Bíceps"
+            [3]="Cuádriceps, Glúteos, Isquiotibiales"
+            [4]="Pecho, Deltoides, Tríceps"
+            [5]="Dorsales, Bíceps"
+            [6]="Cuádriceps, Glúteos, Isquiotibiales"
+            [7]="Descanso 😴"
+          )
+
+          DAY_NAME="${DAY_NAMES[$DAY]:-Desconocido}"
+          DAY_MUSCLE="${DAY_MUSCLES[$DAY]:-}"
+
+          {
+            echo "## 📊 Resumen de Generación de Rutinas"
+            echo ""
+            echo "- **Fecha de ejecución**: $(date -u)"
+            echo "- **Trigger**: ${{ github.event_name }}"
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+              echo "- **Forzar regeneración**: ${{ github.event.inputs.force_regenerate }}"
+            fi
+            echo "- **Fecha de rutina**: $DATE ($DAY_NAME)"
+            echo ""
+
+            if [ "${{ steps.generate.outputs.status }}" = "success" ]; then
+              echo "### ✅ Rutina generada"
+              echo "| Campo | Valor |"
+              echo "|---|---|"
+              echo "| Nombre | ${{ steps.generate.outputs.routine_name }} |"
+              echo "| Intensidad | ${{ steps.generate.outputs.intensity }} |"
+              echo "| Ejercicios | ${{ steps.generate.outputs.exercise_count }} |"
+              echo "| Grupos musculares | $DAY_MUSCLE |"
+              echo ""
+              echo "### 🏋️ Ejercicios"
+              echo '```'
+              echo "${{ steps.generate.outputs.exercises }}"
+              echo '```'
+            else
+              echo "### ❌ Error"
+              echo '```'
+              echo "${{ steps.generate.outputs.error }}"
+              echo '```'
+            fi
+
+            echo ""
+            echo "### 📅 Cronograma Semanal"
+            echo "| Día | Grupos musculares |"
+            echo "|---|---|"
+            echo "| **Lunes** | Pecho, Tríceps, Deltoides |"
+            echo "| **Martes** | Dorsales, Bíceps |"
+            echo "| **Miércoles** | Cuádriceps, Glúteos, Isquiotibiales |"
+            echo "| **Jueves** | Pecho, Deltoides, Tríceps |"
+            echo "| **Viernes** | Dorsales, Bíceps |"
+            echo "| **Sábado** | Cuádriceps, Glúteos, Isquiotibiales |"
+            echo "| **Domingo** | Descanso 😴 |"
+          } >> $GITHUB_STEP_SUMMARY
