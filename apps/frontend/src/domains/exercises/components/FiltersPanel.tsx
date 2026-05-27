@@ -1,5 +1,6 @@
 import type { ExerciseFilters } from '../types/exercise';
 import { useFilterOptionsWithCache } from '../../shared';
+import BodyMap from './BodyMap';
 
 const DIFFICULTIES = ['beginner', 'intermediate', 'advanced'];
 
@@ -124,13 +125,29 @@ export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelP
 
       {/* Muscle Group Selector */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-          Grupo muscular
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-xs sm:text-sm font-medium text-gray-300">
+            Grupo muscular
+          </label>
+          {filters.muscleGroup && (
+            <button
+              onClick={() => handleFilterChange('muscleGroup', '')}
+              className="text-xs text-red-400 hover:text-red-300 transition-colors"
+            >
+              {filters.muscleGroup} ✕
+            </button>
+          )}
+        </div>
+        <BodyMap
+          selectedMuscle={filters.muscleGroup}
+          onMuscleClick={(name) =>
+            handleFilterChange('muscleGroup', filters.muscleGroup === name ? '' : name)
+          }
+        />
         <select
           value={filters.muscleGroup || ''}
           onChange={(e) => handleFilterChange('muscleGroup', e.target.value)}
-          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer text-sm"
+          className="w-full mt-2 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer text-sm"
         >
           <option value="">Todos los grupos</option>
           {muscleGroups.map(group => (
