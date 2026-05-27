@@ -1,6 +1,8 @@
 name: Preview — gym.3dmc.lab
 
 on:
+  push:
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [main]
@@ -45,6 +47,7 @@ jobs:
           exit 1
 
       - name: Comment on PR
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
