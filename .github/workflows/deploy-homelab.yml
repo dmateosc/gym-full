@@ -28,7 +28,7 @@ jobs:
 
       - name: Rebuild and restart preview containers
         run: |
-          cd /opt/gym-full
+          cd /opt/stacks/gym-full
           docker compose up --build -d
 
       - name: Wait for backend health
