@@ -1,51 +1,39 @@
-# Dockerfile para Backend - Heroku Deploy
 FROM node:20-alpine AS builder
 
-# Instalar dependencias para compilación
-RUN apk add --no-cache python3 make g++
-
-# Configurar directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de configuración
 COPY package*.json ./
+COPY apps/backend/package*.json ./apps/backend/
 
-# Instalar todas las dependencias (incluyendo dev para build)
-RUN npm ci
+RUN npm ci --workspace=apps/backend
 
-# Copiar código fuente
-COPY . .
+COPY apps/backend ./apps/backend
+COPY tsconfig*.json ./
 
-# Construir la aplicación
-RUN npm run build
+RUN npm run build --workspace=apps/backend
 
-# Etapa de producción
-FROM node:20-alpine AS production
+# ─── Production ──────────────────────────────────────────────────────────────
 
-# Crear usuario no-root para seguridad
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
+FROM node:20-alpine
 
-# Configurar directorio de trabajo
+RUN addgroup -g 1001 -S nodejs && adduser -S nestjs -u 1001
+RUN apk add --no-cache curl
+
 WORKDIR /app
 
-# Copiar archivos de configuración
 COPY package*.json ./
+COPY apps/backend/package*.json ./apps/backend/
 
-# Instalar solo dependencias de producción
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --omit=dev --workspace=apps/backend && npm cache clean --force
 
-# Copiar build de la etapa anterior
-COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nestjs:nodejs /app/apps/backend/dist ./apps/backend/dist
 
-# Cambiar al usuario no-root
 USER nestjs
 
-# Exponer puerto (Heroku asigna PORT dinámicamente)
-EXPOSE $PORT
+EXPOSE 3001
+ENV NODE_ENV=production PORT=3001
 
-# Configurar variables de entorno por defecto
-ENV NODE_ENV=production
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:3001/api/health || exit 1
 
-# Comando para iniciar la aplicación
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "apps/backend/dist/main"]

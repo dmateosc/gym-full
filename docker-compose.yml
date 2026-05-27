@@ -2,14 +2,11 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: infra/Dockerfile
-      target: frontend-production
+      dockerfile: apps/frontend/Dockerfile
     container_name: gymapp-frontend
     ports:
       - "3000:80"
     restart: unless-stopped
-    environment:
-      - NODE_ENV=production
     networks:
       - gymapp-network
     depends_on:
@@ -19,8 +16,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: infra/Dockerfile
-      target: backend-production
+      dockerfile: apps/backend/Dockerfile
     container_name: gymapp-backend
     ports:
       - "3001:3001"
@@ -42,7 +38,5 @@ services:
 networks:
   gymapp-network:
     driver: bridge
-  # Red externa donde vive el contenedor de PostgreSQL
-  # Crear con: docker network create db-network
   db-network:
     external: true
