@@ -24,9 +24,9 @@ export class OllamaService {
           prompt,
           format: 'json',
           stream: false,
-          options: { temperature: 0.7, num_predict: 2048 },
+          options: { temperature: 0.7, num_predict: 1024 },
         }),
-        signal: AbortSignal.timeout(120_000),
+        signal: AbortSignal.timeout(300_000), // 5 min
       });
     } catch (err) {
       this.logger.error(`Ollama unreachable: ${err}`);

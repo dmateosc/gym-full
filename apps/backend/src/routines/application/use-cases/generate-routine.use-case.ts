@@ -17,6 +17,17 @@ import { ExerciseOrmEntity } from '../../../exercises/infrastructure/persistence
 import { ExerciseType } from '../../infrastructure/persistence/routine-exercise.orm-entity';
 import { RoutineIntensity } from '../../infrastructure/persistence/daily-routine.orm-entity';
 
+// Weekly muscle group schedule (0=Sunday ... 6=Saturday)
+const WEEKLY_SCHEDULE: Record<number, { muscleGroups: string[]; goals: string[]; intensity: RoutineIntensity } | null> = {
+  0: null, // Sunday — rest
+  1: { muscleGroups: ['Pecho', 'Tríceps', 'Deltoides'], goals: ['fuerza', 'pecho', 'empuje'], intensity: RoutineIntensity.HIGH },
+  2: { muscleGroups: ['Dorsales', 'Bíceps', 'Trapecios'], goals: ['fuerza', 'espalda', 'tirón'], intensity: RoutineIntensity.HIGH },
+  3: { muscleGroups: ['Cuádriceps', 'Glúteos', 'Isquiotibiales', 'Gemelos'], goals: ['fuerza', 'piernas'], intensity: RoutineIntensity.HIGH },
+  4: { muscleGroups: ['Pecho', 'Deltoides', 'Tríceps'], goals: ['hipertrofia', 'pecho', 'empuje'], intensity: RoutineIntensity.MODERATE },
+  5: { muscleGroups: ['Dorsales', 'Bíceps', 'Romboides'], goals: ['hipertrofia', 'espalda', 'tirón'], intensity: RoutineIntensity.MODERATE },
+  6: { muscleGroups: ['Cuádriceps', 'Glúteos', 'Isquiotibiales'], goals: ['fuerza', 'piernas', 'funcional'], intensity: RoutineIntensity.MODERATE },
+};
+
 interface OllamaExercise {
   exerciseId: string;
   order: number;
@@ -64,19 +75,40 @@ export class GenerateRoutineUseCase {
       return existing;
     }
 
-    const exercises = await this.exerciseRepo.findAll();
-    const prompt = this.buildPrompt(date, dto, exercises);
+    const dayOfWeek = new Date(date + 'T12:00:00Z').getUTCDay();
+    const schedule = WEEKLY_SCHEDULE[dayOfWeek];
 
-    this.logger.log(`Generating routine for ${date} via Ollama`);
+    if (schedule === null) {
+      this.logger.log(`${date} is Sunday — rest day, skipping generation`);
+      return null;
+    }
+
+    const allExercises = await this.exerciseRepo.findAll();
+    const targetMuscleGroups = dto.goals?.length ? dto.goals : schedule.muscleGroups;
+    const intensity = dto.intensity ?? schedule.intensity;
+    const goals = dto.goals ?? schedule.goals;
+
+    // Filter exercises relevant to today's muscle groups (reduces prompt size ~4x)
+    const relevantExercises = allExercises.filter((e) =>
+      e.muscleGroups.some((mg) =>
+        targetMuscleGroups.some((t) => mg.toLowerCase().includes(t.toLowerCase()) || t.toLowerCase().includes(mg.toLowerCase())),
+      ),
+    );
+    // Always include at least some exercises; fallback to strength category if filter is too narrow
+    const exercises = relevantExercises.length >= 5 ? relevantExercises : allExercises.filter((e) => e.category === 'strength');
+
+    this.logger.log(`Generating routine for ${date} (day ${dayOfWeek}) — muscles: ${targetMuscleGroups.join(', ')} — ${exercises.length} exercises available`);
+    const prompt = this.buildPrompt(date, targetMuscleGroups, goals, intensity, exercises);
+
     const generated = await this.ollamaService.generateJson<OllamaRoutine>(prompt);
 
-    this.validateGenerated(generated, exercises);
+    this.validateGenerated(generated, allExercises);
 
     const routine = await this.routineRepo.create({
       name: generated.name,
       description: generated.description,
       routineDate: new Date(date),
-      intensity: (generated.intensity as RoutineIntensity) ?? RoutineIntensity.MODERATE,
+      intensity: (generated.intensity as RoutineIntensity) ?? intensity,
       estimatedDurationMinutes: generated.estimatedDurationMinutes,
       estimatedCalories: generated.estimatedCalories,
       goals: generated.goals,
@@ -84,7 +116,7 @@ export class GenerateRoutineUseCase {
       coolDownNotes: generated.coolDownNotes,
     });
 
-    const exerciseMap = new Map(exercises.map((e) => [e.id, e]));
+    const exerciseMap = new Map(allExercises.map((e) => [e.id, e]));
 
     for (const ex of generated.exercises) {
       if (!exerciseMap.has(ex.exerciseId)) {
@@ -105,73 +137,69 @@ export class GenerateRoutineUseCase {
       });
     }
 
-    this.logger.log(`Routine created with id=${routine.id} for ${date}`);
+    this.logger.log(`Routine created id=${routine.id} for ${date}`);
     return this.routineRepo.findById(routine.id);
   }
 
   private buildPrompt(
     date: string,
-    dto: GenerateRoutineDto,
+    muscleGroups: string[],
+    goals: string[],
+    intensity: RoutineIntensity,
     exercises: ExerciseOrmEntity[],
   ): string {
-    const intensity = dto.intensity ?? 'moderate';
-    const goals = dto.goals?.join(', ') ?? 'strength, cardio';
-
     const exerciseList = exercises
-      .map(
-        (e) =>
-          `{"id":"${e.id}","name":"${e.name}","category":"${e.category}","difficulty":"${e.difficulty}","muscleGroups":${JSON.stringify(e.muscleGroups)}}`,
-      )
+      .map((e) => `{"id":"${e.id}","name":"${e.name}","muscleGroups":${JSON.stringify(e.muscleGroups)}}`)
       .join(',\n  ');
 
-    return `You are a professional fitness trainer. Generate a daily workout routine for a gym.
+    return `Eres un entrenador personal profesional. Genera una rutina de gimnasio en JSON.
 
-Available exercises (you MUST use the exact "id" values from this list):
+Ejercicios disponibles (usa los "id" exactos de esta lista):
 [
   ${exerciseList}
 ]
 
-Parameters:
-- Date: ${date}
-- Intensity: ${intensity}
-- Goals: ${goals}
-- Include 6 to 9 exercises
-- Balance muscle groups (avoid working same muscles twice)
-- For strength exercises use exerciseType "sets_reps" with sets and reps
-- For cardio use exerciseType "time_based" with durationSeconds
-- Include realistic sets, reps, restSeconds values
+Parámetros:
+- Fecha: ${date}
+- Grupos musculares objetivo: ${muscleGroups.join(', ')}
+- Objetivos: ${goals.join(', ')}
+- Intensidad: ${intensity}
+- Incluye entre 6 y 8 ejercicios
+- Usa exerciseType "sets_reps" para fuerza (con sets y reps realistas)
+- Usa exerciseType "time_based" para cardio (con durationSeconds)
+- restSeconds entre 60 y 90 para fuerza, 30-45 para cardio
 
-Respond ONLY with a JSON object matching this exact structure (no extra text):
+Responde ÚNICAMENTE con este JSON (sin texto adicional):
 {
-  "name": "short routine name in Spanish",
-  "description": "2-3 sentence description in Spanish",
+  "name": "nombre corto de la rutina",
+  "description": "descripción breve de 2 frases",
   "intensity": "${intensity}",
   "estimatedDurationMinutes": 60,
   "estimatedCalories": 400,
-  "goals": ["strength", "cardio"],
-  "warmUpNotes": "warm up description in Spanish",
-  "coolDownNotes": "cool down description in Spanish",
+  "goals": ${JSON.stringify(goals)},
+  "warmUpNotes": "calentamiento 5-10 min",
+  "coolDownNotes": "estiramientos 5 min",
   "exercises": [
     {
-      "exerciseId": "exact-id-from-list-above",
+      "exerciseId": "id-exacto-de-la-lista",
       "order": 1,
       "exerciseType": "sets_reps",
-      "sets": 3,
-      "reps": 12,
+      "sets": 4,
+      "reps": 10,
       "weight": null,
       "durationSeconds": null,
-      "restSeconds": 60,
+      "restSeconds": 75,
       "notes": null
     }
   ]
 }`;
   }
 
-  private validateGenerated(generated: OllamaRoutine, exercises: ExerciseOrmEntity[]): void {
+  private validateGenerated(generated: OllamaRoutine, allExercises: ExerciseOrmEntity[]): void {
     if (!generated?.exercises?.length) {
       throw new BadRequestException('Ollama no generó ejercicios válidos');
     }
-    const validIds = new Set(exercises.map((e) => e.id));
+    const validIds = new Set(allExercises.map((e) => e.id));
     const validExercises = generated.exercises.filter((e) => validIds.has(e.exerciseId));
     if (validExercises.length === 0) {
       throw new BadRequestException('Ollama no devolvió IDs de ejercicios válidos');
