@@ -10,6 +10,7 @@ import {
 } from '../../domain/repositories/daily-routine.repository.port';
 import { CreateDailyRoutineDto } from '../../infrastructure/http/dto/create-daily-routine.dto';
 import { UpdateDailyRoutineDto } from '../../infrastructure/http/dto/update-daily-routine.dto';
+import { DailyRoutineOrmEntity } from '../../infrastructure/persistence/daily-routine.orm-entity';
 
 @Injectable()
 export class DailyRoutineCrudUseCase {
@@ -37,7 +38,8 @@ export class DailyRoutineCrudUseCase {
 
   async findById(id: string) {
     const routine = await this.routineRepo.findById(id);
-    if (!routine) throw new NotFoundException(`Rutina con ID ${id} no encontrada`);
+    if (!routine)
+      throw new NotFoundException(`Rutina con ID ${id} no encontrada`);
     return routine;
   }
 
@@ -56,7 +58,7 @@ export class DailyRoutineCrudUseCase {
       }
     }
 
-    const updateData: any = { ...dto };
+    const updateData: Partial<DailyRoutineOrmEntity> = { ...dto };
     if (dto.routineDate) {
       updateData.routineDate = new Date(dto.routineDate);
     }

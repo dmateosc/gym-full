@@ -196,9 +196,7 @@ export class ExercisesController {
     this.logger.log('GET /exercises/statistics - Generating statistics');
     const stats = await this.metadataUseCase.getStatistics();
     const duration = Date.now() - startTime;
-    this.logger.log(
-      `GET /exercises/statistics - Generated in ${duration}ms`,
-    );
+    this.logger.log(`GET /exercises/statistics - Generated in ${duration}ms`);
     return stats;
   }
 
@@ -229,9 +227,7 @@ export class ExercisesController {
     @Query('category') category?: string,
   ) {
     const startTime = Date.now();
-    this.logger.log(
-      `GET /exercises/search - Searching for: "${searchTerm}"`,
-    );
+    this.logger.log(`GET /exercises/search - Searching for: "${searchTerm}"`);
 
     if (!searchTerm || searchTerm.trim().length < 2) {
       return [];

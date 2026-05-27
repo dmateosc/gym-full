@@ -15,7 +15,7 @@ export class UserTypeormRepository implements UserRepositoryPort {
 
   async findAll(): Promise<UserEntity[]> {
     const ormEntities = await this.repo.find({ order: { createdAt: 'DESC' } });
-    return ormEntities.map(this.toDomain);
+    return ormEntities.map((orm) => this.toDomain(orm));
   }
 
   async findById(id: string): Promise<UserEntity | null> {
@@ -39,7 +39,9 @@ export class UserTypeormRepository implements UserRepositoryPort {
     fullName?: string;
     avatarUrl?: string;
   }): Promise<UserEntity> {
-    let ormEntity = await this.repo.findOne({ where: { supabaseId: data.supabaseId } });
+    let ormEntity = await this.repo.findOne({
+      where: { supabaseId: data.supabaseId },
+    });
 
     if (ormEntity) {
       if (data.fullName !== undefined) ormEntity.fullName = data.fullName;
@@ -77,7 +79,8 @@ export class UserTypeormRepository implements UserRepositoryPort {
   async updateRole(id: string, role: UserRole): Promise<UserEntity> {
     await this.repo.update({ id }, { role });
     const updated = await this.repo.findOne({ where: { id } });
-    if (!updated) throw new Error(`Usuario ${id} no encontrado tras actualizar`);
+    if (!updated)
+      throw new Error(`Usuario ${id} no encontrado tras actualizar`);
     return this.toDomain(updated);
   }
 

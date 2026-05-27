@@ -12,7 +12,9 @@ export class UserRoleVO {
 
   constructor(value: UserRole | string) {
     if (!Object.values(UserRole).includes(value as UserRole)) {
-      throw new Error(`Rol inválido: ${value}. Roles válidos: ${Object.values(UserRole).join(', ')}`);
+      throw new Error(
+        `Rol inválido: ${value}. Roles válidos: ${Object.values(UserRole).join(', ')}`,
+      );
     }
     this._value = value as UserRole;
   }

@@ -7,7 +7,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { JwtVerifier, JwtPayload } from '../../../shared/infrastructure/jwt/jwt-verifier';
+import {
+  JwtVerifier,
+  JwtPayload,
+} from '../../../shared/infrastructure/jwt/jwt-verifier';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 
@@ -36,7 +39,9 @@ export class JwtAuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const request = context.switchToHttp().getRequest();
+    const request = context
+      .switchToHttp()
+      .getRequest<{ headers?: Record<string, string>; user?: JwtPayload }>();
     const token = this.extractToken(request);
 
     if (!token) {
@@ -47,7 +52,10 @@ export class JwtAuthGuard implements CanActivate {
 
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
     if (supabaseUrl) {
-      payload = await JwtVerifier.verifyWithJwks(token, `${supabaseUrl}/auth/v1/.well-known/jwks.json`);
+      payload = await JwtVerifier.verifyWithJwks(
+        token,
+        `${supabaseUrl}/auth/v1/.well-known/jwks.json`,
+      );
     }
 
     if (!payload) {
@@ -65,7 +73,10 @@ export class JwtAuthGuard implements CanActivate {
     return true;
   }
 
-  private extractToken(request: { headers?: Record<string, string> }): string | null {
+  private extractToken(request: {
+    headers?: Record<string, string>;
+    user?: JwtPayload;
+  }): string | null {
     const authHeader = request.headers?.['authorization'];
     if (!authHeader) return null;
 

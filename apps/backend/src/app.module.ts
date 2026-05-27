@@ -37,7 +37,10 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
         UserProfileOrmEntity,
       ],
       synchronize: false,
-      ssl: process.env.DATABASE_SSL === 'false' ? false : { rejectUnauthorized: false },
+      ssl:
+        process.env.DATABASE_SSL === 'false'
+          ? false
+          : { rejectUnauthorized: false },
       logging: ['error', 'warn'],
       logger: new DatabaseLogger(),
       maxQueryExecutionTime: 1000,

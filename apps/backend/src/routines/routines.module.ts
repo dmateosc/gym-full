@@ -19,8 +19,14 @@ import { RoutineStatsUseCase } from './application/use-cases/routine-stats.use-c
   ],
   controllers: [RoutinesController],
   providers: [
-    { provide: DAILY_ROUTINE_REPOSITORY, useClass: DailyRoutineTypeormRepository },
-    { provide: ROUTINE_EXERCISE_REPOSITORY, useClass: RoutineExerciseTypeormRepository },
+    {
+      provide: DAILY_ROUTINE_REPOSITORY,
+      useClass: DailyRoutineTypeormRepository,
+    },
+    {
+      provide: ROUTINE_EXERCISE_REPOSITORY,
+      useClass: RoutineExerciseTypeormRepository,
+    },
     DailyRoutineCrudUseCase,
     DailyRoutineQueriesUseCase,
     DailyRoutineLifecycleUseCase,

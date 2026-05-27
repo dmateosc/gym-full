@@ -29,10 +29,12 @@ import { GetAllUsersUseCase } from '../../application/use-cases/get-all-users.us
 import { GetUserByIdUseCase } from '../../application/use-cases/get-user-by-id.use-case';
 import { UpdateUserRoleUseCase } from '../../application/use-cases/update-user-role.use-case';
 import { UpsertUserProfileUseCase } from '../../application/use-cases/upsert-user-profile.use-case';
-import { USER_REPOSITORY, UserRepositoryPort } from '../../domain/repositories/user.repository.port';
+import {
+  USER_REPOSITORY,
+  UserRepositoryPort,
+} from '../../domain/repositories/user.repository.port';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { UserRole as DomainUserRole } from '../../domain/value-objects/user-role.vo';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -50,7 +52,9 @@ export class UsersController {
   @Get('me')
   @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })
   @ApiResponse({ status: 200, type: UserResponseDto })
-  async getMyProfile(@CurrentUser() user: JwtPayload): Promise<UserResponseDto | null> {
+  async getMyProfile(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<UserResponseDto | null> {
     const entity = await this.userRepo.findBySupabaseId(user.sub);
     if (!entity) return null;
     return UserResponseDto.fromDomain(entity);
@@ -66,7 +70,11 @@ export class UsersController {
     const entity = await this.upsertProfile.execute({
       supabaseId: user.sub,
       email: user.email,
-      fullName: body.fullName ?? (user['user_metadata'] as Record<string, string> | undefined)?.['full_name'],
+      fullName:
+        body.fullName ??
+        (user['user_metadata'] as Record<string, string> | undefined)?.[
+          'full_name'
+        ],
     });
     return UserResponseDto.fromDomain(entity);
   }
@@ -77,7 +85,7 @@ export class UsersController {
   @ApiResponse({ status: 200, type: [UserResponseDto] })
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.getAllUsers.execute();
-    return users.map(UserResponseDto.fromDomain);
+    return users.map((u) => UserResponseDto.fromDomain(u));
   }
 
   @Get(':id')
@@ -100,7 +108,7 @@ export class UsersController {
   ): Promise<UserResponseDto> {
     const entity = await this.updateUserRole.execute({
       userId: id,
-      role: dto.role as DomainUserRole,
+      role: dto.role,
       requestingUserId: currentUser.sub,
     });
     return UserResponseDto.fromDomain(entity);

@@ -13,7 +13,8 @@ export class FindExerciseByIdUseCase {
 
   async execute(id: string) {
     const exercise = await this.exerciseRepo.findById(id);
-    if (!exercise) throw new NotFoundException(`Exercise with ID ${id} not found`);
+    if (!exercise)
+      throw new NotFoundException(`Exercise with ID ${id} not found`);
     return exercise;
   }
 }

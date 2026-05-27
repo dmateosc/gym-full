@@ -7,7 +7,7 @@ import { JwtPayload } from '../../../shared/infrastructure/jwt/jwt-verifier';
  */
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): JwtPayload => {
-    const request = ctx.switchToHttp().getRequest();
-    return request.user as JwtPayload;
+    const request = ctx.switchToHttp().getRequest<{ user: JwtPayload }>();
+    return request.user;
   },
 );

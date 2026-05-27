@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  ExerciseRepositoryPort,
-} from '../../domain/repositories/exercise.repository.port';
+import { ExerciseRepositoryPort } from '../../domain/repositories/exercise.repository.port';
 import { ExerciseOrmEntity } from './exercise.orm-entity';
 import { ExerciseFiltersDto } from '../http/dto/exercise-filters.dto';
 
@@ -22,16 +20,24 @@ export class ExerciseTypeormRepository implements ExerciseRepositoryPort {
     const qb = this.repo.createQueryBuilder('exercise');
 
     if (filters?.category) {
-      qb.andWhere('exercise.category = :category', { category: filters.category });
+      qb.andWhere('exercise.category = :category', {
+        category: filters.category,
+      });
     }
     if (filters?.difficulty) {
-      qb.andWhere('exercise.difficulty = :difficulty', { difficulty: filters.difficulty });
+      qb.andWhere('exercise.difficulty = :difficulty', {
+        difficulty: filters.difficulty,
+      });
     }
     if (filters?.muscleGroup) {
-      qb.andWhere(':muscleGroup = ANY(exercise.muscle_groups)', { muscleGroup: filters.muscleGroup });
+      qb.andWhere(':muscleGroup = ANY(exercise.muscle_groups)', {
+        muscleGroup: filters.muscleGroup,
+      });
     }
     if (filters?.equipment) {
-      qb.andWhere(':equipment = ANY(exercise.equipment)', { equipment: filters.equipment });
+      qb.andWhere(':equipment = ANY(exercise.equipment)', {
+        equipment: filters.equipment,
+      });
     }
     if (filters?.search) {
       qb.andWhere(
@@ -48,12 +54,17 @@ export class ExerciseTypeormRepository implements ExerciseRepositoryPort {
     return this.repo.findOne({ where: { id } });
   }
 
-  async create(exercise: Partial<ExerciseOrmEntity>): Promise<ExerciseOrmEntity> {
+  async create(
+    exercise: Partial<ExerciseOrmEntity>,
+  ): Promise<ExerciseOrmEntity> {
     const entity = this.repo.create(exercise);
     return this.repo.save(entity);
   }
 
-  async update(id: string, exercise: Partial<ExerciseOrmEntity>): Promise<ExerciseOrmEntity> {
+  async update(
+    id: string,
+    exercise: Partial<ExerciseOrmEntity>,
+  ): Promise<ExerciseOrmEntity> {
     await this.repo.update({ id }, exercise);
     return this.repo.findOne({ where: { id } }) as Promise<ExerciseOrmEntity>;
   }

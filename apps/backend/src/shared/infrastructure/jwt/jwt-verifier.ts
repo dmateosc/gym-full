@@ -58,9 +58,7 @@ export class JwtVerifier {
       const header = decoded.header as { kid?: string; alg?: string };
 
       // Pick key matching kid (if present), otherwise first key
-      const key = header.kid
-        ? keys.find((k) => k.kid === header.kid)
-        : keys[0];
+      const key = header.kid ? keys.find((k) => k.kid === header.kid) : keys[0];
       if (!key) return null;
 
       // Build PEM from JWK (only RSA/EC supported by jsonwebtoken)
