@@ -54,9 +54,9 @@ const WEEKLY_SCHEDULE: Record<number, DaySchedule> = {
 // ─── Config from env ──────────────────────────────────────────────────────────
 
 const DATABASE_URL = process.env.DATABASE_URL;
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://192.168.0.103:11434';
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
-const DATABASE_SSL = process.env.DATABASE_SSL === 'true';
+const DATABASE_SSL = process.env.DATABASE_SSL !== 'false';
 
 if (!DATABASE_URL) {
   console.error('❌  DATABASE_URL is required');
@@ -231,9 +231,21 @@ async function insertRoutineExercise(client: PoolClient, data: {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  const date = process.argv[2] ?? new Date().toISOString().split('T')[0];
+  const dateArg = process.argv[2];
+  const date = dateArg ?? new Date().toISOString().slice(0, 10);
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`))) {
+    console.error(`❌  Invalid date "${date}". Expected YYYY-MM-DD.`);
+    process.exit(1);
+  }
+
   const dayOfWeek = new Date(`${date}T12:00:00Z`).getUTCDay();
   const schedule = WEEKLY_SCHEDULE[dayOfWeek];
+
+  if (schedule === undefined) {
+    console.error(`❌  Unsupported dayOfWeek=${dayOfWeek} for date ${date}`);
+    process.exit(1);
+  }
 
   console.log(`📅  Date: ${date} (day ${dayOfWeek})`);
 
