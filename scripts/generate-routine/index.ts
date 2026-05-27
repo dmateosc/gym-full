@@ -54,7 +54,7 @@ const WEEKLY_SCHEDULE: Record<number, DaySchedule> = {
 // ─── Config from env ──────────────────────────────────────────────────────────
 
 const DATABASE_URL = process.env.DATABASE_URL;
-const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://192.168.0.103:11434';
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
 const DATABASE_SSL = process.env.DATABASE_SSL === 'true';
 
