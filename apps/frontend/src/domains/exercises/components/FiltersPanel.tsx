@@ -139,6 +139,7 @@ export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelP
           )}
         </div>
         <BodyMap
+          availableMuscleGroups={muscleGroups}
           selectedMuscle={filters.muscleGroup}
           onMuscleClick={(name) =>
             handleFilterChange('muscleGroup', filters.muscleGroup === name ? '' : name)

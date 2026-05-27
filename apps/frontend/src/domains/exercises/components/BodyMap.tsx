@@ -51,8 +51,15 @@ const ID_TO_MUSCLE: Record<string, string> = {
   'forearms': 'Antebrazos',
 };
 
+const ID_TO_FILTER_OPTIONS: Record<string, string[]> = {
+  'lats': ['Dorsales', 'Espalda'],
+  'lowerback': ['Lumbar', 'Espalda Baja', 'Dorsales', 'Espalda'],
+  'traps-middle': ['Romboides', 'Trapecio', 'Dorsales', 'Espalda'],
+};
+
 export interface BodyMapProps {
   muscleGroups?: string[];
+  availableMuscleGroups?: string[];
   onMuscleClick?: (muscleName: string) => void;
   selectedMuscle?: string;
 }
@@ -81,6 +88,21 @@ function buildSelectedSet(selectedMuscle?: string): Set<string> {
   return buildHighlightedSet([selectedMuscle]);
 }
 
+function resolveMuscleName(svgId: string, availableMuscleGroups: string[] = []): string {
+  const filterOptions = ID_TO_FILTER_OPTIONS[svgId];
+
+  if (filterOptions?.length) {
+    const availableOptions = new Set(availableMuscleGroups.map((group) => group.trim()));
+    const matchingOption = filterOptions.find((option) => availableOptions.has(option));
+
+    if (matchingOption) {
+      return matchingOption;
+    }
+  }
+
+  return ID_TO_MUSCLE[svgId] ?? svgId;
+}
+
 const HIGHLIGHT_COLOR = '#ef4444';   // red-500
 const SELECTED_COLOR  = '#dc2626';   // red-600
 const DEFAULT_COLOR   = '#4b5563';   // gray-600
@@ -90,6 +112,7 @@ function getMuscleProps(
   svgId: string,
   highlighted: Set<string>,
   selected: Set<string>,
+  availableMuscleGroups: string[] = [],
   onMuscleClick?: (name: string) => void,
 ) {
   const isHighlighted = highlighted.has(svgId);
@@ -99,7 +122,7 @@ function getMuscleProps(
 
   return {
     style: { color },
-    onClick: isInteractive ? () => onMuscleClick(ID_TO_MUSCLE[svgId] ?? svgId) : undefined,
+    onClick: isInteractive ? () => onMuscleClick(resolveMuscleName(svgId, availableMuscleGroups)) : undefined,
     className: isInteractive ? 'cursor-pointer transition-colors duration-150 hover:opacity-80' : 'transition-colors duration-300',
   };
 }
@@ -109,9 +132,10 @@ function getMuscleProps(
 const FrontBody: React.FC<{
   highlighted: Set<string>;
   selected: Set<string>;
+  availableMuscleGroups?: string[];
   onMuscleClick?: (name: string) => void;
-}> = ({ highlighted, selected, onMuscleClick }) => {
-  const mp = (id: string) => getMuscleProps(id, highlighted, selected, onMuscleClick);
+}> = ({ highlighted, selected, availableMuscleGroups, onMuscleClick }) => {
+  const mp = (id: string) => getMuscleProps(id, highlighted, selected, availableMuscleGroups, onMuscleClick);
 
   return (
     <svg viewBox="0 0 660.46 1206.46" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -191,9 +215,10 @@ const FrontBody: React.FC<{
 const BackBody: React.FC<{
   highlighted: Set<string>;
   selected: Set<string>;
+  availableMuscleGroups?: string[];
   onMuscleClick?: (name: string) => void;
-}> = ({ highlighted, selected, onMuscleClick }) => {
-  const mp = (id: string) => getMuscleProps(id, highlighted, selected, onMuscleClick);
+}> = ({ highlighted, selected, availableMuscleGroups, onMuscleClick }) => {
+  const mp = (id: string) => getMuscleProps(id, highlighted, selected, availableMuscleGroups, onMuscleClick);
 
   return (
     <svg viewBox="0 0 660.46 1206.46" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
@@ -276,6 +301,7 @@ const BackBody: React.FC<{
 
 const BodyMap: React.FC<BodyMapProps> = ({
   muscleGroups = [],
+  availableMuscleGroups = [],
   onMuscleClick,
   selectedMuscle,
 }) => {
@@ -286,11 +312,21 @@ const BodyMap: React.FC<BodyMapProps> = ({
     <div className="flex gap-2 w-full items-center justify-center">
       <div className="flex-1 max-w-[180px]">
         <p className="text-xs text-center text-gray-500 mb-1">Frontal</p>
-        <FrontBody highlighted={highlighted} selected={selected} onMuscleClick={onMuscleClick} />
+        <FrontBody
+          highlighted={highlighted}
+          selected={selected}
+          availableMuscleGroups={availableMuscleGroups}
+          onMuscleClick={onMuscleClick}
+        />
       </div>
       <div className="flex-1 max-w-[180px]">
         <p className="text-xs text-center text-gray-500 mb-1">Dorsal</p>
-        <BackBody highlighted={highlighted} selected={selected} onMuscleClick={onMuscleClick} />
+        <BackBody
+          highlighted={highlighted}
+          selected={selected}
+          availableMuscleGroups={availableMuscleGroups}
+          onMuscleClick={onMuscleClick}
+        />
       </div>
     </div>
   );
