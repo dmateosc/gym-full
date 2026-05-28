@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# Track compiled scripts used in production containers
+!scripts/*/dist/
 *.local
 .env
 
