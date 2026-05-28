@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Exercise } from '../types/exercise';
 import {
   ArrowIcon,
@@ -212,6 +213,32 @@ const InstructionsSection = ({ instructions }: { instructions: string[] }) => (
   </div>
 );
 
+const ExerciseImage = ({ imageUrl, name }: { imageUrl: string; name: string }) => {
+  const [status, setStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
+
+  if (status === 'error') return null;
+
+  return (
+    <div className="relative w-full bg-gray-950 overflow-hidden" style={{ aspectRatio: '16/9' }}>
+      {status === 'loading' && (
+        <div className="absolute inset-0 bg-gray-800 animate-pulse" />
+      )}
+      <img
+        src={imageUrl}
+        alt={name}
+        className="w-full h-full object-contain transition-opacity duration-500"
+        style={{ opacity: status === 'loaded' ? 1 : 0 }}
+        loading="lazy"
+        onLoad={() => setStatus('loaded')}
+        onError={() => setStatus('error')}
+      />
+      {status === 'loaded' && (
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent pointer-events-none" />
+      )}
+    </div>
+  );
+};
+
 const getYouTubeEmbedUrl = (url: string): string | null => {
   const watchMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
   if (!watchMatch) return null;
@@ -220,7 +247,9 @@ const getYouTubeEmbedUrl = (url: string): string | null => {
 
 const VideoSection = ({ videoUrl }: { videoUrl: string }) => {
   const embedUrl = getYouTubeEmbedUrl(videoUrl);
-  if (!embedUrl) return null;
+  const isMp4 = !embedUrl && videoUrl.includes('.mp4');
+
+  if (!embedUrl && !isMp4) return null;
 
   return (
     <div className="mt-6 sm:mt-8">
@@ -229,13 +258,24 @@ const VideoSection = ({ videoUrl }: { videoUrl: string }) => {
         Vídeo explicativo
       </h2>
       <div className="relative w-full rounded-xl overflow-hidden border border-gray-700 shadow-2xl" style={{ paddingTop: '56.25%' }}>
-        <iframe
-          src={embedUrl}
-          title="Vídeo explicativo del ejercicio"
-          className="absolute inset-0 w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        />
+        {embedUrl ? (
+          <iframe
+            src={embedUrl}
+            title="Vídeo explicativo del ejercicio"
+            className="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <video
+            src={videoUrl}
+            className="absolute inset-0 w-full h-full object-cover"
+            controls
+            loop
+            muted
+            playsInline
+          />
+        )}
       </div>
     </div>
   );
@@ -248,6 +288,7 @@ const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
 
       <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-lg sm:rounded-xl shadow-2xl overflow-hidden border border-gray-700">
         <ExerciseHeader exercise={exercise} />
+        {exercise.imageUrl && <ExerciseImage imageUrl={exercise.imageUrl} name={exercise.name} />}
         <StatsPanel exercise={exercise} />
 
         <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-800 to-gray-900">
