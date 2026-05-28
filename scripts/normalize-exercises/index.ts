@@ -30,6 +30,69 @@ interface OllamaExercise {
   instructions: string[];
 }
 
+// Hardcoded translations for well-known exercises — LLMs are unreliable for technical terminology
+const KNOWN_TRANSLATIONS: Record<string, string> = {
+  // Deadlifts
+  'barbell deadlift': 'Peso Muerto con Barra',
+  'romanian deadlift': 'Peso Muerto Rumano',
+  'romanian deadlift with dumbbells': 'Peso Muerto Rumano con Mancuernas',
+  'sumo deadlift': 'Peso Muerto Sumo',
+  // Squats
+  'barbell full squat': 'Sentadilla Completa con Barra',
+  'barbell squat': 'Sentadilla con Barra',
+  'goblet squat': 'Sentadilla Goblet',
+  'front squat': 'Sentadilla Frontal',
+  // Olympic lifts
+  'hang clean': 'Cargada Colgante',
+  'clean from blocks': 'Cargada desde Bloques',
+  'power clean': 'Cargada de Potencia',
+  'power snatch': 'Arrancada de Potencia',
+  'snatch': 'Arrancada',
+  // Hip / glutes
+  'barbell hip thrust': 'Hip Thrust con Barra',
+  'hip thrust': 'Hip Thrust',
+  'barbell glute bridge': 'Puente de Glúteos con Barra',
+  // Rows
+  'bent over barbell row': 'Remo Inclinado con Barra',
+  'bent over row': 'Remo Inclinado',
+  'cable row': 'Remo en Polea',
+  'dumbbell row': 'Remo con Mancuerna',
+  // Press
+  'bench press': 'Press de Banca con Barra',
+  'dumbbell bench press': 'Press de Banca con Mancuernas',
+  'shoulder press': 'Press de Hombros',
+  'overhead press': 'Press Militar',
+  // Curls
+  'hammer curls': 'Curl Martillo',
+  'curl zottman': 'Curl Zottman',
+  // Pulls
+  'lat pulldown': 'Jalón al Pecho',
+  'pull up': 'Dominadas',
+  'pull-up': 'Dominadas',
+  'chin up': 'Dominadas con Supinación',
+  // Core / cardio
+  'plank': 'Plancha',
+  'side plank': 'Plancha Lateral',
+  'elbow plank': 'Plancha sobre Codos',
+  'russian twist': 'Rotación Rusa',
+  'bicycle crunches': 'Crunch de Bicicleta',
+  'mountain climbers': 'Escaladores',
+  'high knees': 'Rodillas Altas',
+  'jumping rope': 'Salto a la Comba',
+  // Misc
+  'tire flip': 'Volteo de Neumático',
+  'landmine twist': 'Rotación con Barra Fija',
+  'dumbbell flyes': 'Aperturas con Mancuernas',
+  'pushups': 'Flexiones',
+  'push-ups': 'Flexiones',
+  'lunge': 'Zancada',
+  'walking lunge': 'Zancada Caminando',
+};
+
+function getKnownTranslation(name: string): string | null {
+  return KNOWN_TRANSLATIONS[name.toLowerCase().trim()] ?? null;
+}
+
 // Heuristic: name is already in Spanish if it has Spanish words or no English keywords
 function looksEnglish(name: string): boolean {
   const englishWords = /\b(barbell|dumbbell|bench|press|row|squat|deadlift|curl|plank|crunch|lunge|thrust|flip|snatch|clean|hang|swing|pull|push|raise|fly|flies|overhead|incline|decline|grip|wide|narrow|single|double|cable|rope|band|machine|twist|kick|jump|run|hop|step|tire|power|hang|high|side|russian|romanian|hammer|spider|zottman)\b/i;
@@ -127,13 +190,15 @@ async function main() {
       process.stdout.write(`  ${exercise.name} ...`);
 
       try {
+        const knownName = getKnownTranslation(exercise.name);
         const result = await callOllama(exercise);
 
         if (!result.name || !Array.isArray(result.instructions) || result.instructions.length < 2) {
           throw new Error('Invalid response structure');
         }
 
-        const newName = ONLY_INSTRUCTIONS ? exercise.name : result.name;
+        // Dictionary takes priority over LLM for names
+        const newName = ONLY_INSTRUCTIONS ? exercise.name : (knownName ?? result.name);
         const newDesc = ONLY_INSTRUCTIONS ? exercise.description : result.description;
 
         if (DRY_RUN) {
