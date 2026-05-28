@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://192.168.0.103:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'qwen2.5:7b';
 const DRY_RUN = process.argv.includes('--dry-run');
 // --all reprocesses exercises that already have Spanish names
 const ALL = process.argv.includes('--all');
@@ -37,24 +37,57 @@ function looksEnglish(name: string): boolean {
 }
 
 async function callOllama(exercise: DbExercise): Promise<OllamaExercise> {
-  const prompt = `Eres un entrenador personal experto. Dado el siguiente ejercicio:
+  const prompt = `Eres un experto en terminología de musculación y fitness en español de España. Debes traducir el nombre de un ejercicio de gimnasio a su nombre oficial en español y escribir instrucciones claras.
 
+REGLAS PARA EL NOMBRE:
+1. USA la terminología estándar española, NO traduzcas literalmente palabra por palabra.
+2. Los movimientos tienen nombres establecidos — NO los inventes:
+   - Deadlift = "Peso Muerto" (NUNCA "Sentadilla")
+   - Squat = "Sentadilla" (NUNCA "Peso Muerto")
+   - Clean = "Cargada" (NUNCA "Peso" ni "Sentadilla")
+   - Snatch = "Arrancada"
+   - Row = "Remo"
+   - Press = "Press"
+   - Curl = "Curl"
+   - Lunge = "Zancada"
+   - Thrust = "Empuje" o "Hip Thrust"
+   - Fly/Flyes = "Aperturas"
+   - Raise = "Elevaciones"
+   - Pulldown = "Jalón"
+   - Plank = "Plancha"
+3. Añade el equipamiento si es relevante: "con Barra", "con Mancuernas", "en Polea", "en Máquina".
+4. Añade la variante si aplica: "Inclinado", "Declinado", "Rumano", "Colgante", "desde Bloques", "Agarre Cerrado".
+5. Si el nombre ya está bien en español, devuélvelo igual.
+
+TABLA DE TRADUCCIONES OBLIGATORIAS:
+- Barbell Deadlift → Peso Muerto con Barra
+- Romanian Deadlift → Peso Muerto Rumano
+- Barbell Squat / Barbell Full Squat → Sentadilla con Barra
+- Hang Clean → Cargada Colgante
+- Clean from Blocks → Cargada desde Bloques
+- Power Snatch → Arrancada de Potencia
+- Bent Over Barbell Row → Remo Inclinado con Barra
+- Dumbbell Flyes → Aperturas con Mancuernas
+- Barbell Hip Thrust → Hip Thrust con Barra
+- Barbell Glute Bridge → Puente de Glúteos con Barra
+- Tire Flip → Volteo de Neumático
+- Hammer Curls → Curl Martillo
+- Shoulder Press → Press de Hombros
+- Bench Press → Press de Banca
+- Lat Pulldown → Jalón al Pecho
+- Cable Row → Remo en Polea
+
+EJERCICIO A PROCESAR:
 Nombre original: ${exercise.name}
 Categoría: ${exercise.category}
 Músculos: ${exercise.muscle_groups.join(', ')}
 Equipamiento: ${exercise.equipment.join(', ')}
-Descripción actual: ${exercise.description || 'No disponible'}
 
-Genera en español:
-1. Un nombre claro y natural (ej: "Curl de Bíceps con Barra", "Sentadilla con Barra", "Puente de Glúteos")
-2. Una descripción breve de 1-2 frases
-3. Entre 4 y 6 pasos concisos de cómo ejecutarlo correctamente
-
-Responde SOLO con JSON válido, sin texto adicional:
+Responde ÚNICAMENTE con este JSON, sin texto adicional, sin markdown:
 {
-  "name": "nombre en español",
-  "description": "descripción breve",
-  "instructions": ["paso 1", "paso 2", "paso 3", "paso 4"]
+  "name": "nombre oficial en español",
+  "description": "1-2 frases: qué músculos trabaja y beneficio principal",
+  "instructions": ["paso 1", "paso 2", "paso 3", "paso 4", "paso 5"]
 }`;
 
   const res = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
@@ -65,9 +98,9 @@ Responde SOLO con JSON válido, sin texto adicional:
       prompt,
       format: 'json',
       stream: false,
-      options: { temperature: 0.4, num_predict: 512 },
+      options: { temperature: 0.2, num_predict: 600 },
     }),
-    signal: AbortSignal.timeout(120_000),
+    signal: AbortSignal.timeout(180_000),
   });
 
   if (!res.ok) throw new Error(`Ollama HTTP ${res.status}: ${await res.text()}`);
