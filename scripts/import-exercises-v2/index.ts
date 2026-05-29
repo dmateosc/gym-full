@@ -263,6 +263,13 @@ async function main() {
             }
           }
 
+          // Post-translation duplicate check: skip if Spanish name already exists
+          if (existingNames.has(finalName.toLowerCase().trim())) {
+            console.log(`  ~ ${finalName} (duplicate post-translate, skipped)`);
+            skipped++;
+            continue;
+          }
+
           await pool.query(
             `INSERT INTO exercises (name, description, category, difficulty, muscle_groups, equipment, instructions, image_url, video_url)
              VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -273,6 +280,7 @@ async function main() {
           process.stdout.write(`  ✓ ${finalName}\n`);
           inserted++;
           existingNames.add(ex.name.toLowerCase().trim());
+          existingNames.add(finalName.toLowerCase().trim());
 
         } catch (err) {
           console.log(`  ✗ ${ex.name}: ${(err as Error).message}`);
