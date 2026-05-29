@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { AlertIcon, CheckIcon } from '../../../assets/icons/index.tsx';
 
 interface RegisterPageProps {
   onNavigate: (page: 'login') => void;
 }
+
+const inputClass =
+  'w-full px-4 py-3 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#e50914] focus:ring-2 focus:ring-[rgba(229,9,20,0.2)]';
 
 const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const { signUp, isLoading, error } = useAuth();
@@ -13,11 +17,6 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [success, setSuccess] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
-
-  const inputStyle = {
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.15)',
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,21 +39,19 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
 
   if (success) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ background: 'linear-gradient(135deg, #000 0%, #111 50%, #000 100%)' }}
-      >
+      <div className="min-h-screen flex items-center justify-center px-4 bg-[#0f172a]">
         <div className="text-center max-w-md">
-          <div className="text-6xl mb-4">📧</div>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ background: '#16a34a22', color: '#4ade80' }}>
+            <CheckIcon />
+          </div>
           <h2 className="text-2xl font-bold text-white mb-3">¡Revisa tu email!</h2>
-          <p className="text-gray-400 mb-6">
+          <p className="text-[#94a3b8] mb-6">
             Te hemos enviado un enlace de confirmación a <strong className="text-white">{email}</strong>.
             Haz clic en él para activar tu cuenta.
           </p>
           <button
             onClick={() => onNavigate('login')}
-            className="px-6 py-3 rounded-lg font-semibold text-white"
-            style={{ background: '#e50914' }}
+            className="px-6 py-3 rounded-lg font-semibold text-white bg-[#e50914] hover:opacity-90 transition-opacity"
           >
             Volver al login
           </button>
@@ -64,30 +61,30 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-8"
-      style={{ background: 'linear-gradient(135deg, #000 0%, #111 50%, #000 100%)' }}
-    >
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 bg-[#0f172a]">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">🏋️</div>
+          <img
+            src="/logo gym.jpeg"
+            alt=""
+            className="w-16 h-16 mx-auto rounded-xl object-cover mb-3"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+          />
           <h1 className="text-3xl font-bold text-white">Crear cuenta</h1>
-          <p className="text-gray-400 mt-1">Únete a Centro Wellness</p>
+          <p className="text-[#94a3b8] mt-1">Únete a Centro Wellness</p>
         </div>
 
-        <div
-          className="rounded-2xl p-8 shadow-2xl"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
-        >
+        <div className="rounded-2xl p-8 bg-[#1e293b] border border-[#334155]">
           {(error || localError) && (
-            <div className="mb-4 p-3 rounded-lg bg-red-900/50 border border-red-500/50 text-red-300 text-sm">
-              ⚠️ {localError ?? error}
+            <div className="mb-4 p-3 rounded-lg flex items-center gap-2 text-sm" style={{ background: '#ef444415', border: '1px solid #ef444455', color: '#fca5a5' }}>
+              <AlertIcon size={16} />
+              <span>{localError ?? error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1.5">Nombre completo</label>
+              <label htmlFor="fullName" className="block text-sm font-medium text-[#cbd5e1] mb-1.5">Nombre completo</label>
               <input
                 id="fullName"
                 name="fullName"
@@ -96,14 +93,13 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="Juan García"
                 autoComplete="name"
-                className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none"
-                style={inputStyle}
+                className={inputClass}
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-[#cbd5e1] mb-1.5">Email</label>
               <input
                 id="email"
                 name="email"
@@ -112,14 +108,13 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@email.com"
                 autoComplete="email"
-                className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none"
-                style={inputStyle}
+                className={inputClass}
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">Contraseña</label>
+              <label htmlFor="password" className="block text-sm font-medium text-[#cbd5e1] mb-1.5">Contraseña</label>
               <input
                 id="password"
                 name="password"
@@ -128,14 +123,13 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Mín. 6 caracteres"
                 autoComplete="new-password"
-                className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none"
-                style={inputStyle}
+                className={inputClass}
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-1.5">Confirmar contraseña</label>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-[#cbd5e1] mb-1.5">Confirmar contraseña</label>
               <input
                 id="confirmPassword"
                 name="confirmPassword"
@@ -144,8 +138,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Repite la contraseña"
                 autoComplete="new-password"
-                className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none"
-                style={inputStyle}
+                className={inputClass}
                 required
               />
             </div>
@@ -153,19 +146,17 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-lg font-semibold text-white transition-all duration-200 mt-2 disabled:opacity-60"
-              style={{ background: '#e50914' }}
+              className="w-full py-3 rounded-lg font-semibold text-white transition-opacity duration-200 mt-2 disabled:opacity-60 bg-[#e50914] hover:opacity-90"
             >
               {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
             </button>
           </form>
 
-          <p className="text-center text-gray-400 text-sm mt-6">
+          <p className="text-center text-[#94a3b8] text-sm mt-6">
             ¿Ya tienes cuenta?{' '}
             <button
               onClick={() => onNavigate('login')}
-              className="font-semibold hover:underline"
-              style={{ color: '#e50914' }}
+              className="font-semibold text-[#e50914] hover:underline"
             >
               Inicia sesión
             </button>

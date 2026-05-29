@@ -9,6 +9,12 @@ import { AuthProvider, useAuth, LoginPage, RegisterPage } from './domains/auth';
 import DashboardContainer from './domains/dashboard/components/DashboardContainer';
 import AdminUsersContainer from './domains/admin/components/AdminUsersContainer';
 import Header from './domains/shared/components/Header';
+import {
+  HomeIcon,
+  ClipboardIcon,
+  DumbbellIcon,
+  CrownIcon,
+} from './assets/icons/index.tsx';
 
 // ─── Tipos de página ────────────────────────────────────────────────────────
 
@@ -44,13 +50,10 @@ function AppContent() {
   // Pantalla de carga inicial
   if (isLoading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: '#000' }}
-      >
+      <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
         <div className="text-center">
-          <div className="text-5xl mb-4">🏋️</div>
-          <p className="text-gray-400 text-sm">Cargando...</p>
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full border-2 border-[#334155] border-t-[#e50914] animate-spin" />
+          <p className="text-[#94a3b8] text-sm">Cargando...</p>
         </div>
       </div>
     );
@@ -73,10 +76,10 @@ function AppContent() {
 
   // Tabs de navegación según rol
   const navigationTabs = [
-    { id: 'dashboard' as const, label: 'Dashboard', icon: '🏠' },
-    { id: 'exercises' as const, label: 'Ejercicios', icon: '📋' },
-    { id: 'routines' as const, label: 'Rutinas', icon: '💪' },
-    ...(isAdmin ? [{ id: 'admin' as const, label: 'Admin', icon: '👑' }] : []),
+    { id: 'dashboard' as const, label: 'Dashboard', Icon: HomeIcon },
+    { id: 'exercises' as const, label: 'Ejercicios', Icon: ClipboardIcon },
+    { id: 'routines' as const, label: 'Rutinas', Icon: DumbbellIcon },
+    ...(isAdmin ? [{ id: 'admin' as const, label: 'Admin', Icon: CrownIcon }] : []),
   ];
 
   const renderContent = () => {
@@ -111,30 +114,19 @@ function AppContent() {
         <Header onNavigate={navigate} />
 
         {/* Navegación por tabs */}
-        <div
-          className="sticky top-16 z-40 w-full"
-          style={{
-            background: 'rgba(0,0,0,0.8)',
-            backdropFilter: 'blur(12px)',
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-          }}
-        >
+        <div className="sticky top-16 z-40 w-full bg-[#0d1422] border-b border-white/[0.06]">
           <div className="container mx-auto px-4">
             <nav className="flex gap-1 py-2 overflow-x-auto">
-              {navigationTabs.map((tab) => {
-                const isActive = currentPage === tab.id;
+              {navigationTabs.map(({ id, label, Icon }) => {
+                const isActive = currentPage === id;
                 return (
                   <button
-                    key={tab.id}
-                    onClick={() => navigate(tab.id)}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap"
-                    style={{
-                      background: isActive ? '#e50914' : 'transparent',
-                      color: isActive ? '#fff' : '#9ca3af',
-                    }}
+                    key={id}
+                    onClick={() => navigate(id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive ? 'bg-[#e50914] text-white' : 'bg-transparent text-[#94a3b8] hover:text-white hover:bg-white/5'}`}
                   >
-                    <span>{tab.icon}</span>
-                    <span>{tab.label}</span>
+                    <Icon size={18} />
+                    <span>{label}</span>
                   </button>
                 );
               })}

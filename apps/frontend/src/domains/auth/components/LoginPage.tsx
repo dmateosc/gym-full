@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { EyeIcon, EyeOffIcon, AlertIcon } from '../../../assets/icons/index.tsx';
 
 interface LoginPageProps {
   onNavigate: (page: 'register' | 'home') => void;
@@ -16,35 +17,34 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
     await signIn(email, password);
   };
 
+  const inputClass =
+    'w-full px-4 py-3 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#e50914] focus:ring-2 focus:ring-[rgba(229,9,20,0.2)]';
+
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: 'linear-gradient(135deg, #000 0%, #111 50%, #000 100%)' }}
-    >
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#0f172a]">
       <div className="w-full max-w-md">
-        {/* Logo / Header */}
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">🏋️</div>
+          <img
+            src="/logo gym.jpeg"
+            alt=""
+            className="w-16 h-16 mx-auto rounded-xl object-cover mb-3"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+          />
           <h1 className="text-3xl font-bold text-white">Centro Wellness</h1>
-          <p className="text-gray-400 mt-1">Inicia sesión en tu cuenta</p>
+          <p className="text-[#94a3b8] mt-1">Inicia sesión en tu cuenta</p>
         </div>
 
-        {/* Card */}
-        <div
-          className="rounded-2xl p-8 shadow-2xl"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
-        >
-          {/* Error banner */}
+        <div className="rounded-2xl p-8 bg-[#1e293b] border border-[#334155]">
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-900/50 border border-red-500/50 text-red-300 text-sm">
-              ⚠️ {error}
+            <div className="mb-4 p-3 rounded-lg flex items-center gap-2 text-sm" style={{ background: '#ef444415', border: '1px solid #ef444455', color: '#fca5a5' }}>
+              <AlertIcon size={16} />
+              <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-[#cbd5e1] mb-1.5">
                 Email
               </label>
               <input
@@ -56,19 +56,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                 placeholder="tu@email.com"
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none transition-all"
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                }}
-                onFocus={(e) => (e.target.style.borderColor = '#e50914')}
-                onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
+                className={inputClass}
               />
             </div>
 
-            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-[#cbd5e1] mb-1.5">
                 Contraseña
               </label>
               <div className="relative">
@@ -81,42 +74,33 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
                   placeholder="••••••••"
                   required
                   autoComplete="current-password"
-                  className="w-full px-4 py-3 rounded-lg text-white placeholder-gray-500 outline-none transition-all pr-12"
-                  style={{
-                    background: 'rgba(255,255,255,0.08)',
-                    border: '1px solid rgba(255,255,255,0.15)',
-                  }}
-                  onFocus={(e) => (e.target.style.borderColor = '#e50914')}
-                  onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.15)')}
+                  className={`${inputClass} pr-12`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-white transition-colors"
+                  aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
-                  {showPassword ? '🙈' : '👁'}
+                  {showPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
                 </button>
               </div>
             </div>
 
-            {/* Submit button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-lg font-semibold text-white transition-all duration-200 disabled:opacity-60"
-              style={{ background: isLoading ? '#999' : '#e50914' }}
+              className="w-full py-3 rounded-lg font-semibold text-white transition-opacity duration-200 disabled:opacity-60 bg-[#e50914] hover:opacity-90"
             >
               {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
           </form>
 
-          {/* Register link */}
-          <p className="text-center text-gray-400 text-sm mt-6">
+          <p className="text-center text-[#94a3b8] text-sm mt-6">
             ¿No tienes cuenta?{' '}
             <button
               onClick={() => onNavigate('register')}
-              className="font-semibold hover:underline"
-              style={{ color: '#e50914' }}
+              className="font-semibold text-[#e50914] hover:underline"
             >
               Regístrate
             </button>

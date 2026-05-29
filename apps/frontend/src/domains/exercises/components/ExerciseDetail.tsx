@@ -11,150 +11,133 @@ import {
 } from '../../../assets/icons/index.tsx';
 import BodyMap from './BodyMap';
 
-const CATEGORY_COLORS = {
-  strength: 'bg-gradient-to-r from-red-600 to-red-800 text-white border-red-500',
-  cardio: 'bg-gradient-to-r from-orange-600 to-orange-800 text-white border-orange-500',
-  flexibility: 'bg-gradient-to-r from-green-600 to-green-800 text-white border-green-500',
-  endurance: 'bg-gradient-to-r from-blue-600 to-blue-800 text-white border-blue-500',
-  balance: 'bg-gradient-to-r from-purple-600 to-purple-800 text-white border-purple-500',
-  functional: 'bg-gradient-to-r from-yellow-600 to-yellow-800 text-white border-yellow-500'
+const CATEGORY_LABELS: Record<string, string> = {
+  strength: 'Fuerza',
+  cardio: 'Cardio',
+  flexibility: 'Flexibilidad',
+  endurance: 'Resistencia',
+  balance: 'Equilibrio',
+  functional: 'Funcional',
 };
 
-const DIFFICULTY_CONFIGURATIONS = {
-  beginner: { 
-    bg: 'bg-gradient-to-r from-green-600 to-green-800', 
-    text: 'text-white', 
-    border: 'border-green-500' 
-  },
-  intermediate: { 
-    bg: 'bg-gradient-to-r from-yellow-600 to-yellow-800', 
-    text: 'text-white', 
-    border: 'border-yellow-500' 
-  },
-  advanced: { 
-    bg: 'bg-gradient-to-r from-red-600 to-red-800', 
-    text: 'text-white', 
-    border: 'border-red-500' 
-  }
+const DIFFICULTY_LABELS: Record<string, string> = {
+  beginner: 'Principiante',
+  intermediate: 'Intermedio',
+  advanced: 'Avanzado',
 };
-
-const DEFAULT_CATEGORY_COLOR = 'bg-gradient-to-r from-gray-600 to-gray-800 text-white border-gray-500';
 
 interface ExerciseDetailProps {
   exercise: Exercise;
   onBack: () => void;
 }
 
-const getCategoryColor = (category: string): string => {
-  return CATEGORY_COLORS[category as keyof typeof CATEGORY_COLORS] || DEFAULT_CATEGORY_COLOR;
-};
-
-const getDifficultyConfiguration = (difficulty: string) => {
-  const configs = DIFFICULTY_CONFIGURATIONS as Record<string, typeof DIFFICULTY_CONFIGURATIONS.beginner>;
-  return configs[difficulty] || DIFFICULTY_CONFIGURATIONS.beginner;
-};
-
-const capitalize = (text: string): string => {
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
+const capitalize = (text: string): string =>
+  text.charAt(0).toUpperCase() + text.slice(1);
 
 const BackButton = ({ onBack }: { onBack: () => void }) => (
   <button
     onClick={onBack}
-    className="flex items-center text-red-400 hover:text-red-300 mb-4 sm:mb-6 group transition-colors duration-200 text-sm sm:text-base"
+    className="flex items-center text-[#f87171] hover:text-[#fca5a5] mb-4 sm:mb-6 group transition-colors duration-200 text-sm sm:text-base"
   >
     <ArrowIcon />
     Volver a la lista
   </button>
 );
 
-const ExerciseHeader = ({ exercise }: { exercise: Exercise }) => {
-  const difficultyConfig = getDifficultyConfiguration(exercise.difficulty);
-  
-  return (
-    <div className="bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white p-4 sm:p-6 md:p-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div className="mb-4 md:mb-0">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">{exercise.name}</h1>
-          <p className="text-red-100 text-sm sm:text-base md:text-lg">{exercise.description}</p>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-          <span className={`px-2 sm:px-3 md:px-4 py-1 sm:py-2 rounded-full border shadow-lg font-medium text-xs sm:text-sm md:text-base ${getCategoryColor(exercise.category)}`}>
-            {capitalize(exercise.category)}
-          </span>
-          <span className={`px-2 sm:px-3 md:px-4 py-1 sm:py-2 rounded-full border shadow-lg font-medium text-xs sm:text-sm md:text-base ${difficultyConfig.bg} ${difficultyConfig.text} ${difficultyConfig.border}`}>
-            {capitalize(exercise.difficulty)}
-          </span>
-        </div>
+const ExerciseHeader = ({ exercise }: { exercise: Exercise }) => (
+  <div className="bg-[#e50914] text-white p-4 sm:p-6 md:p-8">
+    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">{exercise.name}</h1>
+        <p className="text-[#fecaca] text-sm sm:text-base md:text-lg">{exercise.description}</p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/15 text-white font-semibold text-xs sm:text-sm md:text-base">
+          {CATEGORY_LABELS[exercise.category] || capitalize(exercise.category)}
+        </span>
+        <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/15 text-white font-semibold text-xs sm:text-sm md:text-base">
+          {DIFFICULTY_LABELS[exercise.difficulty] || capitalize(exercise.difficulty)}
+        </span>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
-const QuickStat = ({ 
-  icon, 
-  label, 
-  value, 
-  backgroundColor 
-}: { 
-  icon: React.ReactNode; 
-  label: string; 
-  value: string; 
-  backgroundColor: string;
+const QuickStat = ({
+  icon,
+  label,
+  value,
+  color
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  color: string;
 }) => (
   <div className="text-center">
-    <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 ${backgroundColor} text-white rounded-full mb-2 shadow-lg`}>
+    <div
+      className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full mb-2"
+      style={{ color, background: `${color}1f` }}
+    >
       {icon}
     </div>
-    <p className="text-xs sm:text-sm text-gray-400">{label}</p>
+    <p className="text-xs sm:text-sm text-[#94a3b8]">{label}</p>
     <p className="text-sm sm:text-lg font-semibold text-white">{value}</p>
   </div>
 );
 
 const StatsPanel = ({ exercise }: { exercise: Exercise }) => (
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6 md:p-8 bg-gradient-to-r from-gray-800 to-gray-900 border-b border-gray-700">
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 p-4 sm:p-6 md:p-8 bg-[#172033] border-b border-[#334155]">
     {exercise.estimatedDuration && (
       <QuickStat
         icon={<TimeIcon />}
         label="Duración"
         value={`${exercise.estimatedDuration} min`}
-        backgroundColor="bg-gradient-to-br from-blue-600 to-blue-800"
+        color="#60a5fa"
       />
     )}
-    
+
     {exercise.calories && (
       <QuickStat
         icon={<CaloriesIcon />}
         label="Calorías"
         value={`${exercise.calories} cal`}
-        backgroundColor="bg-gradient-to-br from-orange-600 to-orange-800"
+        color="#fb923c"
       />
     )}
-    
+
     <QuickStat
       icon={<EquipmentIcon />}
       label="Equipamiento"
       value={exercise.equipment[0]}
-      backgroundColor="bg-gradient-to-br from-green-600 to-green-800"
+      color="#4ade80"
     />
   </div>
 );
 
+const FlatTag = ({ solid, text, children }: { solid: string; text: string; children: React.ReactNode }) => (
+  <span
+    className="inline-block px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold"
+    style={{
+      background: `${solid}22`,
+      border: `1px solid ${solid}55`,
+      color: text,
+    }}
+  >
+    {children}
+  </span>
+);
+
 const MuscleGroupsSection = ({ groups }: { groups: string[] }) => (
   <div>
-    <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
-      <MuscleIcon />
+    <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+      <span className="text-[#f87171]"><MuscleIcon /></span>
       Grupos musculares trabajados
     </h2>
     <div className="flex flex-wrap gap-2 mb-4">
       {groups.map((group, index) => (
-        <span
-          key={index}
-          className="inline-block bg-gradient-to-r from-red-600 to-red-800 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium shadow-lg border border-red-500"
-        >
-          {group}
-        </span>
+        <FlatTag key={index} solid="#dc2626" text="#f87171">{group}</FlatTag>
       ))}
     </div>
     <BodyMap muscleGroups={groups} />
@@ -163,42 +146,37 @@ const MuscleGroupsSection = ({ groups }: { groups: string[] }) => (
 
 const EquipmentSection = ({ equipment }: { equipment: string[] }) => (
   <div>
-    <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center">
-      <ToolsIcon />
+    <h2 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
+      <span className="text-[#4ade80]"><ToolsIcon /></span>
       Equipamiento necesario
     </h2>
     <div className="flex flex-wrap gap-2">
       {equipment.map((item, index) => (
-        <span
-          key={index}
-          className="inline-block bg-gradient-to-r from-green-600 to-green-800 text-white px-2 sm:px-3 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium shadow-lg border border-green-500"
-        >
-          {item}
-        </span>
+        <FlatTag key={index} solid="#16a34a" text="#4ade80">{item}</FlatTag>
       ))}
     </div>
   </div>
 );
 
-const InstructionStep = ({ 
-  number, 
-  instruction 
-}: { 
-  number: number; 
+const InstructionStep = ({
+  number,
+  instruction
+}: {
+  number: number;
   instruction: string;
 }) => (
-  <div className="flex items-start space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg border border-gray-600">
-    <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-purple-600 to-purple-800 text-white rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm shadow-lg">
+  <div className="flex items-start gap-3 sm:gap-4 p-3 sm:p-4 bg-[#172033] rounded-lg border border-[#334155]">
+    <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 bg-[#9333ea] text-white rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm">
       {number}
     </div>
-    <p className="text-gray-200 flex-1 pt-0.5 sm:pt-1 text-sm sm:text-base">{instruction}</p>
+    <p className="text-[#e5e7eb] flex-1 pt-0.5 sm:pt-1 text-sm sm:text-base">{instruction}</p>
   </div>
 );
 
 const InstructionsSection = ({ instructions }: { instructions: string[] }) => (
   <div className="mt-6 sm:mt-8">
-    <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 flex items-center">
-      <InstructionsIcon />
+    <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
+      <span className="text-[#c084fc]"><InstructionsIcon /></span>
       Instrucciones paso a paso
     </h2>
     <div className="space-y-3 sm:space-y-4">
@@ -219,9 +197,9 @@ const ExerciseImage = ({ imageUrl, name }: { imageUrl: string; name: string }) =
   if (status === 'error') return null;
 
   return (
-    <div className="relative w-full bg-gray-950 overflow-hidden" style={{ aspectRatio: '16/9' }}>
+    <div className="relative w-full bg-[#0b1120] overflow-hidden" style={{ aspectRatio: '16/9' }}>
       {status === 'loading' && (
-        <div className="absolute inset-0 bg-gray-800 animate-pulse" />
+        <div className="absolute inset-0 bg-[#1e293b] animate-pulse" />
       )}
       <img
         src={imageUrl}
@@ -232,9 +210,6 @@ const ExerciseImage = ({ imageUrl, name }: { imageUrl: string; name: string }) =
         onLoad={() => setStatus('loaded')}
         onError={() => setStatus('error')}
       />
-      {status === 'loaded' && (
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 via-transparent to-transparent pointer-events-none" />
-      )}
     </div>
   );
 };
@@ -254,10 +229,10 @@ const VideoSection = ({ videoUrl }: { videoUrl: string }) => {
   return (
     <div className="mt-6 sm:mt-8">
       <h2 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6 flex items-center gap-2">
-        <span className="text-red-400">▶</span>
+        <span className="text-[#f87171]">▶</span>
         Vídeo explicativo
       </h2>
-      <div className="relative w-full rounded-xl overflow-hidden border border-gray-700 shadow-2xl" style={{ paddingTop: '56.25%' }}>
+      <div className="relative w-full rounded-xl overflow-hidden border border-[#334155]" style={{ paddingTop: '56.25%' }}>
         {embedUrl ? (
           <iframe
             src={embedUrl}
@@ -286,17 +261,17 @@ const ExerciseDetail = ({ exercise, onBack }: ExerciseDetailProps) => {
     <div className="max-w-4xl mx-auto">
       <BackButton onBack={onBack} />
 
-      <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-lg sm:rounded-xl shadow-2xl overflow-hidden border border-gray-700">
+      <div className="bg-[#1e293b] rounded-xl overflow-hidden border border-[#334155]">
         <ExerciseHeader exercise={exercise} />
         {exercise.imageUrl && <ExerciseImage imageUrl={exercise.imageUrl} name={exercise.name} />}
         <StatsPanel exercise={exercise} />
 
-        <div className="p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-800 to-gray-900">
+        <div className="p-4 sm:p-6 md:p-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             <MuscleGroupsSection groups={exercise.muscleGroups} />
             <EquipmentSection equipment={exercise.equipment} />
           </div>
-          
+
           <InstructionsSection instructions={exercise.instructions} />
           {exercise.videoUrl && <VideoSection videoUrl={exercise.videoUrl} />}
         </div>

@@ -9,6 +9,12 @@ interface FiltersPanelProps {
   onFiltersChange: (filters: ExerciseFilters) => void;
 }
 
+const inputClass =
+  'w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#334155] border border-[#475569] rounded-lg text-white placeholder-[#94a3b8] focus:outline-none focus:border-[#e50914] focus:ring-2 focus:ring-[rgba(229,9,20,0.2)] transition-all duration-200 text-sm';
+
+const selectClass = `${inputClass} cursor-pointer`;
+const labelClass = 'block text-xs sm:text-sm font-medium text-[#cbd5e1] mb-2';
+
 export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelProps) {
   const { categories, muscleGroups, equipment, isLoaded } = useFilterOptionsWithCache();
 
@@ -46,12 +52,12 @@ export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelP
 
   if (!isLoaded) {
     return (
-      <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
+      <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-6">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-700 rounded mb-4"></div>
+          <div className="h-4 bg-[#334155] rounded mb-4"></div>
           <div className="space-y-4">
             {[1, 2, 3, 4].map(i => (
-              <div key={i} className="h-12 bg-gray-700 rounded"></div>
+              <div key={i} className="h-12 bg-[#334155] rounded"></div>
             ))}
           </div>
         </div>
@@ -60,79 +66,67 @@ export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelP
   }
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="bg-[#1e293b] border border-[#334155] rounded-xl p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-base sm:text-lg font-semibold text-white">Filtros</h3>
         <button
           onClick={clearFilters}
-          className="text-xs sm:text-sm text-red-400 hover:text-red-300 transition-colors px-2 py-1 rounded-md hover:bg-gray-700"
+          className="text-xs sm:text-sm text-[#f87171] hover:text-[#fca5a5] transition-colors px-2 py-1 rounded-md hover:bg-white/5"
         >
           Limpiar
         </button>
       </div>
 
-      {/* Search Field */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-          Buscar ejercicio
-        </label>
+        <label className={labelClass}>Buscar ejercicio</label>
         <input
           type="text"
           placeholder="Nombre del ejercicio..."
           value={filters.search || ''}
           onChange={(e) => handleFilterChange('search', e.target.value)}
-          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 text-sm"
+          className={inputClass}
         />
       </div>
 
-      {/* Category Selector */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-          Categoría
-        </label>
+        <label className={labelClass}>Categoría</label>
         <select
           value={filters.category || ''}
           onChange={(e) => handleFilterChange('category', e.target.value)}
-          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer text-sm"
+          className={selectClass}
         >
           <option value="">Todas las categorías</option>
           {categories.map(category => (
-            <option key={category} value={category} className="bg-gray-700 text-white">
+            <option key={category} value={category} className="bg-[#334155] text-white">
               {getCategoryLabel(category)}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Difficulty Selector */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-          Dificultad
-        </label>
+        <label className={labelClass}>Dificultad</label>
         <select
           value={filters.difficulty || ''}
           onChange={(e) => handleFilterChange('difficulty', e.target.value)}
-          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer text-sm"
+          className={selectClass}
         >
           <option value="">Todas las dificultades</option>
           {DIFFICULTIES.map(difficulty => (
-            <option key={difficulty} value={difficulty} className="bg-gray-700 text-white">
+            <option key={difficulty} value={difficulty} className="bg-[#334155] text-white">
               {getDifficultyLabel(difficulty)}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Muscle Group Selector */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="block text-xs sm:text-sm font-medium text-gray-300">
-            Grupo muscular
-          </label>
+          <label className={labelClass.replace(' mb-2', '')}>Grupo muscular</label>
           {filters.muscleGroup && (
             <button
               onClick={() => handleFilterChange('muscleGroup', '')}
-              className="text-xs text-red-400 hover:text-red-300 transition-colors"
+              className="text-xs text-[#f87171] hover:text-[#fca5a5] transition-colors"
             >
               {filters.muscleGroup} ✕
             </button>
@@ -148,30 +142,27 @@ export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelP
         <select
           value={filters.muscleGroup || ''}
           onChange={(e) => handleFilterChange('muscleGroup', e.target.value)}
-          className="w-full mt-2 px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer text-sm"
+          className={`${selectClass} mt-2`}
         >
           <option value="">Todos los grupos</option>
           {muscleGroups.map(group => (
-            <option key={group} value={group} className="bg-gray-700 text-white">
+            <option key={group} value={group} className="bg-[#334155] text-white">
               {group}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Equipment Selector */}
       <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-300 mb-2">
-          Equipamiento
-        </label>
+        <label className={labelClass}>Equipamiento</label>
         <select
           value={filters.equipment || ''}
           onChange={(e) => handleFilterChange('equipment', e.target.value)}
-          className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 cursor-pointer text-sm"
+          className={selectClass}
         >
           <option value="">Todo el equipamiento</option>
           {equipment.map(eq => (
-            <option key={eq} value={eq} className="bg-gray-700 text-white">
+            <option key={eq} value={eq} className="bg-[#334155] text-white">
               {eq}
             </option>
           ))}
