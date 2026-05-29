@@ -2,12 +2,15 @@ import { Pool } from 'pg';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL ?? 'http://192.168.0.103:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'qwen2.5:7b';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL ?? 'llama3.2:3b';
 const DRY_RUN = process.argv.includes('--dry-run');
 // --all reprocesses exercises that already have Spanish names
 const ALL = process.argv.includes('--all');
 // --only-instructions skips renaming, only regenerates instructions
 const ONLY_INSTRUCTIONS = process.argv.includes('--only-instructions');
+// --worker W --workers N — split work into N parallel chunks, this instance handles chunk W (0-indexed)
+const WORKERS = parseInt(process.argv[process.argv.indexOf('--workers') + 1] ?? '1', 10);
+const WORKER  = parseInt(process.argv[process.argv.indexOf('--worker')  + 1] ?? '0', 10);
 
 if (!DATABASE_URL) {
   console.error('Missing DATABASE_URL env var');
@@ -163,7 +166,7 @@ Responde ÚNICAMENTE con este JSON, sin texto adicional, sin markdown:
       stream: false,
       options: { temperature: 0.2, num_predict: 600 },
     }),
-    signal: AbortSignal.timeout(180_000),
+    signal: AbortSignal.timeout(90_000),
   });
 
   if (!res.ok) throw new Error(`Ollama HTTP ${res.status}: ${await res.text()}`);
@@ -180,8 +183,11 @@ async function main() {
       'SELECT id, name, description, instructions, category, muscle_groups, equipment FROM exercises ORDER BY name'
     );
 
-    const targets = ALL ? exercises : exercises.filter(e => looksEnglish(e.name));
-    console.log(`Found ${targets.length} exercises to normalize (${exercises.length} total)\n`);
+    const candidates = ALL ? exercises : exercises.filter(e => looksEnglish(e.name));
+    const targets = WORKERS > 1
+      ? candidates.filter((_, i) => i % WORKERS === WORKER)
+      : candidates;
+    console.log(`Worker ${WORKER}/${WORKERS}: ${targets.length} exercises (${exercises.length} total)\n`);
 
     let updated = 0;
     let failed = 0;

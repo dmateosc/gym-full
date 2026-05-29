@@ -40,3 +40,6 @@ src/disabled-supabase/
 
 # One-off scripts with credentials
 fix-db.js
+
+# Claude Code per-project settings (may contain secrets in allowlist)
+.claude/
