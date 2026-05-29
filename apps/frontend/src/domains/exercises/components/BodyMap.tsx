@@ -11,7 +11,9 @@ const MUSCLE_TO_IDS: Record<string, string[]> = {
   'Deltoides Anterior': ['front-shoulders'],
   'Deltoides Posterior': ['rear-shoulders'],
   'Trapecio': ['traps'],
+  'Trapecios': ['traps'],
   'Romboides': ['traps-middle'],
+  'Espalda media': ['traps-middle'],
   'Core': ['abdominals'],
   'Abdominales': ['abdominals'],
   'Oblicuos': ['obliques'],
@@ -31,22 +33,22 @@ const MUSCLE_TO_IDS: Record<string, string[]> = {
   'Todo el cuerpo': ['chest', 'abdominals', 'quads', 'hamstrings', 'glutes', 'lats', 'front-shoulders', 'rear-shoulders'],
 };
 
-// Maps SVG IDs back to display names (for click callbacks)
+// Maps SVG IDs back to DB muscle group names (used for filter callbacks)
 const ID_TO_MUSCLE: Record<string, string> = {
   'chest': 'Pecho',
   'biceps': 'Bíceps',
   'triceps': 'Tríceps',
-  'front-shoulders': 'Hombros',
-  'rear-shoulders': 'Hombros',
-  'traps': 'Trapecio',
-  'traps-middle': 'Espalda',
+  'front-shoulders': 'Deltoides',
+  'rear-shoulders': 'Deltoides',
+  'traps': 'Trapecios',
+  'traps-middle': 'Espalda media',
   'abdominals': 'Abdominales',
   'obliques': 'Oblicuos',
   'quads': 'Cuádriceps',
   'hamstrings': 'Isquiotibiales',
   'glutes': 'Glúteos',
-  'lats': 'Espalda',
-  'lowerback': 'Espalda',
+  'lats': 'Dorsales',
+  'lowerback': 'Lumbar',
   'calves': 'Gemelos',
   'forearms': 'Antebrazos',
 };
@@ -54,7 +56,7 @@ const ID_TO_MUSCLE: Record<string, string> = {
 const ID_TO_FILTER_OPTIONS: Record<string, string[]> = {
   'lats': ['Dorsales', 'Espalda'],
   'lowerback': ['Lumbar', 'Espalda Baja', 'Dorsales', 'Espalda'],
-  'traps-middle': ['Romboides', 'Trapecio', 'Dorsales', 'Espalda'],
+  'traps-middle': ['Espalda media', 'Romboides', 'Trapecio', 'Trapecios', 'Espalda'],
 };
 
 export interface BodyMapProps {

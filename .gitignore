@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# Track compiled scripts used in production containers
+!scripts/*/dist/
 *.local
 .env
 
@@ -38,3 +40,6 @@ src/disabled-supabase/
 
 # One-off scripts with credentials
 fix-db.js
+
+# Claude Code per-project settings (may contain secrets in allowlist)
+.claude/

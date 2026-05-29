@@ -12,6 +12,7 @@ export default defineConfig({
     },
   },
   server: {
+    allowedHosts: ['gym-dev.3dmc.lab'],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
