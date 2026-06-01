@@ -43,7 +43,7 @@ TypeOrmModule.forRoot({
 });
 
 // ❌ BAD: Hardcoded URLs or credentials
-const apiUrl = 'https://my-api.example.com/api';
+const hardcodedApiUrl = 'https://my-api.example.com/api';
 const dbUrl = 'postgresql://user:pass@host:port/db';
 ```
 
