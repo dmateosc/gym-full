@@ -1,16 +1,14 @@
 # Gym Exercise App - Copilot Instructions
 
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
-
 ## Project Overview
 This is a full-stack gym exercise management application with a React TypeScript frontend and NestJS backend. The app allows users to browse, filter, and view details of various gym exercises with real-time data from a PostgreSQL database.
 
 ## Architecture
 - **Monorepo Structure**: Apps separated in `apps/frontend` and `apps/backend`
-- **Frontend**: React + TypeScript + Vite (deployed on Vercel)
-- **Backend**: NestJS + TypeORM + PostgreSQL (deployed on Vercel Serverless)
-- **Database**: Supabase PostgreSQL with 54+ exercises
-- **Deployment**: Full Vercel stack with environment-based configuration
+- **Frontend**: React + TypeScript + Vite (served by nginx in Docker)
+- **Backend**: NestJS + TypeORM + PostgreSQL (Node container)
+- **Database**: PostgreSQL self-hosted on the homelab
+- **Deployment**: Self-hosted on the homelab (Docker Compose + Traefik) — `gym.3dmc.lab` (prod) / `gym-dev.3dmc.lab` (dev). Auto-deploys via the `Deploy — gym.3dmc.lab` GitHub Actions workflow on push to `main`, running on a self-hosted runner in CT 100.
 
 ## Code Style & Conventions
 - Use TypeScript for all components and utilities
@@ -30,7 +28,7 @@ This is a full-stack gym exercise management application with a React TypeScript
 - **Frontend**: Use `VITE_API_BASE_URL` for API endpoints
 - **Backend**: Use environment variables for database connection
 - **Never commit**: API keys, database URLs, passwords, or tokens
-- **Always use**: `.env.local`, `.env.example`, and Vercel environment settings
+- **Always use**: `.env.local`, `.env.example`, and the homelab stack's `/opt/stacks/gym-full/.env`
 
 ### Configuration Patterns
 ```typescript
@@ -45,7 +43,7 @@ TypeOrmModule.forRoot({
 });
 
 // ❌ BAD: Hardcoded URLs or credentials
-const apiUrl = 'https://my-api.vercel.app/api';
+const apiUrl = 'https://my-api.example.com/api';
 const dbUrl = 'postgresql://user:pass@host:port/db';
 ```
 
@@ -56,22 +54,22 @@ const dbUrl = 'postgresql://user:pass@host:port/db';
 - **Build Tool**: Vite 7
 - **Styling**: Tailwind CSS
 - **Testing**: Jest + Testing Library
-- **Deployment**: Vercel
+- **Deployment**: Docker image (nginx) on the homelab, port 8090
 - **Environment**: Vite environment variables (`VITE_*`)
 
 ### Backend (`apps/backend`)
 - **Framework**: NestJS 11
 - **Database ORM**: TypeORM
-- **Database**: PostgreSQL (Supabase)
+- **Database**: PostgreSQL (homelab)
 - **Testing**: Jest + Supertest
-- **Deployment**: Vercel Serverless
+- **Deployment**: Docker (Node) on the homelab, port 3001
 - **Authentication**: Environment-based configuration
-- **Design/Architecture**: DDD, TDD 
+- **Design/Architecture**: DDD, TDD
 
 ### Development Tools
 - **Monorepo**: npm workspaces
 - **Linting**: ESLint with TypeScript rules
-- **CI/CD**: GitHub Actions with automated testing
+- **CI/CD**: GitHub Actions with automated testing + self-hosted deploy runner
 - **Package Management**: npm
 - **Version Control**: Git with conventional commits
 
@@ -88,14 +86,14 @@ const dbUrl = 'postgresql://user:pass@host:port/db';
 1. **Local Development**: Use environment variables for API connections
 2. **Testing**: Run both frontend and backend test suites
 3. **Building**: Ensure TypeScript compilation succeeds
-4. **Deployment**: Automatic via Vercel on push to main
-5. **Environment Management**: Use Vercel dashboard or CLI for production variables
+4. **Deployment**: Automatic via the homelab deploy workflow on push to `main` (selective rebuild based on `apps/frontend/**` or `apps/backend/**` changes)
+5. **Environment Management**: Edit `/opt/stacks/gym-full/.env` on the homelab and `docker compose up -d --force-recreate <service>` to apply
 
 ## API Integration
 - **Base URL**: Configurable via `VITE_API_BASE_URL`
 - **Endpoints**: RESTful API (`/api/exercises`, `/api/exercises/categories`)
 - **Error Handling**: Proper HTTP status codes and error messages
-- **CORS**: Configured for Vercel deployments
+- **CORS**: Configured via the `CORS_ORIGINS` env var on the backend container
 
 ## Database Schema
 - **Exercises Table**: ID, name, description, category, difficulty, muscle groups, equipment, instructions
@@ -110,9 +108,8 @@ apps/
 │   │   ├── components/     # React components
 │   │   ├── services/       # API integration
 │   │   ├── types/          # TypeScript interfaces
-│   │   └── test/          # Jest tests
-│   ├── vercel.json        # Vercel configuration
-│   └── .env.example       # Environment template
+│   │   └── test/           # Jest tests
+│   └── .env.example        # Environment template
 └── backend/
     ├── src/
     │   ├── exercises/      # Feature module
@@ -120,7 +117,6 @@ apps/
     │   │   ├── dto/        # Data transfer objects
     │   │   └── *.spec.ts   # Unit tests
     │   └── database/       # Database utilities
-    ├── vercel.json         # Serverless config
     └── .env.example        # Environment template
 ```
 
@@ -135,12 +131,6 @@ npm run backend:dev            # Backend only
 npm run test                   # Run all tests
 npm run frontend:test          # Frontend tests
 npm run backend:test           # Backend tests
-
-# Deployment
-npm run deploy:frontend        # Deploy frontend to Vercel
-npm run deploy:backend         # Deploy backend to Vercel
-npm run setup-env:frontend     # Configure frontend environment
-npm run setup-env:backend      # Configure backend environment
 ```
 
 evitar crear documentación cada vez que se hace algo a menos que lo especifique
