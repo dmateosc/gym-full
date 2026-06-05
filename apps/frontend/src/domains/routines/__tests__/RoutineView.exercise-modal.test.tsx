@@ -92,7 +92,7 @@ describe('RoutineView - Exercise Detail Modal', () => {
   it('should show "Ver detalles" text on hover', () => {
     renderWithProvider(<RoutineView routine={mockRoutine} />);
     
-    const detailsText = screen.getByText('👁️ Ver detalles');
+    const detailsText = screen.getByText('Ver detalles');
     expect(detailsText).toBeInTheDocument();
   });
 
