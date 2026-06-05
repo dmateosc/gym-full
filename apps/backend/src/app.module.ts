@@ -37,16 +37,20 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
         UserProfileOrmEntity,
       ],
       synchronize: false,
+      // Run any pending migrations at boot. The container will not
+      // serve traffic until they finish, so the schema is always
+      // ahead of the code that needs it.
+      migrationsRun: true,
+      migrations: [__dirname + '/database/migrations/*.{ts,js}'],
+      migrationsTableName: 'migrations',
       ssl:
         process.env.DATABASE_SSL === 'false'
           ? false
           : { rejectUnauthorized: false },
-      logging: ['error', 'warn'],
+      logging: ['error', 'warn', 'migration'],
       logger: new DatabaseLogger(),
       maxQueryExecutionTime: 1000,
-      // Fail fast — Vercel's timeout is 10s
       retryAttempts: 0,
-      // Pass connection timeout directly to the pg driver
       extra: {
         connectionTimeoutMillis: 5000,
       },
