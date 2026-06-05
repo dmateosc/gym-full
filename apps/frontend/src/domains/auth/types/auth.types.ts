@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'admin' | 'instructor' | 'user';
 
 export interface UserProfile {
   id: string;
@@ -21,5 +21,6 @@ export interface AuthState {
   isLoading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isInstructor: boolean;
   error: string | null;
 }

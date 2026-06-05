@@ -4,6 +4,7 @@
  */
 export enum UserRole {
   ADMIN = 'admin',
+  INSTRUCTOR = 'instructor',
   USER = 'user',
 }
 
@@ -27,6 +28,10 @@ export class UserRoleVO {
     return this._value === UserRole.ADMIN;
   }
 
+  isInstructor(): boolean {
+    return this._value === UserRole.INSTRUCTOR;
+  }
+
   isUser(): boolean {
     return this._value === UserRole.USER;
   }
@@ -45,6 +50,10 @@ export class UserRoleVO {
 
   static admin(): UserRoleVO {
     return new UserRoleVO(UserRole.ADMIN);
+  }
+
+  static instructor(): UserRoleVO {
+    return new UserRoleVO(UserRole.INSTRUCTOR);
   }
 
   static user(): UserRoleVO {

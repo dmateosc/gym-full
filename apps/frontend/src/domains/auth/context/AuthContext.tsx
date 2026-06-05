@@ -16,6 +16,7 @@ const initialState: AuthState = {
   isLoading: true,
   isAuthenticated: false,
   isAdmin: false,
+  isInstructor: false,
   error: null,
 };
 
@@ -29,6 +30,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         user: action.payload,
         isAuthenticated: !!action.payload,
         isAdmin: action.payload?.profile?.role === 'admin',
+        isInstructor: action.payload?.profile?.role === 'instructor',
         isLoading: false,
         error: null,
       };
