@@ -125,7 +125,14 @@ const AdminUsersContainer: React.FC = () => {
                       <div className="flex items-center gap-3">
                         <div
                           className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
-                          style={{ background: user.role === 'admin' ? '#e50914' : '#374151' }}
+                          style={{
+                            background:
+                              user.role === 'admin'
+                                ? '#e50914'
+                                : user.role === 'instructor'
+                                  ? '#f59e0b'
+                                  : '#374151',
+                          }}
                         >
                           {(user.fullName ?? user.email).charAt(0).toUpperCase()}
                         </div>
@@ -158,13 +165,30 @@ const AdminUsersContainer: React.FC = () => {
                         disabled={isCurrentUser || isUpdating}
                         className="text-sm rounded-lg px-2 py-1.5 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                         style={{
-                          background: user.role === 'admin' ? 'rgba(229,9,20,0.15)' : 'rgba(255,255,255,0.08)',
-                          border: `1px solid ${user.role === 'admin' ? 'rgba(229,9,20,0.4)' : 'rgba(255,255,255,0.15)'}`,
-                          color: user.role === 'admin' ? '#f87171' : '#9ca3af',
+                          background:
+                            user.role === 'admin'
+                              ? 'rgba(229,9,20,0.15)'
+                              : user.role === 'instructor'
+                                ? 'rgba(245,158,11,0.15)'
+                                : 'rgba(255,255,255,0.08)',
+                          border: `1px solid ${
+                            user.role === 'admin'
+                              ? 'rgba(229,9,20,0.4)'
+                              : user.role === 'instructor'
+                                ? 'rgba(245,158,11,0.4)'
+                                : 'rgba(255,255,255,0.15)'
+                          }`,
+                          color:
+                            user.role === 'admin'
+                              ? '#f87171'
+                              : user.role === 'instructor'
+                                ? '#fbbf24'
+                                : '#9ca3af',
                         }}
                       >
-                        <option value="user">👤 Usuario</option>
-                        <option value="admin">👑 Admin</option>
+                        <option value="user">Usuario</option>
+                        <option value="instructor">Instructor</option>
+                        <option value="admin">Admin</option>
                       </select>
                     </td>
 

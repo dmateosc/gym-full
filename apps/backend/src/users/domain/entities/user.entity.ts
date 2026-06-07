@@ -65,8 +65,17 @@ export class UserEntity {
     return this._role.isAdmin();
   }
 
+  isInstructor(): boolean {
+    return this._role.isInstructor();
+  }
+
   promoteToAdmin(): void {
     this._role = UserRoleVO.admin();
+    this._updatedAt = new Date();
+  }
+
+  promoteToInstructor(): void {
+    this._role = UserRoleVO.instructor();
     this._updatedAt = new Date();
   }
 
