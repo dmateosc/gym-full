@@ -103,7 +103,8 @@ export class ClassesController {
   ): Promise<ClassResponseDto> {
     const me = await this.resolveLocalUserId(user);
     const entity = await this.createClass.execute({
-      instructorId: me,
+      requestingUserId: me,
+      requestingUserRole: user.role as UserRole,
       name: dto.name,
       description: dto.description,
       category: dto.category,
@@ -112,6 +113,7 @@ export class ClassesController {
       durationMin: dto.durationMin,
       capacity: dto.capacity,
       location: dto.location,
+      instructorId: dto.instructorId,
     });
     return ClassResponseDto.fromDomain(entity);
   }

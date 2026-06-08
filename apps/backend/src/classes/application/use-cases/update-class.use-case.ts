@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -8,6 +9,10 @@ import {
   CLASS_REPOSITORY,
   ClassRepositoryPort,
 } from '../../domain/repositories/class.repository.port';
+import {
+  USER_REPOSITORY,
+  UserRepositoryPort,
+} from '../../../users/domain/repositories/user.repository.port';
 import { ClassEntity } from '../../domain/entities/class.entity';
 import { ClassCategory } from '../../domain/value-objects/class-category.vo';
 import { UserRole } from '../../../users/domain/value-objects/user-role.vo';
@@ -25,6 +30,8 @@ export interface UpdateClassCommand {
   capacity?: number;
   location?: string | null;
   active?: boolean;
+  /** Solo lo respeta el admin. */
+  instructorId?: string;
 }
 
 @Injectable()
@@ -32,6 +39,8 @@ export class UpdateClassUseCase {
   constructor(
     @Inject(CLASS_REPOSITORY)
     private readonly repo: ClassRepositoryPort,
+    @Inject(USER_REPOSITORY)
+    private readonly users: UserRepositoryPort,
   ) {}
 
   async execute(cmd: UpdateClassCommand): Promise<ClassEntity> {
@@ -77,6 +86,26 @@ export class UpdateClassUseCase {
 
     if (cmd.active === true) entity.activate();
     else if (cmd.active === false) entity.deactivate();
+
+    if (cmd.instructorId && cmd.instructorId !== entity.instructorId) {
+      if (cmd.requestingUserRole !== UserRole.ADMIN) {
+        throw new ForbiddenException(
+          'Solo un administrador puede reasignar el instructor de una clase',
+        );
+      }
+      const target = await this.users.findById(cmd.instructorId);
+      if (!target) {
+        throw new NotFoundException(
+          `Instructor ${cmd.instructorId} no encontrado`,
+        );
+      }
+      if (!target.role.isInstructor() && !target.role.isAdmin()) {
+        throw new BadRequestException(
+          'El usuario asignado debe tener el rol de instructor o admin',
+        );
+      }
+      entity.reassignInstructor(target.id);
+    }
 
     return this.repo.save(entity);
   }

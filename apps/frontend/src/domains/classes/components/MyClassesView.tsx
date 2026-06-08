@@ -8,9 +8,13 @@ import {
 import { CategoryPill } from './CategoryPill';
 import { ClassFormModal } from './ClassFormModal';
 import { AttendeesModal } from './AttendeesModal';
+import { useAuth } from '../../auth/hooks/useAuth';
+import { AdminService } from '../../admin/services/adminService';
 
 export function MyClassesView() {
+  const { isAdmin, getToken } = useAuth();
   const [classes, setClasses] = useState<Class[] | null>(null);
+  const [instructorById, setInstructorById] = useState<Map<string, string>>(new Map());
   const [todaySessionByClass, setTodaySessionByClass] = useState<Map<string, string>>(
     new Map(),
   );
@@ -25,9 +29,27 @@ export function MyClassesView() {
 
   const load = () => {
     setClasses(null);
-    ClassesService.mine()
+    // Admins see every class; instructors only their own.
+    const fetcher = isAdmin ? ClassesService.listAll() : ClassesService.mine();
+    fetcher
       .then(setClasses)
       .catch((e: Error) => setError(e.message));
+
+    if (isAdmin) {
+      const token = getToken();
+      if (token) {
+        AdminService.getAllUsers(token)
+          .then((users) => {
+            const map = new Map<string, string>();
+            for (const u of users) {
+              map.set(u.id, u.fullName ?? u.email);
+            }
+            setInstructorById(map);
+          })
+          .catch(() => { /* no es crítico */ });
+      }
+    }
+
     ClassesService.today()
       .then((sessions) => {
         const map = new Map<string, string>();
@@ -37,7 +59,9 @@ export function MyClassesView() {
       .catch(() => { /* not critical */ });
   };
 
-  useEffect(load, []);
+  // load depends on isAdmin / getToken implicitly; reload whenever role flips.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(load, [isAdmin]);
 
   const handleSubmit = async (payload: CreateClassPayload | UpdateClassPayload) => {
     if (modal.editing) {
@@ -129,6 +153,11 @@ export function MyClassesView() {
                     <span>Aforo {c.capacity}</span>
                     {c.location && <span>{c.location}</span>}
                     <span className="text-[#94a3b8]">{CLASS_CATEGORY_LABELS[c.category]}</span>
+                    {isAdmin && (
+                      <span className="text-[#fbbf24]">
+                        Instructor: {instructorById.get(c.instructorId) ?? c.instructorId.slice(0, 8)}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 shrink-0">

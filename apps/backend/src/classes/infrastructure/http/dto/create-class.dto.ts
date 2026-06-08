@@ -3,6 +3,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
+  IsUUID,
   Matches,
   Max,
   MaxLength,
@@ -67,4 +68,12 @@ export class CreateClassDto {
   @IsString()
   @MaxLength(120)
   location?: string | null;
+
+  @ApiPropertyOptional({
+    description:
+      'Solo lo respeta el rol ADMIN. Ignorado para instructores (el caller es el instructor).',
+  })
+  @IsOptional()
+  @IsUUID()
+  instructorId?: string;
 }

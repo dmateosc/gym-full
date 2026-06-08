@@ -10,6 +10,9 @@ import {
   CLASS_CATEGORY_LABELS,
   DAY_OF_WEEK_LABELS,
 } from '../types/class';
+import { useAuth } from '../../auth/hooks/useAuth';
+import { AdminService } from '../../admin/services/adminService';
+import type { UserProfile } from '../../auth/types/auth.types';
 
 interface Props {
   isOpen: boolean;
@@ -24,6 +27,7 @@ const inputClass =
 const labelClass = 'block text-xs font-medium text-[#cbd5e1] mb-1.5';
 
 export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
+  const { isAdmin, getToken } = useAuth();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<ClassCategory>('cycling');
@@ -32,8 +36,24 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
   const [durationMin, setDurationMin] = useState(60);
   const [capacity, setCapacity] = useState(20);
   const [location, setLocation] = useState('');
+  const [instructorId, setInstructorId] = useState<string>('');
+  const [instructors, setInstructors] = useState<UserProfile[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Load the instructor list when an admin opens the form.
+  useEffect(() => {
+    if (!isOpen || !isAdmin) return;
+    const token = getToken();
+    if (!token) return;
+    AdminService.getAllUsers(token)
+      .then((users) =>
+        setInstructors(
+          users.filter((u) => u.role === 'instructor' || u.role === 'admin'),
+        ),
+      )
+      .catch(() => { /* silenciar — el campo dropdown queda vacío */ });
+  }, [isOpen, isAdmin, getToken]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -46,6 +66,7 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
       setDurationMin(initial.durationMin);
       setCapacity(initial.capacity);
       setLocation(initial.location ?? '');
+      setInstructorId(initial.instructorId);
     } else {
       setName('');
       setDescription('');
@@ -55,6 +76,7 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
       setDurationMin(60);
       setCapacity(20);
       setLocation('');
+      setInstructorId('');
     }
     setError(null);
   }, [isOpen, initial]);
@@ -75,6 +97,8 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
         durationMin,
         capacity,
         location: location || null,
+        // Only admins can set instructorId; for instructors the backend ignores it.
+        ...(isAdmin && instructorId ? { instructorId } : {}),
       });
       onClose();
     } catch (err) {
@@ -154,6 +178,24 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
             <label className={labelClass}>Ubicación</label>
             <input value={location} onChange={(e) => setLocation(e.target.value)} maxLength={120} className={inputClass} placeholder="Sala 1, Pista exterior, …" />
           </div>
+
+          {isAdmin && (
+            <div>
+              <label className={labelClass}>Instructor</label>
+              <select
+                value={instructorId}
+                onChange={(e) => setInstructorId(e.target.value)}
+                className={`${inputClass} cursor-pointer`}
+              >
+                <option value="">— Sin asignar (yo mismo) —</option>
+                {instructors.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.fullName ?? u.email} {u.role === 'admin' ? '· admin' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-medium text-[#cbd5e1] hover:bg-white/5">Cancelar</button>
