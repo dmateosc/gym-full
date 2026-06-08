@@ -29,7 +29,9 @@ export class SoftDeleteClassUseCase {
       cmd.requestingUserRole !== UserRole.ADMIN &&
       !entity.belongsTo(cmd.requestingUserId)
     ) {
-      throw new ForbiddenException('Solo el instructor propietario puede eliminar esta clase');
+      throw new ForbiddenException(
+        'Solo el instructor propietario puede eliminar esta clase',
+      );
     }
 
     if (!entity.isActive()) return; // idempotente

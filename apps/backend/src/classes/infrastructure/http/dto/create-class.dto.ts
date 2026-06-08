@@ -19,7 +19,9 @@ export class CreateClassDto {
   @MaxLength(200)
   name!: string;
 
-  @ApiPropertyOptional({ example: 'Sesión intensa de spinning con música motivadora' })
+  @ApiPropertyOptional({
+    example: 'Sesión intensa de spinning con música motivadora',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(2000)
@@ -29,13 +31,21 @@ export class CreateClassDto {
   @IsEnum(ClassCategory)
   category!: ClassCategory;
 
-  @ApiProperty({ description: '0 = domingo, 6 = sábado', minimum: 0, maximum: 6, example: 1 })
+  @ApiProperty({
+    description: '0 = domingo, 6 = sábado',
+    minimum: 0,
+    maximum: 6,
+    example: 1,
+  })
   @IsInt()
   @Min(0)
   @Max(6)
   dayOfWeek!: number;
 
-  @ApiProperty({ description: "Hora de inicio en formato 'HH:MM'", example: '19:00' })
+  @ApiProperty({
+    description: "Hora de inicio en formato 'HH:MM'",
+    example: '19:00',
+  })
   @IsString()
   @Matches(/^([01]\d|2[0-3]):[0-5]\d$/, { message: 'startTime debe ser HH:MM' })
   startTime!: string;

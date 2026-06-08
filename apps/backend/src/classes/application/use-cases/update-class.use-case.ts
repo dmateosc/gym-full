@@ -42,7 +42,9 @@ export class UpdateClassUseCase {
       cmd.requestingUserRole !== UserRole.ADMIN &&
       !entity.belongsTo(cmd.requestingUserId)
     ) {
-      throw new ForbiddenException('Solo el instructor propietario puede modificar esta clase');
+      throw new ForbiddenException(
+        'Solo el instructor propietario puede modificar esta clase',
+      );
     }
 
     if (cmd.name !== undefined) entity.rename(cmd.name);
@@ -73,9 +75,8 @@ export class UpdateClassUseCase {
       });
     }
 
-    if (cmd.active !== undefined) {
-      cmd.active ? entity.activate() : entity.deactivate();
-    }
+    if (cmd.active === true) entity.activate();
+    else if (cmd.active === false) entity.deactivate();
 
     return this.repo.save(entity);
   }

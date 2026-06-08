@@ -25,7 +25,9 @@ describe('madrid-time helpers', () => {
   });
 
   it('madridDayRangeUtc spans exactly 24h', () => {
-    const { fromUtc, toUtc } = madridDayRangeUtc(new Date('2026-06-15T10:00:00Z'));
+    const { fromUtc, toUtc } = madridDayRangeUtc(
+      new Date('2026-06-15T10:00:00Z'),
+    );
     expect(toUtc.getTime() - fromUtc.getTime()).toBe(24 * 3600 * 1000);
   });
 });

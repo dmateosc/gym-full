@@ -11,7 +11,9 @@ export abstract class ClassSessionRepositoryPort {
    * Idempotent upsert keyed by (class_id, scheduled_at). Used to
    * materialise today's sessions on demand without duplicating rows.
    */
-  abstract upsertScheduledSession(data: UpsertSessionData): Promise<ClassSessionEntity>;
+  abstract upsertScheduledSession(
+    data: UpsertSessionData,
+  ): Promise<ClassSessionEntity>;
   abstract findInRange(opts: {
     fromUtc: Date;
     toUtc: Date;

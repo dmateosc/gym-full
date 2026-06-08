@@ -27,7 +27,13 @@ function getMadridParts(at: Date): MadridParts {
   const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
   const weekday = get('weekday');
   const dowMap: Record<string, number> = {
-    Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6,
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
   };
   return {
     year: Number(get('year')),
@@ -50,10 +56,7 @@ export function todayDayOfWeekInMadrid(now: Date = new Date()): number {
  * because `Intl.DateTimeFormat` with timeZoneName: 'shortOffset' gives
  * us the offset that applies on that date.
  */
-export function madridLocalToUtc(
-  hhmm: string,
-  now: Date = new Date(),
-): Date {
+export function madridLocalToUtc(hhmm: string, now: Date = new Date()): Date {
   const { year, month, day } = getMadridParts(now);
   const [hStr, mStr] = hhmm.split(':');
   const h = Number(hStr);
@@ -66,9 +69,9 @@ export function madridLocalToUtc(
     timeZone: TZ,
     timeZoneName: 'shortOffset',
   });
-  const offsetPart = offsetFmt
-    .formatToParts(tentative)
-    .find((p) => p.type === 'timeZoneName')?.value ?? 'GMT+0';
+  const offsetPart =
+    offsetFmt.formatToParts(tentative).find((p) => p.type === 'timeZoneName')
+      ?.value ?? 'GMT+0';
   // 'GMT+2', 'GMT+1', etc.
   const match = /GMT([+-])(\d{1,2})(?::?(\d{2}))?/.exec(offsetPart);
   const sign = match?.[1] === '-' ? -1 : 1;

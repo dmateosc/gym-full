@@ -39,7 +39,10 @@ export class TodaySessionResponseDto {
   @ApiPropertyOptional({ nullable: true }) location!: string | null;
   @ApiProperty({ enum: ClassSessionStatus }) status!: ClassSessionStatus;
 
-  static from(session: ClassSessionEntity, klass: ClassEntity): TodaySessionResponseDto {
+  static from(
+    session: ClassSessionEntity,
+    klass: ClassEntity,
+  ): TodaySessionResponseDto {
     const dto = new TodaySessionResponseDto();
     dto.sessionId = session.id;
     dto.classId = klass.id;

@@ -9,7 +9,9 @@ import {
 } from '../../domain/repositories/class-session.repository.port';
 
 @Injectable()
-export class ClassSessionTypeormRepository implements ClassSessionRepositoryPort {
+export class ClassSessionTypeormRepository
+  implements ClassSessionRepositoryPort
+{
   constructor(
     @InjectRepository(ClassSessionOrmEntity)
     private readonly repo: Repository<ClassSessionOrmEntity>,
@@ -39,8 +41,9 @@ export class ClassSessionTypeormRepository implements ClassSessionRepositoryPort
       .returning('*')
       .execute();
 
-    if (inserted.raw && inserted.raw.length > 0) {
-      return this.toDomain(inserted.raw[0] as ClassSessionOrmEntity);
+    const rows = (inserted.raw ?? []) as ClassSessionOrmEntity[];
+    if (rows.length > 0) {
+      return this.toDomain(rows[0]);
     }
     const existing = await this.repo.findOne({
       where: { classId: data.classId, scheduledAt: data.scheduledAt },

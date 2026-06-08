@@ -43,7 +43,10 @@ import { ListTodaySessionsUseCase } from '../../application/use-cases/list-today
 
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
-import { ClassResponseDto, TodaySessionResponseDto } from './dto/class-response.dto';
+import {
+  ClassResponseDto,
+  TodaySessionResponseDto,
+} from './dto/class-response.dto';
 
 @ApiTags('classes')
 @ApiBearerAuth()
@@ -73,12 +76,14 @@ export class ClassesController {
   // ─── Instructor: gestionar sus propias clases ────────────────────
   @Get('mine')
   @Roles(UserRole.INSTRUCTOR, UserRole.ADMIN)
-  @ApiOperation({ summary: '[INSTRUCTOR] Listar clases del instructor autenticado' })
+  @ApiOperation({
+    summary: '[INSTRUCTOR] Listar clases del instructor autenticado',
+  })
   @ApiResponse({ status: 200, type: [ClassResponseDto] })
   async mine(@CurrentUser() user: JwtPayload): Promise<ClassResponseDto[]> {
     const me = await this.resolveLocalUserId(user);
     const list = await this.listMyClasses.execute(me);
-    return list.map(ClassResponseDto.fromDomain);
+    return list.map((c) => ClassResponseDto.fromDomain(c));
   }
 
   @Post()
@@ -126,7 +131,9 @@ export class ClassesController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Roles(UserRole.INSTRUCTOR, UserRole.ADMIN)
-  @ApiOperation({ summary: '[INSTRUCTOR] Desactivar (soft delete) una clase propia' })
+  @ApiOperation({
+    summary: '[INSTRUCTOR] Desactivar (soft delete) una clase propia',
+  })
   async remove(
     @CurrentUser() user: JwtPayload,
     @Param('id') id: string,
@@ -150,7 +157,7 @@ export class ClassesController {
     const list = await this.listAllClasses.execute({
       activeOnly: activeOnly === 'true',
     });
-    return list.map(ClassResponseDto.fromDomain);
+    return list.map((c) => ClassResponseDto.fromDomain(c));
   }
 
   // ─── helper ───────────────────────────────────────────────────────
@@ -161,11 +168,12 @@ export class ClassesController {
         'Perfil local no encontrado — sincroniza tu cuenta antes de gestionar clases',
       );
     }
-    if (
-      user.role !== UserRole.ADMIN &&
-      user.role !== UserRole.INSTRUCTOR &&
-      user.role !== UserRole.USER
-    ) {
+    const known: string[] = [
+      UserRole.ADMIN,
+      UserRole.INSTRUCTOR,
+      UserRole.USER,
+    ];
+    if (!known.includes(user.role)) {
       throw new ForbiddenException('Rol desconocido');
     }
     return local.id;

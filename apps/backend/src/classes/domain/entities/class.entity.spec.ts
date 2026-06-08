@@ -22,7 +22,11 @@ describe('ClassEntity', () => {
     });
 
     it('trims name and description', () => {
-      const c = new ClassEntity({ ...baseProps(), name: '  Yoga  ', description: '  zen  ' });
+      const c = new ClassEntity({
+        ...baseProps(),
+        name: '  Yoga  ',
+        description: '  zen  ',
+      });
       expect(c.name).toBe('Yoga');
       expect(c.description).toBe('zen');
     });
@@ -31,29 +35,40 @@ describe('ClassEntity', () => {
       expect(() => new ClassEntity({ ...baseProps(), name })).toThrow(/nombre/);
     });
 
-    it.each([
-      ['unknown' as never],
-    ])('rejects unknown category', (category) => {
-      expect(() => new ClassEntity({ ...baseProps(), category })).toThrow(/Categoría/);
+    it.each([['unknown' as never]])('rejects unknown category', (category) => {
+      expect(() => new ClassEntity({ ...baseProps(), category })).toThrow(
+        /Categoría/,
+      );
     });
 
     it.each([-1, 7])('rejects dayOfWeek out of range (%p)', (dayOfWeek) => {
-      expect(() => new ClassEntity({ ...baseProps(), dayOfWeek })).toThrow(/dayOfWeek/);
+      expect(() => new ClassEntity({ ...baseProps(), dayOfWeek })).toThrow(
+        /dayOfWeek/,
+      );
     });
 
     it.each(['25:00', '07:60', '7:30', 'foo'])(
       'rejects invalid startTime (%p)',
       (startTime) => {
-        expect(() => new ClassEntity({ ...baseProps(), startTime })).toThrow(/startTime/);
+        expect(() => new ClassEntity({ ...baseProps(), startTime })).toThrow(
+          /startTime/,
+        );
       },
     );
 
-    it.each([0, -5, 700])('rejects out-of-range durationMin (%p)', (durationMin) => {
-      expect(() => new ClassEntity({ ...baseProps(), durationMin })).toThrow(/durationMin/);
-    });
+    it.each([0, -5, 700])(
+      'rejects out-of-range durationMin (%p)',
+      (durationMin) => {
+        expect(() => new ClassEntity({ ...baseProps(), durationMin })).toThrow(
+          /durationMin/,
+        );
+      },
+    );
 
     it.each([0, 1500])('rejects out-of-range capacity (%p)', (capacity) => {
-      expect(() => new ClassEntity({ ...baseProps(), capacity })).toThrow(/capacity/);
+      expect(() => new ClassEntity({ ...baseProps(), capacity })).toThrow(
+        /capacity/,
+      );
     });
   });
 

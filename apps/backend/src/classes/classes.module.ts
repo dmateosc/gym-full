@@ -28,7 +28,10 @@ import { UsersModule } from '../users/infrastructure/users.module';
   controllers: [ClassesController],
   providers: [
     { provide: CLASS_REPOSITORY, useClass: ClassTypeormRepository },
-    { provide: CLASS_SESSION_REPOSITORY, useClass: ClassSessionTypeormRepository },
+    {
+      provide: CLASS_SESSION_REPOSITORY,
+      useClass: ClassSessionTypeormRepository,
+    },
     CreateClassUseCase,
     UpdateClassUseCase,
     SoftDeleteClassUseCase,

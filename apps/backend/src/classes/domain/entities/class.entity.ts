@@ -1,4 +1,7 @@
-import { ClassCategory, isClassCategory } from '../value-objects/class-category.vo';
+import {
+  ClassCategory,
+  isClassCategory,
+} from '../value-objects/class-category.vo';
 
 /**
  * Patrón semanal recurrente de una clase colectiva. Las ocurrencias
@@ -57,7 +60,7 @@ export class ClassEntity {
     this._instructorId = props.instructorId;
     this._name = props.name.trim();
     this._description = props.description?.trim() || null;
-    this._category = props.category as ClassCategory;
+    this._category = props.category;
     this._dayOfWeek = props.dayOfWeek;
     this._startTime = props.startTime;
     this._durationMin = props.durationMin;
@@ -68,19 +71,45 @@ export class ClassEntity {
     this._updatedAt = props.updatedAt ?? new Date();
   }
 
-  get id(): string { return this._id; }
-  get instructorId(): string { return this._instructorId; }
-  get name(): string { return this._name; }
-  get description(): string | null { return this._description; }
-  get category(): ClassCategory { return this._category; }
-  get dayOfWeek(): number { return this._dayOfWeek; }
-  get startTime(): string { return this._startTime; }
-  get durationMin(): number { return this._durationMin; }
-  get capacity(): number { return this._capacity; }
-  get location(): string | null { return this._location; }
-  get active(): boolean { return this._active; }
-  get createdAt(): Date { return this._createdAt; }
-  get updatedAt(): Date { return this._updatedAt; }
+  get id(): string {
+    return this._id;
+  }
+  get instructorId(): string {
+    return this._instructorId;
+  }
+  get name(): string {
+    return this._name;
+  }
+  get description(): string | null {
+    return this._description;
+  }
+  get category(): ClassCategory {
+    return this._category;
+  }
+  get dayOfWeek(): number {
+    return this._dayOfWeek;
+  }
+  get startTime(): string {
+    return this._startTime;
+  }
+  get durationMin(): number {
+    return this._durationMin;
+  }
+  get capacity(): number {
+    return this._capacity;
+  }
+  get location(): string | null {
+    return this._location;
+  }
+  get active(): boolean {
+    return this._active;
+  }
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
 
   rename(newName: string): void {
     if (!newName || newName.trim().length === 0) {
@@ -90,12 +119,18 @@ export class ClassEntity {
     this.touch();
   }
 
-  changeSchedule(dayOfWeek: number, startTime: string, durationMin: number): void {
-    if (dayOfWeek < 0 || dayOfWeek > 6) throw new Error('dayOfWeek fuera de rango');
+  changeSchedule(
+    dayOfWeek: number,
+    startTime: string,
+    durationMin: number,
+  ): void {
+    if (dayOfWeek < 0 || dayOfWeek > 6)
+      throw new Error('dayOfWeek fuera de rango');
     if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(startTime)) {
       throw new Error('startTime inválido');
     }
-    if (durationMin <= 0 || durationMin > 600) throw new Error('durationMin fuera de rango');
+    if (durationMin <= 0 || durationMin > 600)
+      throw new Error('durationMin fuera de rango');
     this._dayOfWeek = dayOfWeek;
     this._startTime = startTime;
     this._durationMin = durationMin;
@@ -122,7 +157,7 @@ export class ClassEntity {
       if (!isClassCategory(props.category)) {
         throw new Error(`Categoría inválida: ${String(props.category)}`);
       }
-      this._category = props.category as ClassCategory;
+      this._category = props.category;
     }
     if (props.location !== undefined) {
       this._location = props.location?.trim() || null;

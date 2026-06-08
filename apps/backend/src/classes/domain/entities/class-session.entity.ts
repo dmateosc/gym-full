@@ -26,18 +26,33 @@ export class ClassSessionEntity {
     this._classId = props.classId;
     this._scheduledAt = props.scheduledAt;
     this._capacityOverride = props.capacityOverride ?? null;
-    this._status = (props.status ?? ClassSessionStatus.SCHEDULED) as ClassSessionStatus;
+    this._status = (props.status ??
+      ClassSessionStatus.SCHEDULED) as ClassSessionStatus;
     this._createdAt = props.createdAt ?? new Date();
     this._updatedAt = props.updatedAt ?? new Date();
   }
 
-  get id(): string { return this._id; }
-  get classId(): string { return this._classId; }
-  get scheduledAt(): Date { return this._scheduledAt; }
-  get capacityOverride(): number | null { return this._capacityOverride; }
-  get status(): ClassSessionStatus { return this._status; }
-  get createdAt(): Date { return this._createdAt; }
-  get updatedAt(): Date { return this._updatedAt; }
+  get id(): string {
+    return this._id;
+  }
+  get classId(): string {
+    return this._classId;
+  }
+  get scheduledAt(): Date {
+    return this._scheduledAt;
+  }
+  get capacityOverride(): number | null {
+    return this._capacityOverride;
+  }
+  get status(): ClassSessionStatus {
+    return this._status;
+  }
+  get createdAt(): Date {
+    return this._createdAt;
+  }
+  get updatedAt(): Date {
+    return this._updatedAt;
+  }
 
   effectiveCapacity(classCapacity: number): number {
     return this._capacityOverride ?? classCapacity;
@@ -69,8 +84,7 @@ export class ClassSessionEntity {
 
   isBookable(now: Date): boolean {
     return (
-      this._status === ClassSessionStatus.SCHEDULED &&
-      now < this._scheduledAt
+      this._status === ClassSessionStatus.SCHEDULED && now < this._scheduledAt
     );
   }
 

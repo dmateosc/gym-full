@@ -51,7 +51,8 @@ export class ClassTypeormRepository implements ClassRepositoryPort {
       description: data.description ?? null,
       category: data.category,
       dayOfWeek: data.dayOfWeek,
-      startTime: data.startTime.length === 5 ? `${data.startTime}:00` : data.startTime,
+      startTime:
+        data.startTime.length === 5 ? `${data.startTime}:00` : data.startTime,
       durationMin: data.durationMin,
       capacity: data.capacity,
       location: data.location ?? null,
@@ -84,7 +85,8 @@ export class ClassTypeormRepository implements ClassRepositoryPort {
 
   private toDomain(row: ClassOrmEntity): ClassEntity {
     // Postgres TIME viene como 'HH:MM:SS'; normalizamos a 'HH:MM' para la capa de dominio.
-    const startTime = row.startTime.length >= 5 ? row.startTime.slice(0, 5) : row.startTime;
+    const startTime =
+      row.startTime.length >= 5 ? row.startTime.slice(0, 5) : row.startTime;
     return new ClassEntity({
       id: row.id,
       instructorId: row.instructorId,
