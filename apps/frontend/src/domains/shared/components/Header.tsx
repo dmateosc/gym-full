@@ -8,6 +8,7 @@ import {
   AccountIcon,
   LogoutIcon,
   ChevronIcon,
+  RepeatIcon,
 } from '../../../assets/icons/index.tsx';
 
 interface HeaderProps {
@@ -81,6 +82,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                     { page: 'dashboard', Icon: HomeIcon, label: 'Mi Dashboard' },
                     { page: 'exercises', Icon: ClipboardIcon, label: 'Ejercicios' },
                     { page: 'routines', Icon: DumbbellIcon, label: 'Rutinas' },
+                    { page: 'classes', Icon: RepeatIcon, label: 'Clases' },
                   ].map(({ page, Icon, label }) => (
                     <button
                       key={page}

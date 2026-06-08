@@ -10,12 +10,15 @@ import { ExercisesModule } from './exercises/exercises.module';
 import { RoutinesModule } from './routines/routines.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/infrastructure/users.module';
+import { ClassesModule } from './classes/classes.module';
 
 // Entidades ORM
 import { ExerciseOrmEntity } from './exercises/infrastructure/persistence/exercise.orm-entity';
 import { DailyRoutineOrmEntity } from './routines/infrastructure/persistence/daily-routine.orm-entity';
 import { RoutineExerciseOrmEntity } from './routines/infrastructure/persistence/routine-exercise.orm-entity';
 import { UserProfileOrmEntity } from './users/infrastructure/persistence/user-profile.orm-entity';
+import { ClassOrmEntity } from './classes/infrastructure/persistence/class.orm-entity';
+import { ClassSessionOrmEntity } from './classes/infrastructure/persistence/class-session.orm-entity';
 import { DatabaseLogger } from './database/database.logger';
 
 // Guards globales
@@ -35,6 +38,8 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
         DailyRoutineOrmEntity,
         RoutineExerciseOrmEntity,
         UserProfileOrmEntity,
+        ClassOrmEntity,
+        ClassSessionOrmEntity,
       ],
       synchronize: false,
       // Run any pending migrations at boot. The container will not
@@ -60,6 +65,7 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
     UsersModule,
     ExercisesModule,
     RoutinesModule,
+    ClassesModule,
   ],
   controllers: [AppController],
   providers: [
