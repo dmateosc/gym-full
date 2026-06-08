@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UserProfileOrmEntity } from './persistence/user-profile.orm-entity';
@@ -11,6 +11,7 @@ import { UpdateUserRoleUseCase } from '../application/use-cases/update-user-role
 import { UpsertUserProfileUseCase } from '../application/use-cases/upsert-user-profile.use-case';
 import { USER_REPOSITORY } from '../domain/repositories/user.repository.port';
 
+@Global()
 @Module({
   imports: [TypeOrmModule.forFeature([UserProfileOrmEntity])],
   controllers: [UsersController],
