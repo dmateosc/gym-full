@@ -54,6 +54,7 @@ export interface TodaySession {
   sessionId: string;
   classId: string;
   instructorId: string;
+  instructorName: string | null;
   name: string;
   description: string | null;
   category: ClassCategory;

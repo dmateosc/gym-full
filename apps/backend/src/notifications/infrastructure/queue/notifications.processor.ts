@@ -40,6 +40,26 @@ interface BookingJobData {
   scheduledAt: string | Date;
 }
 
+interface ClassAssignedJobData {
+  type: 'class-assigned';
+  userId: string;
+  assignedByUserId: string;
+  classId: string;
+  className: string;
+  dayOfWeek: number;
+  startTime: string;
+}
+
+const DAY_LABELS = [
+  'domingo',
+  'lunes',
+  'martes',
+  'miércoles',
+  'jueves',
+  'viernes',
+  'sábado',
+];
+
 @Processor(NOTIFICATIONS_QUEUE_NAME)
 export class NotificationsProcessor extends WorkerHost {
   private readonly logger = new Logger('NotificationsProcessor');
@@ -66,8 +86,33 @@ export class NotificationsProcessor extends WorkerHost {
         return this.handleBookingPromoted(job.data as BookingJobData);
       case 'daily-reminder':
         return this.handleDailyReminder();
+      case 'class-assigned':
+        return this.handleClassAssigned(job.data as ClassAssignedJobData);
       default:
         this.logger.warn(`Unknown job: ${job.name}`);
+    }
+  }
+
+  private async handleClassAssigned(data: ClassAssignedJobData): Promise<void> {
+    const dayLabel = DAY_LABELS[data.dayOfWeek] ?? '';
+    await this.notifications.create({
+      userId: data.userId,
+      type: NotificationType.CLASS_ASSIGNED,
+      title: `Te han asignado una clase: ${data.className}`,
+      body: `Eres el instructor de ${data.className} los ${dayLabel} a las ${data.startTime}.`,
+      payload: {
+        classId: data.classId,
+        assignedByUserId: data.assignedByUserId,
+      },
+    });
+
+    const user = await this.users.findById(data.userId);
+    if (user) {
+      await this.mailer.send({
+        to: user.email,
+        subject: `Nueva clase asignada — ${data.className}`,
+        body: `Hola ${user.fullName ?? ''},\n\nUn administrador te ha asignado la clase ${data.className} (${dayLabel} a las ${data.startTime}).\n\nPuedes verla y editarla en "Mis clases".`,
+      });
     }
   }
 

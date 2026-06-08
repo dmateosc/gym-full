@@ -12,6 +12,10 @@ import {
   BookingCounts,
   BookingRepositoryPort,
 } from '../../domain/repositories/booking.repository.port';
+import {
+  USER_REPOSITORY,
+  UserRepositoryPort,
+} from '../../../users/domain/repositories/user.repository.port';
 import { ClassEntity } from '../../domain/entities/class.entity';
 import { ClassSessionEntity } from '../../domain/entities/class-session.entity';
 import { BookingEntity } from '../../domain/entities/booking.entity';
@@ -26,6 +30,7 @@ export interface TodaySessionView {
   klass: ClassEntity;
   counts: BookingCounts;
   myBooking: BookingEntity | null;
+  instructorName: string | null;
 }
 
 /**
@@ -42,6 +47,8 @@ export class ListTodaySessionsUseCase {
     private readonly sessionRepo: ClassSessionRepositoryPort,
     @Inject(BOOKING_REPOSITORY)
     private readonly bookingRepo: BookingRepositoryPort,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepo: UserRepositoryPort,
   ) {}
 
   async execute(
@@ -81,14 +88,30 @@ export class ListTodaySessionsUseCase {
       if (!b.isCancelled()) myBookingBySession.set(b.sessionId, b);
     }
 
+    // Resolve instructor names in one pass per unique instructor.
+    const instructorIds = Array.from(
+      new Set(todaysClasses.map((c) => c.instructorId)),
+    );
+    const instructors = await Promise.all(
+      instructorIds.map((id) => this.userRepo.findById(id)),
+    );
+    const nameById = new Map<string, string>();
+    for (const u of instructors) {
+      if (u) nameById.set(u.id, u.fullName ?? u.email);
+    }
+
     const classById = new Map(todaysClasses.map((c) => [c.id, c]));
     return sessions
       .filter((s) => classById.has(s.classId))
-      .map((session) => ({
-        session,
-        klass: classById.get(session.classId)!,
-        counts: counts.get(session.id) ?? { confirmed: 0, waitlist: 0 },
-        myBooking: myBookingBySession.get(session.id) ?? null,
-      }));
+      .map((session) => {
+        const klass = classById.get(session.classId)!;
+        return {
+          session,
+          klass,
+          counts: counts.get(session.id) ?? { confirmed: 0, waitlist: 0 },
+          myBooking: myBookingBySession.get(session.id) ?? null,
+          instructorName: nameById.get(klass.instructorId) ?? null,
+        };
+      });
   }
 }

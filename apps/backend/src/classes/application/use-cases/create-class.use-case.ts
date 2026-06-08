@@ -16,6 +16,10 @@ import {
 import { ClassEntity } from '../../domain/entities/class.entity';
 import { ClassCategory } from '../../domain/value-objects/class-category.vo';
 import { UserRole } from '../../../users/domain/value-objects/user-role.vo';
+import {
+  NOTIFICATIONS_QUEUE,
+  NotificationsQueuePort,
+} from '../../../notifications/application/services/notifications-queue.port';
 
 export interface CreateClassCommand {
   requestingUserId: string;
@@ -39,6 +43,8 @@ export class CreateClassUseCase {
     private readonly repo: ClassRepositoryPort,
     @Inject(USER_REPOSITORY)
     private readonly users: UserRepositoryPort,
+    @Inject(NOTIFICATIONS_QUEUE)
+    private readonly queue: NotificationsQueuePort,
   ) {}
 
   async execute(cmd: CreateClassCommand): Promise<ClassEntity> {
@@ -58,7 +64,7 @@ export class CreateClassUseCase {
       location: cmd.location,
     });
 
-    return this.repo.create({
+    const created = await this.repo.create({
       instructorId: probe.instructorId,
       name: probe.name,
       description: probe.description,
@@ -69,6 +75,21 @@ export class CreateClassUseCase {
       capacity: probe.capacity,
       location: probe.location,
     });
+
+    // Notify the instructor when an admin assigned them this class.
+    if (instructorId !== cmd.requestingUserId) {
+      void this.queue.enqueue({
+        type: 'class-assigned',
+        userId: instructorId,
+        assignedByUserId: cmd.requestingUserId,
+        classId: created.id,
+        className: created.name,
+        dayOfWeek: created.dayOfWeek,
+        startTime: created.startTime,
+      });
+    }
+
+    return created;
   }
 
   private async resolveInstructorId(cmd: CreateClassCommand): Promise<string> {
