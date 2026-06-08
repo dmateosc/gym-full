@@ -137,6 +137,12 @@ export class ClassEntity {
     this.touch();
   }
 
+  reassignInstructor(instructorId: string): void {
+    if (!instructorId) throw new Error('instructorId vacío');
+    this._instructorId = instructorId;
+    this.touch();
+  }
+
   setCapacity(capacity: number): void {
     if (capacity <= 0 || capacity > 1000) {
       throw new Error('capacity fuera de rango');

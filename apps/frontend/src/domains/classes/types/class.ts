@@ -110,6 +110,8 @@ export interface CreateClassPayload {
   durationMin: number;
   capacity: number;
   location?: string | null;
+  /** Solo se respeta cuando el caller es admin. */
+  instructorId?: string;
 }
 
 export type UpdateClassPayload = Partial<CreateClassPayload> & { active?: boolean };
