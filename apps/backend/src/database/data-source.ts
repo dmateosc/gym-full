@@ -4,6 +4,8 @@ import { ExerciseOrmEntity } from '../exercises/infrastructure/persistence/exerc
 import { DailyRoutineOrmEntity } from '../routines/infrastructure/persistence/daily-routine.orm-entity';
 import { RoutineExerciseOrmEntity } from '../routines/infrastructure/persistence/routine-exercise.orm-entity';
 import { UserProfileOrmEntity } from '../users/infrastructure/persistence/user-profile.orm-entity';
+import { ClassOrmEntity } from '../classes/infrastructure/persistence/class.orm-entity';
+import { ClassSessionOrmEntity } from '../classes/infrastructure/persistence/class-session.orm-entity';
 
 /**
  * DataSource for the TypeORM CLI (migration:generate / :run / :revert).
@@ -25,6 +27,8 @@ export const AppDataSource = new DataSource({
     DailyRoutineOrmEntity,
     RoutineExerciseOrmEntity,
     UserProfileOrmEntity,
+    ClassOrmEntity,
+    ClassSessionOrmEntity,
   ],
   migrations: [__dirname + '/migrations/*.{ts,js}'],
   migrationsTableName: 'migrations',

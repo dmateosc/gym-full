@@ -9,11 +9,13 @@ import { AuthProvider, useAuth, LoginPage, RegisterPage } from './domains/auth';
 import DashboardContainer from './domains/dashboard/components/DashboardContainer';
 import AdminUsersContainer from './domains/admin/components/AdminUsersContainer';
 import Header from './domains/shared/components/Header';
+import ClassesContainer from './domains/classes/components/ClassesContainer';
 import {
   HomeIcon,
   ClipboardIcon,
   DumbbellIcon,
   CrownIcon,
+  RepeatIcon,
 } from './assets/icons/index.tsx';
 
 // ─── Tipos de página ────────────────────────────────────────────────────────
@@ -24,6 +26,7 @@ type Page =
   | 'dashboard'
   | 'exercises'
   | 'routines'
+  | 'classes'
   | 'admin';
 
 // ─── Contenido principal (requiere auth) ─────────────────────────────────────
@@ -79,6 +82,7 @@ function AppContent() {
     { id: 'dashboard' as const, label: 'Dashboard', Icon: HomeIcon },
     { id: 'exercises' as const, label: 'Ejercicios', Icon: ClipboardIcon },
     { id: 'routines' as const, label: 'Rutinas', Icon: DumbbellIcon },
+    { id: 'classes' as const, label: 'Clases', Icon: RepeatIcon },
     ...(isAdmin ? [{ id: 'admin' as const, label: 'Admin', Icon: CrownIcon }] : []),
   ];
 
@@ -94,6 +98,8 @@ function AppContent() {
         return <ExercisesContainer />;
       case 'routines':
         return <RoutinesContainer />;
+      case 'classes':
+        return <ClassesContainer />;
       case 'admin':
         return isAdmin ? <AdminUsersContainer /> : null;
       default:
