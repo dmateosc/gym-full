@@ -10,6 +10,7 @@ import {
   ChevronIcon,
   RepeatIcon,
 } from '../../../assets/icons/index.tsx';
+import { NotificationsBell } from '../../notifications/components/NotificationsBell';
 
 interface HeaderProps {
   onNavigate?: (page: string) => void;
@@ -45,6 +46,8 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
         </button>
 
         {isAuthenticated && user ? (
+          <div className="flex items-center gap-2">
+            <NotificationsBell />
           <div className="relative">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
@@ -115,6 +118,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
                 </div>
               </>
             )}
+          </div>
           </div>
         ) : (
           <div className="flex items-center gap-2">

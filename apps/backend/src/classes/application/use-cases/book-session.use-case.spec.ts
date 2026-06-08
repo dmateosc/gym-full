@@ -9,6 +9,13 @@ import { ClassSessionEntity } from '../../domain/entities/class-session.entity';
 import { BookingEntity } from '../../domain/entities/booking.entity';
 import { ClassCategory } from '../../domain/value-objects/class-category.vo';
 import { BookingStatus } from '../../domain/value-objects/booking-status.vo';
+import { NotificationsQueuePort } from '../../../notifications/application/services/notifications-queue.port';
+
+function mkQueue(): jest.Mocked<NotificationsQueuePort> {
+  return {
+    enqueue: jest.fn().mockResolvedValue(undefined),
+  } as unknown as jest.Mocked<NotificationsQueuePort>;
+}
 
 // "Now": Mon 2026-06-15 10:00 Madrid (CEST, UTC+2) = 08:00 UTC.
 const NOW = new Date('2026-06-15T08:00:00Z');
@@ -86,6 +93,7 @@ describe('BookSessionUseCase', () => {
       mkBookings(),
       mkClasses(klass),
       mkSessions(null),
+      mkQueue(),
     );
     await expect(
       uc.execute({ sessionId: 's', userId: 'u', now: NOW }),
@@ -98,6 +106,7 @@ describe('BookSessionUseCase', () => {
       mkBookings(),
       mkClasses(klass),
       mkSessions(session),
+      mkQueue(),
     );
     await expect(
       uc.execute({ sessionId: 's', userId: 'u', now: NOW }),
@@ -110,6 +119,7 @@ describe('BookSessionUseCase', () => {
       mkBookings(),
       mkClasses(klass),
       mkSessions(session),
+      mkQueue(),
     );
     await expect(
       uc.execute({ sessionId: 's', userId: 'u', now: NOW }),
@@ -122,6 +132,7 @@ describe('BookSessionUseCase', () => {
       mkBookings(),
       mkClasses(klass),
       mkSessions(session),
+      mkQueue(),
     );
     await expect(
       uc.execute({ sessionId: 's', userId: 'u', now: NOW }),
@@ -138,6 +149,7 @@ describe('BookSessionUseCase', () => {
       mkBookings(),
       mkClasses(inactive),
       mkSessions(session),
+      mkQueue(),
     );
     await expect(
       uc.execute({ sessionId: 's', userId: 'u', now: NOW }),
@@ -162,6 +174,7 @@ describe('BookSessionUseCase', () => {
       bookings,
       mkClasses(klass),
       mkSessions(session),
+      mkQueue(),
     );
 
     const result = await uc.execute({
@@ -198,6 +211,7 @@ describe('BookSessionUseCase', () => {
       bookings,
       mkClasses(klass),
       mkSessions(session),
+      mkQueue(),
     );
 
     await uc.execute({ sessionId: 'session-1', userId: 'u', now: NOW });

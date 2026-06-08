@@ -21,6 +21,10 @@ import { BookingEntity } from '../../domain/entities/booking.entity';
 import { BookingStatus } from '../../domain/value-objects/booking-status.vo';
 import { madridDayRangeUtc } from '../services/madrid-time';
 import { ClassSessionStatus } from '../../domain/value-objects/class-session-status.vo';
+import {
+  NOTIFICATIONS_QUEUE,
+  NotificationsQueuePort,
+} from '../../../notifications/application/services/notifications-queue.port';
 
 export interface BookSessionCommand {
   sessionId: string;
@@ -43,6 +47,8 @@ export class BookSessionUseCase {
     private readonly classes: ClassRepositoryPort,
     @Inject(CLASS_SESSION_REPOSITORY)
     private readonly sessions: ClassSessionRepositoryPort,
+    @Inject(NOTIFICATIONS_QUEUE)
+    private readonly queue: NotificationsQueuePort,
   ) {}
 
   async execute(cmd: BookSessionCommand): Promise<BookSessionResult> {
@@ -75,8 +81,9 @@ export class BookSessionUseCase {
     }
 
     // Repo enforces uniqueness + concurrency via SELECT FOR UPDATE.
+    let result: BookSessionResult;
     try {
-      return await this.bookings.bookAtomically({
+      result = await this.bookings.bookAtomically({
         sessionId: session.id,
         userId: cmd.userId,
         capacity: session.effectiveCapacity(klass.capacity),
@@ -88,5 +95,20 @@ export class BookSessionUseCase {
       // Defensive: any other failure surface as a 400 to the caller.
       throw new BadRequestException((e as Error).message);
     }
+
+    // Fire-and-forget: a queue outage must not break the booking flow.
+    if (result.status === BookingStatus.CONFIRMED) {
+      void this.queue.enqueue({
+        type: 'booking-confirmed',
+        userId: cmd.userId,
+        bookingId: result.booking.id,
+        sessionId: session.id,
+        classId: klass.id,
+        className: klass.name,
+        scheduledAt: session.scheduledAt,
+      });
+    }
+
+    return result;
   }
 }
