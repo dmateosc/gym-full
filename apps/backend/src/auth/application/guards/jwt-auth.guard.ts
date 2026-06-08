@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   UnauthorizedException,
   SetMetadata,
+  Inject,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
@@ -11,6 +12,11 @@ import {
   JwtVerifier,
   JwtPayload,
 } from '../../../shared/infrastructure/jwt/jwt-verifier';
+import {
+  USER_REPOSITORY,
+  UserRepositoryPort,
+} from '../../../users/domain/repositories/user.repository.port';
+import { UserRole } from '../../../users/domain/value-objects/user-role.vo';
 
 export const IS_PUBLIC_KEY = 'isPublic';
 
@@ -22,14 +28,23 @@ export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
 /**
  * Guard principal de autenticación.
- * Verifica el JWT de Supabase en el header Authorization: Bearer <token>
- * Añade el payload decodificado como request.user
+ *
+ * 1. Verifica el JWT (firmado por Supabase) — usa JWKS o el secreto.
+ * 2. Sobrescribe el claim `role` del JWT con el rol REAL del perfil
+ *    local. Supabase emite `role: 'authenticated'`, que no se
+ *    corresponde con nuestros roles de aplicación
+ *    (`admin` / `instructor` / `user`); confiar en ese claim haría
+ *    que cualquier comprobación @Roles() devolviese 403.
+ *    Si el usuario aún no tiene perfil sincronizado, queda como
+ *    `user` por defecto.
  */
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly configService: ConfigService,
+    @Inject(USER_REPOSITORY)
+    private readonly userRepo: UserRepositoryPort,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -67,6 +82,15 @@ export class JwtAuthGuard implements CanActivate {
 
     if (!payload) {
       throw new UnauthorizedException('Token inválido o expirado');
+    }
+
+    // Resolve the app-level role from the local DB; Supabase's `role`
+    // claim is always 'authenticated' and not authoritative for us.
+    try {
+      const local = await this.userRepo.findBySupabaseId(payload.sub);
+      payload.role = local?.role.value ?? UserRole.USER;
+    } catch {
+      payload.role = UserRole.USER;
     }
 
     request.user = payload;
