@@ -9,6 +9,7 @@ import { GetAllUsersUseCase } from '../application/use-cases/get-all-users.use-c
 import { GetUserByIdUseCase } from '../application/use-cases/get-user-by-id.use-case';
 import { UpdateUserRoleUseCase } from '../application/use-cases/update-user-role.use-case';
 import { UpsertUserProfileUseCase } from '../application/use-cases/upsert-user-profile.use-case';
+import { EnsureAdminsService } from '../application/services/ensure-admins.service';
 import { USER_REPOSITORY } from '../domain/repositories/user.repository.port';
 
 @Global()
@@ -26,6 +27,8 @@ import { USER_REPOSITORY } from '../domain/repositories/user.repository.port';
     GetUserByIdUseCase,
     UpdateUserRoleUseCase,
     UpsertUserProfileUseCase,
+    // Bootstrap declarativo del rol admin
+    EnsureAdminsService,
   ],
   exports: [USER_REPOSITORY, GetUserByIdUseCase, UpsertUserProfileUseCase],
 })
