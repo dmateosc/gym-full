@@ -68,9 +68,16 @@ export class ClassesController {
   @Get('today')
   @ApiOperation({ summary: 'Clases programadas para hoy (Europe/Madrid)' })
   @ApiResponse({ status: 200, type: [TodaySessionResponseDto] })
-  async today(): Promise<TodaySessionResponseDto[]> {
-    const views = await this.listTodaySessions.execute();
-    return views.map((v) => TodaySessionResponseDto.from(v.session, v.klass));
+  async today(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<TodaySessionResponseDto[]> {
+    const me = await this.resolveLocalUserIdOrNull(user);
+    const views = await this.listTodaySessions.execute({
+      userId: me ?? undefined,
+    });
+    return views.map((v) =>
+      TodaySessionResponseDto.from(v.session, v.klass, v.counts, v.myBooking),
+    );
   }
 
   // ─── Instructor: gestionar sus propias clases ────────────────────
@@ -160,7 +167,14 @@ export class ClassesController {
     return list.map((c) => ClassResponseDto.fromDomain(c));
   }
 
-  // ─── helper ───────────────────────────────────────────────────────
+  // ─── helpers ──────────────────────────────────────────────────────
+  private async resolveLocalUserIdOrNull(
+    user: JwtPayload,
+  ): Promise<string | null> {
+    const local = await this.userRepo.findBySupabaseId(user.sub);
+    return local?.id ?? null;
+  }
+
   private async resolveLocalUserId(user: JwtPayload): Promise<string> {
     const local = await this.userRepo.findBySupabaseId(user.sub);
     if (!local) {

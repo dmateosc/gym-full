@@ -7,20 +7,34 @@ import {
 } from '../types/class';
 import { CategoryPill } from './CategoryPill';
 import { ClassFormModal } from './ClassFormModal';
+import { AttendeesModal } from './AttendeesModal';
 
 export function MyClassesView() {
   const [classes, setClasses] = useState<Class[] | null>(null);
+  const [todaySessionByClass, setTodaySessionByClass] = useState<Map<string, string>>(
+    new Map(),
+  );
   const [error, setError] = useState<string | null>(null);
   const [modal, setModal] = useState<{ open: boolean; editing: Class | null }>({
     open: false,
     editing: null,
   });
+  const [attendees, setAttendees] = useState<{ sessionId: string; title: string } | null>(
+    null,
+  );
 
   const load = () => {
     setClasses(null);
     ClassesService.mine()
       .then(setClasses)
       .catch((e: Error) => setError(e.message));
+    ClassesService.today()
+      .then((sessions) => {
+        const map = new Map<string, string>();
+        for (const s of sessions) map.set(s.classId, s.sessionId);
+        setTodaySessionByClass(map);
+      })
+      .catch(() => { /* not critical */ });
   };
 
   useEffect(load, []);
@@ -89,57 +103,68 @@ export function MyClassesView() {
         </div>
       ) : (
         <div className="space-y-3">
-          {classes.map((c) => (
-            <div
-              key={c.id}
-              className={`bg-[#1e293b] rounded-xl border p-4 flex items-start justify-between gap-4 ${
-                c.active ? 'border-[#334155]' : 'border-[#334155] opacity-60'
-              }`}
-            >
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <h3 className="text-base sm:text-lg font-semibold text-white">{c.name}</h3>
-                  <CategoryPill category={c.category} />
-                  {!c.active && (
-                    <span className="text-xs font-semibold uppercase text-[#94a3b8]">Inactiva</span>
+          {classes.map((c) => {
+            const todaySessionId = todaySessionByClass.get(c.id);
+            return (
+              <div
+                key={c.id}
+                className={`bg-[#1e293b] rounded-xl border p-4 flex items-start justify-between gap-4 ${
+                  c.active ? 'border-[#334155]' : 'border-[#334155] opacity-60'
+                }`}
+              >
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <h3 className="text-base sm:text-lg font-semibold text-white">{c.name}</h3>
+                    <CategoryPill category={c.category} />
+                    {!c.active && (
+                      <span className="text-xs font-semibold uppercase text-[#94a3b8]">Inactiva</span>
+                    )}
+                  </div>
+                  {c.description && (
+                    <p className="text-[#94a3b8] text-sm mb-2 line-clamp-2">{c.description}</p>
+                  )}
+                  <div className="flex flex-wrap gap-4 text-sm text-[#cbd5e1]">
+                    <span>{DAY_OF_WEEK_LABELS[c.dayOfWeek]} · {c.startTime}</span>
+                    <span>{c.durationMin} min</span>
+                    <span>Aforo {c.capacity}</span>
+                    {c.location && <span>{c.location}</span>}
+                    <span className="text-[#94a3b8]">{CLASS_CATEGORY_LABELS[c.category]}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 shrink-0">
+                  {todaySessionId && (
+                    <button
+                      onClick={() => setAttendees({ sessionId: todaySessionId, title: c.name })}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#60a5fa] hover:bg-white/5"
+                    >
+                      Ver asistentes hoy
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setModal({ open: true, editing: c })}
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#cbd5e1] bg-white/5 hover:bg-white/10"
+                  >
+                    Editar
+                  </button>
+                  {c.active ? (
+                    <button
+                      onClick={() => handleDelete(c)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(229,9,20,0.15)]"
+                    >
+                      Desactivar
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleReactivate(c)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#4ade80] hover:bg-[rgba(34,197,94,0.15)]"
+                    >
+                      Reactivar
+                    </button>
                   )}
                 </div>
-                {c.description && (
-                  <p className="text-[#94a3b8] text-sm mb-2 line-clamp-2">{c.description}</p>
-                )}
-                <div className="flex flex-wrap gap-4 text-sm text-[#cbd5e1]">
-                  <span>{DAY_OF_WEEK_LABELS[c.dayOfWeek]} · {c.startTime}</span>
-                  <span>{c.durationMin} min</span>
-                  <span>Aforo {c.capacity}</span>
-                  {c.location && <span>{c.location}</span>}
-                  <span className="text-[#94a3b8]">{CLASS_CATEGORY_LABELS[c.category]}</span>
-                </div>
               </div>
-              <div className="flex flex-col gap-2 shrink-0">
-                <button
-                  onClick={() => setModal({ open: true, editing: c })}
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#cbd5e1] bg-white/5 hover:bg-white/10"
-                >
-                  Editar
-                </button>
-                {c.active ? (
-                  <button
-                    onClick={() => handleDelete(c)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(229,9,20,0.15)]"
-                  >
-                    Desactivar
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleReactivate(c)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#4ade80] hover:bg-[rgba(34,197,94,0.15)]"
-                  >
-                    Reactivar
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -148,6 +173,11 @@ export function MyClassesView() {
         initial={modal.editing}
         onClose={() => setModal({ open: false, editing: null })}
         onSubmit={handleSubmit}
+      />
+      <AttendeesModal
+        sessionId={attendees?.sessionId ?? null}
+        title={attendees?.title ?? ''}
+        onClose={() => setAttendees(null)}
       />
     </div>
   );

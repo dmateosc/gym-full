@@ -3,6 +3,8 @@ import { ClassEntity } from '../../../domain/entities/class.entity';
 import { ClassCategory } from '../../../domain/value-objects/class-category.vo';
 import { ClassSessionEntity } from '../../../domain/entities/class-session.entity';
 import { ClassSessionStatus } from '../../../domain/value-objects/class-session-status.vo';
+import { BookingEntity } from '../../../domain/entities/booking.entity';
+import { BookingStatus } from '../../../domain/value-objects/booking-status.vo';
 
 export class ClassResponseDto {
   @ApiProperty() id!: string;
@@ -39,9 +41,31 @@ export class TodaySessionResponseDto {
   @ApiPropertyOptional({ nullable: true }) location!: string | null;
   @ApiProperty({ enum: ClassSessionStatus }) status!: ClassSessionStatus;
 
+  @ApiProperty({ description: 'Reservas confirmadas en esta sesión' })
+  bookedCount!: number;
+  @ApiProperty({ description: 'Personas en lista de espera' })
+  waitlistCount!: number;
+  @ApiProperty({ description: 'Plazas libres' })
+  availableSpots!: number;
+
+  @ApiPropertyOptional({ enum: BookingStatus, nullable: true })
+  myBookingStatus!: BookingStatus | null;
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Posición del usuario en waitlist',
+  })
+  myWaitlistPosition!: number | null;
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Id de la reserva del usuario',
+  })
+  myBookingId!: string | null;
+
   static from(
     session: ClassSessionEntity,
     klass: ClassEntity,
+    counts: { confirmed: number; waitlist: number },
+    myBooking: BookingEntity | null,
   ): TodaySessionResponseDto {
     const dto = new TodaySessionResponseDto();
     dto.sessionId = session.id;
@@ -55,6 +79,12 @@ export class TodaySessionResponseDto {
     dto.capacity = session.effectiveCapacity(klass.capacity);
     dto.location = klass.location;
     dto.status = session.status;
+    dto.bookedCount = counts.confirmed;
+    dto.waitlistCount = counts.waitlist;
+    dto.availableSpots = Math.max(dto.capacity - counts.confirmed, 0);
+    dto.myBookingStatus = myBooking?.status ?? null;
+    dto.myWaitlistPosition = myBooking?.position ?? null;
+    dto.myBookingId = myBooking?.id ?? null;
     return dto;
   }
 }
