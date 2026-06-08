@@ -76,7 +76,13 @@ export class ClassesController {
       userId: me ?? undefined,
     });
     return views.map((v) =>
-      TodaySessionResponseDto.from(v.session, v.klass, v.counts, v.myBooking),
+      TodaySessionResponseDto.from(
+        v.session,
+        v.klass,
+        v.counts,
+        v.myBooking,
+        v.instructorName,
+      ),
     );
   }
 

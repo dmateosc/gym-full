@@ -147,6 +147,11 @@ function SessionCard({
             <span className="text-[#fbbf24]"> · {s.waitlistCount} en espera</span>
           )}
         </span>
+        {s.instructorName && (
+          <span className="text-[#fbbf24]">
+            Instructor: {s.instructorName}
+          </span>
+        )}
       </div>
 
       {cancelled ? (

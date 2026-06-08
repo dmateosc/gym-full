@@ -23,7 +23,20 @@ export interface BookingPromotedEvent {
   scheduledAt: Date;
 }
 
-export type NotificationEvent = BookingConfirmedEvent | BookingPromotedEvent;
+export interface ClassAssignedEvent {
+  type: 'class-assigned';
+  userId: string; // instructor receiving the class
+  assignedByUserId: string;
+  classId: string;
+  className: string;
+  dayOfWeek: number;
+  startTime: string;
+}
+
+export type NotificationEvent =
+  | BookingConfirmedEvent
+  | BookingPromotedEvent
+  | ClassAssignedEvent;
 
 export abstract class NotificationsQueuePort {
   abstract enqueue(event: NotificationEvent): Promise<void>;

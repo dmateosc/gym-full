@@ -32,6 +32,12 @@ export class TodaySessionResponseDto {
   @ApiProperty() sessionId!: string;
   @ApiProperty() classId!: string;
   @ApiProperty() instructorId!: string;
+  @ApiPropertyOptional({
+    nullable: true,
+    description:
+      'Nombre completo del instructor (cae a email si no hay nombre)',
+  })
+  instructorName!: string | null;
   @ApiProperty() name!: string;
   @ApiPropertyOptional({ nullable: true }) description!: string | null;
   @ApiProperty({ enum: ClassCategory }) category!: ClassCategory;
@@ -66,11 +72,13 @@ export class TodaySessionResponseDto {
     klass: ClassEntity,
     counts: { confirmed: number; waitlist: number },
     myBooking: BookingEntity | null,
+    instructorName: string | null = null,
   ): TodaySessionResponseDto {
     const dto = new TodaySessionResponseDto();
     dto.sessionId = session.id;
     dto.classId = klass.id;
     dto.instructorId = klass.instructorId;
+    dto.instructorName = instructorName;
     dto.name = klass.name;
     dto.description = klass.description;
     dto.category = klass.category;

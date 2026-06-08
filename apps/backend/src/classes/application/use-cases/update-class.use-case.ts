@@ -16,6 +16,10 @@ import {
 import { ClassEntity } from '../../domain/entities/class.entity';
 import { ClassCategory } from '../../domain/value-objects/class-category.vo';
 import { UserRole } from '../../../users/domain/value-objects/user-role.vo';
+import {
+  NOTIFICATIONS_QUEUE,
+  NotificationsQueuePort,
+} from '../../../notifications/application/services/notifications-queue.port';
 
 export interface UpdateClassCommand {
   id: string;
@@ -41,6 +45,8 @@ export class UpdateClassUseCase {
     private readonly repo: ClassRepositoryPort,
     @Inject(USER_REPOSITORY)
     private readonly users: UserRepositoryPort,
+    @Inject(NOTIFICATIONS_QUEUE)
+    private readonly queue: NotificationsQueuePort,
   ) {}
 
   async execute(cmd: UpdateClassCommand): Promise<ClassEntity> {
@@ -107,6 +113,25 @@ export class UpdateClassUseCase {
       entity.reassignInstructor(target.id);
     }
 
-    return this.repo.save(entity);
+    const saved = await this.repo.save(entity);
+
+    // Notify the new instructor on a real reassignment (different from caller).
+    if (
+      cmd.instructorId &&
+      cmd.instructorId !== cmd.requestingUserId &&
+      saved.instructorId === cmd.instructorId
+    ) {
+      void this.queue.enqueue({
+        type: 'class-assigned',
+        userId: saved.instructorId,
+        assignedByUserId: cmd.requestingUserId,
+        classId: saved.id,
+        className: saved.name,
+        dayOfWeek: saved.dayOfWeek,
+        startTime: saved.startTime,
+      });
+    }
+
+    return saved;
   }
 }
