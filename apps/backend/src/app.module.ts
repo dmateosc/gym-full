@@ -19,6 +19,7 @@ import { RoutineExerciseOrmEntity } from './routines/infrastructure/persistence/
 import { UserProfileOrmEntity } from './users/infrastructure/persistence/user-profile.orm-entity';
 import { ClassOrmEntity } from './classes/infrastructure/persistence/class.orm-entity';
 import { ClassSessionOrmEntity } from './classes/infrastructure/persistence/class-session.orm-entity';
+import { BookingOrmEntity } from './classes/infrastructure/persistence/booking.orm-entity';
 import { DatabaseLogger } from './database/database.logger';
 
 // Guards globales
@@ -40,6 +41,7 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
         UserProfileOrmEntity,
         ClassOrmEntity,
         ClassSessionOrmEntity,
+        BookingOrmEntity,
       ],
       synchronize: false,
       // Run any pending migrations at boot. The container will not

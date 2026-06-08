@@ -7,8 +7,14 @@ import {
   CLASS_SESSION_REPOSITORY,
   ClassSessionRepositoryPort,
 } from '../../domain/repositories/class-session.repository.port';
+import {
+  BOOKING_REPOSITORY,
+  BookingCounts,
+  BookingRepositoryPort,
+} from '../../domain/repositories/booking.repository.port';
 import { ClassEntity } from '../../domain/entities/class.entity';
 import { ClassSessionEntity } from '../../domain/entities/class-session.entity';
+import { BookingEntity } from '../../domain/entities/booking.entity';
 import {
   madridDayRangeUtc,
   madridLocalToUtc,
@@ -18,14 +24,14 @@ import {
 export interface TodaySessionView {
   session: ClassSessionEntity;
   klass: ClassEntity;
+  counts: BookingCounts;
+  myBooking: BookingEntity | null;
 }
 
 /**
- * Returns today's class sessions in Madrid time. Sessions are
- * materialised on demand: for every active class scheduled for today's
- * weekday we UPSERT a ClassSession at the corresponding wall-clock
- * time. The unique (class_id, scheduled_at) constraint makes the
- * UPSERT idempotent so concurrent requests don't duplicate rows.
+ * Today's class sessions (Madrid time) with materialisation, booking
+ * counts per session, and (when a userId is provided) the user's own
+ * active booking on each session.
  */
 @Injectable()
 export class ListTodaySessionsUseCase {
@@ -34,14 +40,18 @@ export class ListTodaySessionsUseCase {
     private readonly classRepo: ClassRepositoryPort,
     @Inject(CLASS_SESSION_REPOSITORY)
     private readonly sessionRepo: ClassSessionRepositoryPort,
+    @Inject(BOOKING_REPOSITORY)
+    private readonly bookingRepo: BookingRepositoryPort,
   ) {}
 
-  async execute(now: Date = new Date()): Promise<TodaySessionView[]> {
+  async execute(
+    opts: { userId?: string; now?: Date } = {},
+  ): Promise<TodaySessionView[]> {
+    const now = opts.now ?? new Date();
     const dow = todayDayOfWeekInMadrid(now);
     const todaysClasses = await this.classRepo.findActiveByDayOfWeek(dow);
     if (todaysClasses.length === 0) return [];
 
-    // Materialise (idempotent) one session per class for today.
     await Promise.all(
       todaysClasses.map((klass) =>
         this.sessionRepo.upsertScheduledSession({
@@ -58,9 +68,27 @@ export class ListTodaySessionsUseCase {
       classIds: todaysClasses.map((c) => c.id),
     });
 
+    const sessionIds = sessions.map((s) => s.id);
+    const counts = await this.bookingRepo.countsBySession(sessionIds);
+    const myBookings = opts.userId
+      ? await this.bookingRepo.findUserBookingsForSessions(
+          opts.userId,
+          sessionIds,
+        )
+      : [];
+    const myBookingBySession = new Map<string, BookingEntity>();
+    for (const b of myBookings) {
+      if (!b.isCancelled()) myBookingBySession.set(b.sessionId, b);
+    }
+
     const classById = new Map(todaysClasses.map((c) => [c.id, c]));
     return sessions
       .filter((s) => classById.has(s.classId))
-      .map((session) => ({ session, klass: classById.get(session.classId)! }));
+      .map((session) => ({
+        session,
+        klass: classById.get(session.classId)!,
+        counts: counts.get(session.id) ?? { confirmed: 0, waitlist: 0 },
+        myBooking: myBookingBySession.get(session.id) ?? null,
+      }));
   }
 }

@@ -48,6 +48,8 @@ export interface Class {
   updatedAt: string;
 }
 
+export type BookingStatus = 'confirmed' | 'waitlist' | 'cancelled';
+
 export interface TodaySession {
   sessionId: string;
   classId: string;
@@ -60,6 +62,43 @@ export interface TodaySession {
   capacity: number;
   location: string | null;
   status: ClassSessionStatus;
+  bookedCount: number;
+  waitlistCount: number;
+  availableSpots: number;
+  myBookingStatus: BookingStatus | null;
+  myWaitlistPosition: number | null;
+  myBookingId: string | null;
+}
+
+export interface MyBooking {
+  bookingId: string;
+  status: BookingStatus;
+  position: number | null;
+  sessionId: string;
+  classId: string;
+  name: string;
+  category: ClassCategory;
+  scheduledAt: string;
+  durationMin: number;
+  location: string | null;
+}
+
+export interface Attendee {
+  bookingId: string;
+  userId: string;
+  userEmail: string;
+  userFullName: string | null;
+  status: BookingStatus;
+  position: number | null;
+}
+
+export interface Booking {
+  id: string;
+  sessionId: string;
+  userId: string;
+  status: BookingStatus;
+  position: number | null;
+  createdAt: string;
 }
 
 export interface CreateClassPayload {
