@@ -67,6 +67,8 @@ export class ClassTypeormRepository implements ClassRepositoryPort {
     await this.repo.update(
       { id: entity.id },
       {
+        // instructorId is mutable via reassignInstructor — keep it in sync.
+        instructorId: p.instructorId,
         name: p.name,
         description: p.description,
         category: p.category,
