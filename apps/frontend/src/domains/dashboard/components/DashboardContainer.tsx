@@ -32,10 +32,12 @@ const StatCard: React.FC<{
     >
       {icon}
     </div>
-    <div>
-      <p className="text-[#94a3b8] text-sm">{title}</p>
+    <div className="min-w-0">
+      <p className="text-[#94a3b8] text-sm truncate">{title}</p>
       <p className="text-white text-2xl font-bold">{value}</p>
-      {subtitle && <p className="text-[#64748b] text-xs mt-0.5">{subtitle}</p>}
+      {subtitle && (
+        <p className="text-[#64748b] text-xs mt-0.5 truncate">{subtitle}</p>
+      )}
     </div>
   </div>
 );
@@ -85,20 +87,22 @@ const DashboardContainer: React.FC<{
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
-      {/* Hero de bienvenida — rojo plano */}
-      <div className="rounded-2xl p-6 sm:p-8 bg-[#1f9e3f]">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl font-bold text-white flex-shrink-0 bg-white/20">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8">
+      {/* Hero de bienvenida — bloque verde plano */}
+      <div className="rounded-2xl p-4 sm:p-6 lg:p-8 bg-[#1f9e3f]">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-xl sm:text-3xl font-bold text-white flex-shrink-0 bg-white/20">
             {displayName.charAt(0).toUpperCase()}
           </div>
-          <div>
-            <p className="text-[#fecaca] text-sm capitalize">{today}</p>
-            <h1 className="text-2xl font-bold text-white">
+          <div className="min-w-0 flex-1">
+            <p className="text-[#dcfce7] text-xs sm:text-sm capitalize truncate">
+              {today}
+            </p>
+            <h1 className="text-lg sm:text-2xl font-bold text-white break-words">
               {greeting}, {displayName}
             </h1>
             {isAdmin && (
-              <p className="text-[#fecaca] text-sm mt-1 inline-flex items-center gap-1">
+              <p className="text-[#dcfce7] text-xs sm:text-sm mt-1 inline-flex items-center gap-1">
                 <CrownIcon size={14} />
                 Administrador
               </p>
