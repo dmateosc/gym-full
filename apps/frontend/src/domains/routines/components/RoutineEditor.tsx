@@ -22,21 +22,52 @@ interface DraftExercise {
 }
 
 interface RoutineEditorProps {
+  initialRoutine?: DailyRoutine;
   onCancel: () => void;
-  onCreated: (routine: DailyRoutine) => void;
+  onCreated?: (routine: DailyRoutine) => void;
+  onUpdated?: (routine: DailyRoutine) => void;
 }
 
 const inputClass =
   'w-full px-3 py-2 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#1f9e3f] focus:ring-2 focus:ring-[rgba(64,206,66,0.25)] text-sm';
 
-const RoutineEditor: React.FC<RoutineEditorProps> = ({ onCancel, onCreated }) => {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [intensity, setIntensity] = useState<RoutineIntensity>(
-    RoutineIntensity.MODERATE,
+const RoutineEditor: React.FC<RoutineEditorProps> = ({
+  initialRoutine,
+  onCancel,
+  onCreated,
+  onUpdated,
+}) => {
+  const isEdit = !!initialRoutine;
+  const [name, setName] = useState(initialRoutine?.name ?? '');
+  const [description, setDescription] = useState(
+    initialRoutine?.description ?? '',
   );
-  const [estimatedDuration, setEstimatedDuration] = useState<string>('');
-  const [drafts, setDrafts] = useState<DraftExercise[]>([]);
+  const [intensity, setIntensity] = useState<RoutineIntensity>(
+    (initialRoutine?.intensity as RoutineIntensity) ?? RoutineIntensity.MODERATE,
+  );
+  const [estimatedDuration, setEstimatedDuration] = useState<string>(
+    initialRoutine?.estimatedDurationMinutes?.toString() ?? '',
+  );
+  const [visibility, setVisibility] = useState<'private' | 'public'>(
+    ((initialRoutine as { visibility?: 'private' | 'public' } | undefined)
+      ?.visibility ?? 'private'),
+  );
+  const [drafts, setDrafts] = useState<DraftExercise[]>(
+    (initialRoutine?.routineExercises ?? [])
+      .slice()
+      .sort((a, b) => a.orderInRoutine - b.orderInRoutine)
+      .map((re) => ({
+        exerciseId: re.exerciseId,
+        exerciseName: re.exercise?.name ?? 'Ejercicio',
+        exerciseType: re.exerciseType,
+        sets: re.sets,
+        reps: re.reps,
+        durationSeconds: re.duration,
+        distanceMeters: re.distance,
+        restSeconds: re.restSeconds,
+        notes: re.notes,
+      })),
+  );
   const [pickerOpen, setPickerOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,27 +78,44 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ onCancel, onCreated }) =>
     setSaving(true);
     setError(null);
     try {
-      const payload = {
-        name: name.trim(),
-        description: description.trim() || undefined,
-        intensity,
-        estimatedDurationMinutes: estimatedDuration
-          ? Number(estimatedDuration)
-          : undefined,
-        exercises: drafts.map((d, idx) => ({
-          exerciseId: d.exerciseId,
-          orderInRoutine: idx + 1,
-          exerciseType: d.exerciseType,
-          sets: d.sets,
-          reps: d.reps,
-          durationSeconds: d.durationSeconds,
-          distanceMeters: d.distanceMeters,
-          restSeconds: d.restSeconds,
-          notes: d.notes?.trim() || undefined,
-        })),
-      };
-      const created = await RoutineService.createMyRoutine(payload);
-      onCreated(created);
+      const exercises = drafts.map((d, idx) => ({
+        exerciseId: d.exerciseId,
+        orderInRoutine: idx + 1,
+        exerciseType: d.exerciseType,
+        sets: d.sets,
+        reps: d.reps,
+        durationSeconds: d.durationSeconds,
+        distanceMeters: d.distanceMeters,
+        restSeconds: d.restSeconds,
+        notes: d.notes?.trim() || undefined,
+      }));
+      if (isEdit && initialRoutine) {
+        const updated = await RoutineService.updateMyRoutine(
+          initialRoutine.id,
+          {
+            name: name.trim(),
+            description: description.trim() || undefined,
+            intensity,
+            estimatedDurationMinutes: estimatedDuration
+              ? Number(estimatedDuration)
+              : undefined,
+            visibility,
+            exercises,
+          },
+        );
+        onUpdated?.(updated);
+      } else {
+        const created = await RoutineService.createMyRoutine({
+          name: name.trim(),
+          description: description.trim() || undefined,
+          intensity,
+          estimatedDurationMinutes: estimatedDuration
+            ? Number(estimatedDuration)
+            : undefined,
+          exercises,
+        });
+        onCreated?.(created);
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -121,7 +169,7 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ onCancel, onCreated }) =>
           disabled={!canSave}
           className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90 disabled:opacity-50"
         >
-          {saving ? 'Guardando…' : 'Crear rutina'}
+          {saving ? 'Guardando…' : isEdit ? 'Guardar cambios' : 'Crear rutina'}
         </button>
       </div>
 
@@ -192,6 +240,35 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({ onCancel, onCreated }) =>
             />
           </div>
         </div>
+
+        {isEdit && (
+          <div>
+            <label className="block text-sm font-medium text-[#cbd5e1] mb-1.5">
+              Visibilidad
+            </label>
+            <div className="flex gap-2">
+              {(['private', 'public'] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setVisibility(v)}
+                  className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                    visibility === v
+                      ? 'bg-[#1f9e3f] text-white'
+                      : 'bg-[#334155] text-[#cbd5e1] hover:bg-[#475569]'
+                  }`}
+                >
+                  {v === 'private' ? 'Privada' : 'Pública'}
+                </button>
+              ))}
+            </div>
+            <p className="text-[#64748b] text-xs mt-1.5">
+              {visibility === 'public'
+                ? 'Cualquier miembro podrá ver y clonar esta rutina.'
+                : 'Solo tú puedes verla.'}
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="bg-[#1e293b] rounded-xl border border-[#334155] p-5">

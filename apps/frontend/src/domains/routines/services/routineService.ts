@@ -321,6 +321,49 @@ export class RoutineService {
     if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
   }
 
+  static async listPublicRoutines(): Promise<DailyRoutine[]> {
+    const res = await fetch(`${API_BASE_URL}/routines/public`, {
+      headers: authHeaders(),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json() as Promise<DailyRoutine[]>;
+  }
+
+  static async updateMyRoutine(
+    id: string,
+    payload: Partial<{
+      name: string;
+      description?: string;
+      intensity: RoutineIntensity;
+      estimatedDurationMinutes: number;
+      goals: string[];
+      visibility: 'private' | 'public';
+      exercises: {
+        exerciseId: string;
+        orderInRoutine: number;
+        exerciseType?: ExerciseType;
+        sets?: number;
+        reps?: number;
+        weight?: number;
+        durationSeconds?: number;
+        distanceMeters?: number;
+        restSeconds?: number;
+        notes?: string;
+      }[];
+    }>,
+  ): Promise<DailyRoutine> {
+    const res = await fetch(`${API_BASE_URL}/routines/mine/${id}`, {
+      method: 'PATCH',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const body = (await res.json().catch(() => null)) as { message?: string } | null;
+      throw new Error(body?.message ?? `HTTP ${res.status}`);
+    }
+    return res.json() as Promise<DailyRoutine>;
+  }
+
   static async createMyRoutine(payload: {
     name: string;
     description?: string;

@@ -4,10 +4,11 @@ import RoutineView from './RoutineView';
 import EmptyRoutineState from './EmptyRoutineState';
 import RoutineDateSelector from './RoutineDateSelector';
 import MyRoutinesView from './MyRoutinesView';
+import PublicRoutinesView from './PublicRoutinesView';
 import { RoutineService } from '../services/routineService';
 import { AlertIcon } from '../../../assets/icons/index.tsx';
 
-type Tab = 'today' | 'mine';
+type Tab = 'today' | 'mine' | 'public';
 
 const RoutinesContainer: React.FC = () => {
   const { currentRoutine, isLoading, error } = useRoutinesWithCache();
@@ -33,6 +34,7 @@ const RoutinesContainer: React.FC = () => {
   const tabs: { id: Tab; label: string }[] = [
     { id: 'today', label: 'Hoy' },
     { id: 'mine', label: 'Mis rutinas' },
+    { id: 'public', label: 'Públicas' },
   ];
 
   return (
@@ -107,8 +109,10 @@ const RoutinesContainer: React.FC = () => {
             <EmptyRoutineState />
           )}
         </>
-      ) : (
+      ) : tab === 'mine' ? (
         <MyRoutinesView />
+      ) : (
+        <PublicRoutinesView />
       )}
     </div>
   );

@@ -24,6 +24,7 @@ import { UpdateDailyRoutineDto } from './dto/update-daily-routine.dto';
 import { CreateRoutineExerciseDto } from './dto/create-routine-exercise.dto';
 import { UpdateRoutineExerciseDto } from './dto/update-routine-exercise.dto';
 import { CreateUserRoutineDto } from './dto/create-user-routine.dto';
+import { UpdateUserRoutineDto } from './dto/update-user-routine.dto';
 import {
   JwtAuthGuard,
   Public,
@@ -93,6 +94,24 @@ export class RoutinesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteMyRoutine(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.userRoutines.deleteMine(id, user.sub);
+  }
+
+  @Patch('mine/:id')
+  @ApiOperation({
+    summary: 'Actualizar mi rutina (metadatos y/o ejercicios)',
+  })
+  updateMyRoutine(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserRoutineDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.userRoutines.updateMine(id, user.sub, dto);
+  }
+
+  @Get('public')
+  @ApiOperation({ summary: 'Listar rutinas públicas (biblioteca)' })
+  listPublicRoutines() {
+    return this.userRoutines.listPublic();
   }
 
   // Endpoints para DailyRoutine

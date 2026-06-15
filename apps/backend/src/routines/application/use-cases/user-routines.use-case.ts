@@ -13,6 +13,7 @@ import {
   RoutineExerciseRepositoryPort,
 } from '../../domain/repositories/routine-exercise.repository.port';
 import { CreateUserRoutineDto } from '../../infrastructure/http/dto/create-user-routine.dto';
+import { UpdateUserRoutineDto } from '../../infrastructure/http/dto/update-user-routine.dto';
 import {
   DailyRoutineOrmEntity,
   RoutineVisibility,
@@ -142,5 +143,59 @@ export class UserRoutinesUseCase {
       throw new NotFoundException(`Rutina ${id} no encontrada`);
     }
     await this.routineRepo.delete(id);
+  }
+
+  async listPublic(): Promise<DailyRoutineOrmEntity[]> {
+    return this.routineRepo.findPublic();
+  }
+
+  /**
+   * Actualiza una rutina propia. Si se aporta `exercises`, sustituye
+   * la lista completa (los antiguos se borran). Si no, solo actualiza
+   * los metadatos.
+   */
+  async updateMine(
+    id: string,
+    ownerUserId: string,
+    dto: UpdateUserRoutineDto,
+  ): Promise<DailyRoutineOrmEntity> {
+    const routine = await this.routineRepo.findById(id);
+    if (!routine || routine.ownerUserId !== ownerUserId) {
+      throw new NotFoundException(`Rutina ${id} no encontrada`);
+    }
+
+    await this.routineRepo.update(id, {
+      ...(dto.name !== undefined && { name: dto.name }),
+      ...(dto.description !== undefined && { description: dto.description }),
+      ...(dto.intensity !== undefined && { intensity: dto.intensity }),
+      ...(dto.estimatedDurationMinutes !== undefined && {
+        estimatedDurationMinutes: dto.estimatedDurationMinutes,
+      }),
+      ...(dto.goals !== undefined && { goals: dto.goals }),
+      ...(dto.visibility !== undefined && { visibility: dto.visibility }),
+    });
+
+    if (dto.exercises) {
+      for (const existing of routine.routineExercises ?? []) {
+        await this.exerciseRepo.delete(existing.id);
+      }
+      for (const ex of dto.exercises) {
+        await this.exerciseRepo.create({
+          dailyRoutineId: id,
+          exerciseId: ex.exerciseId,
+          orderInRoutine: ex.orderInRoutine,
+          exerciseType: ex.exerciseType,
+          sets: ex.sets,
+          reps: ex.reps,
+          weight: ex.weight,
+          durationSeconds: ex.durationSeconds,
+          distanceMeters: ex.distanceMeters,
+          restSeconds: ex.restSeconds,
+          notes: ex.notes,
+        });
+      }
+    }
+
+    return this.routineRepo.findById(id) as Promise<DailyRoutineOrmEntity>;
   }
 }

@@ -11,7 +11,7 @@ import {
 const MyRoutinesView: React.FC = () => {
   const [routines, setRoutines] = useState<DailyRoutine[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState<null | { id?: string }>(null);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -39,13 +39,23 @@ const MyRoutinesView: React.FC = () => {
     }
   };
 
-  if (editing) {
+  if (editing !== null) {
+    const target = editing.id
+      ? routines?.find((r) => r.id === editing.id)
+      : undefined;
     return (
       <RoutineEditor
-        onCancel={() => setEditing(false)}
+        initialRoutine={target}
+        onCancel={() => setEditing(null)}
         onCreated={(created) => {
-          setEditing(false);
+          setEditing(null);
           setRoutines((prev) => (prev ? [created, ...prev] : [created]));
+        }}
+        onUpdated={(updated) => {
+          setEditing(null);
+          setRoutines((prev) =>
+            prev ? prev.map((r) => (r.id === updated.id ? updated : r)) : [updated],
+          );
         }}
       />
     );
@@ -108,7 +118,7 @@ const MyRoutinesView: React.FC = () => {
           desde cero.
         </p>
         <button
-          onClick={() => setEditing(true)}
+          onClick={() => setEditing({})}
           className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90"
         >
           Crear nueva rutina
@@ -121,7 +131,7 @@ const MyRoutinesView: React.FC = () => {
     <div className="space-y-4">
       <div className="flex justify-end">
         <button
-          onClick={() => setEditing(true)}
+          onClick={() => setEditing({})}
           className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90"
         >
           + Crear rutina
@@ -154,13 +164,21 @@ const MyRoutinesView: React.FC = () => {
             >
               Ver
             </button>
-            <button
-              onClick={() => void handleDelete(r.id)}
-              disabled={deletingId === r.id}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(220,38,38,0.15)] disabled:opacity-50"
-            >
-              {deletingId === r.id ? 'Eliminando…' : 'Eliminar'}
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setEditing({ id: r.id })}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#cbd5e1] hover:bg-white/5"
+              >
+                Editar
+              </button>
+              <button
+                onClick={() => void handleDelete(r.id)}
+                disabled={deletingId === r.id}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(220,38,38,0.15)] disabled:opacity-50"
+              >
+                {deletingId === r.id ? 'Eliminando…' : 'Eliminar'}
+              </button>
+            </div>
           </div>
         </div>
       ))}
