@@ -11,8 +11,13 @@ import { useInstallPrompt } from '../hooks/useInstallPrompt';
  *   standalone.
  */
 export function InstallAppButton() {
-  const { canInstall, iosNeedsManualInstall, installed, promptInstall } =
-    useInstallPrompt();
+  const {
+    canInstall,
+    iosNeedsManualInstall,
+    iosBrowser,
+    installed,
+    promptInstall,
+  } = useInstallPrompt();
   const [showIosHelp, setShowIosHelp] = useState(false);
 
   if (installed) return null;
@@ -58,27 +63,67 @@ export function InstallAppButton() {
           />
           <div className="absolute right-0 top-full mt-2 w-72 rounded-xl shadow-2xl z-20 bg-[#161e2e] border border-white/10 p-4">
             <p className="text-white text-sm font-semibold mb-2">
-              Cómo instalar en iPhone
+              {iosBrowser === 'chrome'
+                ? 'Cómo instalar desde Chrome (iPhone)'
+                : iosBrowser === 'firefox'
+                  ? 'Cómo instalar desde Firefox (iPhone)'
+                  : iosBrowser === 'edge'
+                    ? 'Cómo instalar desde Edge (iPhone)'
+                    : 'Cómo instalar en iPhone'}
             </p>
             <ol className="text-[#cbd5e1] text-xs space-y-2 list-decimal list-inside">
-              <li>
-                Toca el botón <span className="font-semibold">Compartir</span>{' '}
-                en la barra inferior de Safari (icono cuadrado con flecha
-                hacia arriba).
-              </li>
-              <li>
-                Desplázate y pulsa{' '}
-                <span className="font-semibold">
-                  «Añadir a pantalla de inicio»
-                </span>
-                .
-              </li>
-              <li>Confirma con «Añadir» arriba a la derecha.</li>
+              {iosBrowser === 'chrome' ? (
+                <>
+                  <li>
+                    Toca el menú <span className="font-semibold">⋯</span> (tres
+                    puntos) abajo a la derecha.
+                  </li>
+                  <li>
+                    Pulsa{' '}
+                    <span className="font-semibold">
+                      «Añadir a pantalla de inicio»
+                    </span>
+                    .
+                  </li>
+                  <li>Confirma con «Añadir».</li>
+                </>
+              ) : iosBrowser === 'firefox' || iosBrowser === 'edge' ? (
+                <>
+                  <li>
+                    Abre el menú del navegador (icono de tres líneas o tres
+                    puntos).
+                  </li>
+                  <li>
+                    Busca{' '}
+                    <span className="font-semibold">«Compartir»</span> y luego{' '}
+                    <span className="font-semibold">
+                      «Añadir a pantalla de inicio»
+                    </span>
+                    .
+                  </li>
+                  <li>
+                    Si no aparece, abre la web en Safari y úsalo desde ahí.
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    Toca el botón{' '}
+                    <span className="font-semibold">Compartir</span> en la
+                    barra inferior de Safari (icono cuadrado con flecha hacia
+                    arriba).
+                  </li>
+                  <li>
+                    Desplázate y pulsa{' '}
+                    <span className="font-semibold">
+                      «Añadir a pantalla de inicio»
+                    </span>
+                    .
+                  </li>
+                  <li>Confirma con «Añadir» arriba a la derecha.</li>
+                </>
+              )}
             </ol>
-            <p className="text-[#94a3b8] text-[11px] mt-3">
-              Chrome en iPhone no permite instalar PWAs — Apple solo lo
-              ofrece desde Safari.
-            </p>
           </div>
         </>
       )}

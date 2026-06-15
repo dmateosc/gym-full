@@ -6,10 +6,11 @@ import { useCallback, useEffect, useState } from 'react';
  * - Captura el evento `beforeinstallprompt` (Chrome/Edge en Android,
  *   Chrome en desktop). Lo guarda hasta que se llame a
  *   `promptInstall()`.
- * - Detecta Safari iOS para mostrar la instrucción manual de
- *   "Compartir → Añadir a pantalla de inicio" (Safari no soporta
- *   beforeinstallprompt; ahí tenemos que decirle al usuario qué
- *   hacer).
+ * - Detecta iOS (cualquier navegador: Safari, Chrome, Firefox, Edge —
+ *   todos son WebKit) para mostrar la instrucción manual de
+ *   "Compartir → Añadir a pantalla de inicio". iOS no soporta
+ *   beforeinstallprompt en ningún navegador; ahí tenemos que decirle
+ *   al usuario qué hacer.
  * - Reconoce si la app ya está corriendo standalone (instalada).
  */
 
@@ -19,14 +20,23 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
-function isIosSafari(): boolean {
-  if (typeof navigator === 'undefined') return false;
+export type IosBrowser = 'safari' | 'chrome' | 'firefox' | 'edge' | 'other';
+
+function detectIos(): { isIos: boolean; browser: IosBrowser } {
+  if (typeof navigator === 'undefined') return { isIos: false, browser: 'other' };
   const ua = navigator.userAgent;
-  const isIOS = /iPhone|iPad|iPod/.test(ua) && !('MSStream' in window);
-  const isSafari =
-    /Safari/.test(ua) &&
-    !/CriOS|FxiOS|EdgiOS|OPiOS|YaBrowser/.test(ua);
-  return isIOS && isSafari;
+  const isIos =
+    (/iPhone|iPad|iPod/.test(ua) ||
+      // iPadOS 13+ reports as Mac with touch support
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) &&
+    !('MSStream' in window);
+  if (!isIos) return { isIos: false, browser: 'other' };
+  let browser: IosBrowser = 'safari';
+  if (/CriOS/.test(ua)) browser = 'chrome';
+  else if (/FxiOS/.test(ua)) browser = 'firefox';
+  else if (/EdgiOS/.test(ua)) browser = 'edge';
+  else if (!/Safari/.test(ua)) browser = 'other';
+  return { isIos, browser };
 }
 
 function isStandalone(): boolean {
@@ -41,6 +51,7 @@ function isStandalone(): boolean {
 interface UseInstallPrompt {
   canInstall: boolean;
   iosNeedsManualInstall: boolean;
+  iosBrowser: IosBrowser;
   installed: boolean;
   promptInstall: () => Promise<'accepted' | 'dismissed' | 'unavailable'>;
 }
@@ -48,6 +59,7 @@ interface UseInstallPrompt {
 export function useInstallPrompt(): UseInstallPrompt {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState<boolean>(() => isStandalone());
+  const ios = detectIos();
 
   useEffect(() => {
     const onBeforeInstall = (e: Event) => {
@@ -79,7 +91,8 @@ export function useInstallPrompt(): UseInstallPrompt {
 
   return {
     canInstall: deferred !== null && !installed,
-    iosNeedsManualInstall: !installed && isIosSafari(),
+    iosNeedsManualInstall: !installed && ios.isIos,
+    iosBrowser: ios.browser,
     installed,
     promptInstall,
   };
