@@ -33,9 +33,9 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
           onClick={() => isAuthenticated ? onNavigate?.('dashboard') : undefined}
         >
           <img
-            src="/logo gym.jpeg"
+            src="/logo-centro-wellness.png"
             alt=""
-            className="w-9 h-9 rounded-lg object-cover"
+            className="w-9 h-9 rounded-lg object-contain"
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
           <div className="text-left hidden sm:block">
