@@ -29,7 +29,7 @@ export function AttendeesModal({ sessionId, title, onClose }: Props) {
         className="bg-[#1e293b] rounded-xl border border-[#334155] w-full max-w-lg max-h-[85vh] overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-[#e50914] text-white p-4 flex items-center justify-between">
+        <div className="bg-[#1f9e3f] text-white p-4 flex items-center justify-between">
           <h2 className="text-lg font-bold">Asistentes — {title}</h2>
           <button onClick={onClose} className="text-white/80 hover:text-white p-1" aria-label="Cerrar">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '../../auth/hooks/useAuth';
 import { AdminService } from '../services/adminService';
 import { UserProfile, UserRole } from '../../auth/types/auth.types';
+import { CrownIcon, AlertIcon, AccountIcon } from '../../../assets/icons/index.tsx';
 
 const AdminUsersContainer: React.FC = () => {
   const { getToken, user: currentUser } = useAuth();
@@ -63,7 +64,10 @@ const AdminUsersContainer: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">👑 Gestión de Usuarios</h1>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <span className="text-[#fdc400]"><CrownIcon size={22} /></span>
+            Gestión de Usuarios
+          </h1>
           <p className="text-gray-400 text-sm mt-1">
             {users.length} usuarios registrados
           </p>
@@ -73,13 +77,14 @@ const AdminUsersContainer: React.FC = () => {
           className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
           style={{ background: 'rgba(255,255,255,0.1)' }}
         >
-          🔄 Actualizar
+          Actualizar
         </button>
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-red-900/50 border border-red-500/50 text-red-300 text-sm">
-          ⚠️ {error}
+        <div className="p-4 rounded-lg bg-red-900/50 border border-red-500/50 text-red-300 text-sm flex items-start gap-2">
+          <span className="mt-0.5"><AlertIcon size={16} /></span>
+          <span>{error}</span>
         </div>
       )}
 
@@ -94,7 +99,7 @@ const AdminUsersContainer: React.FC = () => {
           </div>
         ) : users.length === 0 ? (
           <div className="p-8 text-center">
-            <div className="text-gray-500 text-4xl mb-3">👥</div>
+            <div className="text-gray-500 mb-3 flex justify-center"><AccountIcon size={48} /></div>
             <p className="text-gray-400">No hay usuarios registrados</p>
           </div>
         ) : (
@@ -128,10 +133,11 @@ const AdminUsersContainer: React.FC = () => {
                           style={{
                             background:
                               user.role === 'admin'
-                                ? '#e50914'
+                                ? '#fdc400'
                                 : user.role === 'instructor'
-                                  ? '#f59e0b'
+                                  ? '#1f9e3f'
                                   : '#374151',
+                            color: user.role === 'admin' ? '#0f172a' : '#ffffff',
                           }}
                         >
                           {(user.fullName ?? user.email).charAt(0).toUpperCase()}
@@ -140,7 +146,7 @@ const AdminUsersContainer: React.FC = () => {
                           <p className="text-white text-sm font-medium">
                             {user.fullName ?? <span className="text-gray-500 italic">Sin nombre</span>}
                             {isCurrentUser && (
-                              <span className="ml-2 text-xs px-1.5 py-0.5 rounded" style={{ background: '#e5091420', color: '#e50914' }}>
+                              <span className="ml-2 text-xs px-1.5 py-0.5 rounded" style={{ background: '#1f9e3f22', color: '#6ee06f' }}>
                                 Tú
                               </span>
                             )}
@@ -167,22 +173,22 @@ const AdminUsersContainer: React.FC = () => {
                         style={{
                           background:
                             user.role === 'admin'
-                              ? 'rgba(229,9,20,0.15)'
+                              ? 'rgba(253,196,0,0.15)'
                               : user.role === 'instructor'
-                                ? 'rgba(245,158,11,0.15)'
+                                ? 'rgba(31,158,63,0.15)'
                                 : 'rgba(255,255,255,0.08)',
                           border: `1px solid ${
                             user.role === 'admin'
-                              ? 'rgba(229,9,20,0.4)'
+                              ? 'rgba(253,196,0,0.4)'
                               : user.role === 'instructor'
-                                ? 'rgba(245,158,11,0.4)'
+                                ? 'rgba(64,206,66,0.4)'
                                 : 'rgba(255,255,255,0.15)'
                           }`,
                           color:
                             user.role === 'admin'
-                              ? '#f87171'
+                              ? '#fdc400'
                               : user.role === 'instructor'
-                                ? '#fbbf24'
+                                ? '#6ee06f'
                                 : '#9ca3af',
                         }}
                       >

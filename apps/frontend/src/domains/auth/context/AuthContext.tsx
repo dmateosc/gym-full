@@ -49,6 +49,8 @@ interface AuthContextType extends AuthState {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName?: string) => Promise<boolean>;
   signInWithGoogle: () => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<boolean>;
+  updatePassword: (newPassword: string) => Promise<boolean>;
   signOut: () => Promise<void>;
   clearError: () => void;
   getToken: () => string | null;
@@ -159,6 +161,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     }
   };
 
+  const requestPasswordReset = async (email: string): Promise<boolean> => {
+    dispatch({ type: 'CLEAR_ERROR' });
+    try {
+      await AuthService.requestPasswordReset(email);
+      return true;
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', payload: (err as Error).message });
+      return false;
+    }
+  };
+
+  const updatePassword = async (newPassword: string): Promise<boolean> => {
+    dispatch({ type: 'CLEAR_ERROR' });
+    try {
+      await AuthService.updatePassword(newPassword);
+      return true;
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', payload: (err as Error).message });
+      return false;
+    }
+  };
+
   const signOut = async () => {
     try {
       await AuthService.signOut();
@@ -174,7 +198,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
 
   return (
     <AuthContext.Provider
-      value={{ ...state, signIn, signUp, signInWithGoogle, signOut, clearError, getToken }}
+      value={{
+        ...state,
+        signIn,
+        signUp,
+        signInWithGoogle,
+        requestPasswordReset,
+        updatePassword,
+        signOut,
+        clearError,
+        getToken,
+      }}
     >
       {children}
     </AuthContext.Provider>

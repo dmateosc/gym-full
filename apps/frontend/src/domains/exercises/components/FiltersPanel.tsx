@@ -10,7 +10,7 @@ interface FiltersPanelProps {
 }
 
 const inputClass =
-  'w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#334155] border border-[#475569] rounded-lg text-white placeholder-[#94a3b8] focus:outline-none focus:border-[#e50914] focus:ring-2 focus:ring-[rgba(229,9,20,0.2)] transition-all duration-200 text-sm';
+  'w-full px-3 sm:px-4 py-2 sm:py-3 bg-[#334155] border border-[#475569] rounded-lg text-white placeholder-[#94a3b8] focus:outline-none focus:border-[#1f9e3f] focus:ring-2 focus:ring-[rgba(64,206,66,0.25)] transition-all duration-200 text-sm';
 
 const selectClass = `${inputClass} cursor-pointer`;
 const labelClass = 'block text-xs sm:text-sm font-medium text-[#cbd5e1] mb-2';

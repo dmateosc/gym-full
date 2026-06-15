@@ -121,7 +121,7 @@ export function MyBookingsView() {
           <button
             onClick={() => onCancel(b.bookingId)}
             disabled={busy === b.bookingId}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(229,9,20,0.15)] disabled:opacity-50 shrink-0"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(220,38,38,0.15)] disabled:opacity-50 shrink-0"
           >
             {busy === b.bookingId ? 'Cancelando…' : 'Cancelar'}
           </button>

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { EyeIcon, EyeOffIcon, AlertIcon } from '../../../assets/icons/index.tsx';
+import GoogleSignInButton from './GoogleSignInButton';
 
 interface LoginPageProps {
-  onNavigate: (page: 'register' | 'home') => void;
+  onNavigate: (page: 'register' | 'home' | 'forgot-password') => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
@@ -18,7 +19,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
   };
 
   const inputClass =
-    'w-full px-4 py-3 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#e50914] focus:ring-2 focus:ring-[rgba(229,9,20,0.2)]';
+    'w-full px-4 py-3 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#1f9e3f] focus:ring-2 focus:ring-[rgba(64,206,66,0.25)]';
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-[#0f172a]">
@@ -87,20 +88,38 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
               </div>
             </div>
 
+            <div className="flex justify-end -mt-2">
+              <button
+                type="button"
+                onClick={() => onNavigate('forgot-password')}
+                className="text-xs text-[#94a3b8] hover:text-white transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-lg font-semibold text-white transition-opacity duration-200 disabled:opacity-60 bg-[#e50914] hover:opacity-90"
+              className="w-full py-3 rounded-lg font-semibold text-white transition-opacity duration-200 disabled:opacity-60 bg-[#1f9e3f] hover:opacity-90"
             >
               {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
           </form>
 
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-[#334155]" />
+            <span className="text-[#64748b] text-xs uppercase tracking-wider">o</span>
+            <div className="flex-1 h-px bg-[#334155]" />
+          </div>
+
+          <GoogleSignInButton />
+
           <p className="text-center text-[#94a3b8] text-sm mt-6">
             ¿No tienes cuenta?{' '}
             <button
               onClick={() => onNavigate('register')}
-              className="font-semibold text-[#e50914] hover:underline"
+              className="font-semibold text-[#1f9e3f] hover:underline"
             >
               Regístrate
             </button>

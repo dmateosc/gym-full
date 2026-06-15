@@ -43,3 +43,5 @@ fix-db.js
 
 # Claude Code per-project settings (may contain secrets in allowlist)
 .claude/
+temp/
+temp/*

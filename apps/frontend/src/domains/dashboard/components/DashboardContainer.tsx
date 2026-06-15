@@ -25,7 +25,7 @@ const StatCard: React.FC<{
   value: string | number;
   subtitle?: string;
   color?: string;
-}> = ({ icon, title, value, subtitle, color = '#e50914' }) => (
+}> = ({ icon, title, value, subtitle, color = '#1f9e3f' }) => (
   <div className="rounded-xl p-5 flex items-center gap-4 bg-[#1e293b] border border-[#334155]">
     <div
       className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -88,7 +88,7 @@ const DashboardContainer: React.FC<{
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Hero de bienvenida — rojo plano */}
-      <div className="rounded-2xl p-6 sm:p-8 bg-[#e50914]">
+      <div className="rounded-2xl p-6 sm:p-8 bg-[#1f9e3f]">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl font-bold text-white flex-shrink-0 bg-white/20">
             {displayName.charAt(0).toUpperCase()}
@@ -163,9 +163,9 @@ const DashboardContainer: React.FC<{
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <button
             onClick={() => onNavigate('exercises')}
-            className="rounded-xl p-6 text-left transition-[border-color,transform] duration-200 bg-[#1e293b] border border-[#334155] hover:border-[rgba(229,9,20,0.6)] hover:-translate-y-0.5"
+            className="rounded-xl p-6 text-left transition-[border-color,transform] duration-200 bg-[#1e293b] border border-[#334155] hover:border-[rgba(64,206,66,0.6)] hover:-translate-y-0.5"
           >
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-[#fca5a5]" style={{ background: '#e5091422' }}>
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-[#6ee06f]" style={{ background: '#1f9e3f22' }}>
               <ClipboardIcon size={22} />
             </div>
             <h3 className="text-white font-semibold text-lg">Catálogo de Ejercicios</h3>
@@ -176,7 +176,7 @@ const DashboardContainer: React.FC<{
 
           <button
             onClick={() => onNavigate('routines')}
-            className="rounded-xl p-6 text-left transition-[border-color,transform] duration-200 bg-[#1e293b] border border-[#334155] hover:border-[rgba(229,9,20,0.6)] hover:-translate-y-0.5"
+            className="rounded-xl p-6 text-left transition-[border-color,transform] duration-200 bg-[#1e293b] border border-[#334155] hover:border-[rgba(64,206,66,0.6)] hover:-translate-y-0.5"
           >
             <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-[#fbbf24]" style={{ background: '#f59e0b22' }}>
               <DumbbellIcon size={22} />

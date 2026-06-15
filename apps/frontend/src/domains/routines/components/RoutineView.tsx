@@ -68,7 +68,7 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
   return (
     <div className="max-w-6xl mx-auto p-2 sm:p-3 lg:p-4">
       {/* Header de la rutina — bloque rojo plano */}
-      <div className="bg-[#e50914] rounded-xl p-4 sm:p-5 lg:p-6 mb-4 sm:mb-5 text-white">
+      <div className="bg-[#1f9e3f] rounded-xl p-4 sm:p-5 lg:p-6 mb-4 sm:mb-5 text-white">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
@@ -147,7 +147,7 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
                 return (
                   <div
                     key={routineExercise.id}
-                    className="bg-[#172033] rounded-lg p-3 border border-[#334155] hover:border-[rgba(229,9,20,0.6)] transition-colors duration-200"
+                    className="bg-[#172033] rounded-lg p-3 border border-[#334155] hover:border-[rgba(64,206,66,0.6)] transition-colors duration-200"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">

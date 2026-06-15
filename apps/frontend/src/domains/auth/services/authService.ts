@@ -40,6 +40,18 @@ export const AuthService = {
     return data;
   },
 
+  async requestPasswordReset(email: string) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${globalThis.location.origin}/?recovery=1`,
+    });
+    if (error) throw new Error(error.message);
+  },
+
+  async updatePassword(newPassword: string) {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) throw new Error(error.message);
+  },
+
   async signOut() {
     const { error } = await supabase.auth.signOut();
     _cachedToken = null;

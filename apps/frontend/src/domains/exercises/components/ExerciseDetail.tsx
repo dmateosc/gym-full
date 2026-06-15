@@ -45,7 +45,7 @@ const BackButton = ({ onBack }: { onBack: () => void }) => (
 );
 
 const ExerciseHeader = ({ exercise }: { exercise: Exercise }) => (
-  <div className="bg-[#e50914] text-white p-4 sm:p-6 md:p-8">
+  <div className="bg-[#1f9e3f] text-white p-4 sm:p-6 md:p-8">
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">{exercise.name}</h1>
