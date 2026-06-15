@@ -75,7 +75,9 @@ export class UserRoutinesUseCase {
       });
     }
 
-    return this.routineRepo.findById(routine.id) as Promise<DailyRoutineOrmEntity>;
+    return this.routineRepo.findById(
+      routine.id,
+    ) as Promise<DailyRoutineOrmEntity>;
   }
 
   /**
@@ -134,7 +136,9 @@ export class UserRoutinesUseCase {
       });
     }
 
-    return this.routineRepo.findById(clone.id) as Promise<DailyRoutineOrmEntity>;
+    return this.routineRepo.findById(
+      clone.id,
+    ) as Promise<DailyRoutineOrmEntity>;
   }
 
   async deleteMine(id: string, ownerUserId: string): Promise<void> {

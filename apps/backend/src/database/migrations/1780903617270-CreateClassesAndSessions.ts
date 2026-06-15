@@ -10,7 +10,9 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  *
  * Bookings live in a separate table introduced by the next PR.
  */
-export class CreateClassesAndSessions1780903617270 implements MigrationInterface {
+export class CreateClassesAndSessions1780903617270
+  implements MigrationInterface
+{
   name = 'CreateClassesAndSessions1780903617270';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -34,8 +36,12 @@ export class CreateClassesAndSessions1780903617270 implements MigrationInterface
         ))
       )
     `);
-    await queryRunner.query(`CREATE INDEX classes_instructor_active_idx ON classes(instructor_id, active)`);
-    await queryRunner.query(`CREATE INDEX classes_active_dow_idx       ON classes(active, day_of_week)`);
+    await queryRunner.query(
+      `CREATE INDEX classes_instructor_active_idx ON classes(instructor_id, active)`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX classes_active_dow_idx       ON classes(active, day_of_week)`,
+    );
 
     await queryRunner.query(`
       CREATE TABLE class_sessions (
@@ -50,7 +56,9 @@ export class CreateClassesAndSessions1780903617270 implements MigrationInterface
         CONSTRAINT class_sessions_unique_slot UNIQUE (class_id, scheduled_at)
       )
     `);
-    await queryRunner.query(`CREATE INDEX class_sessions_scheduled_at_idx ON class_sessions(scheduled_at)`);
+    await queryRunner.query(
+      `CREATE INDEX class_sessions_scheduled_at_idx ON class_sessions(scheduled_at)`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

@@ -61,15 +61,25 @@ export class DailyRoutineCrudUseCase {
     const updateData: Partial<DailyRoutineOrmEntity> = {
       ...(dto.name !== undefined && { name: dto.name }),
       ...(dto.description !== undefined && { description: dto.description }),
-      ...(dto.routineDate !== undefined && { routineDate: new Date(dto.routineDate) }),
+      ...(dto.routineDate !== undefined && {
+        routineDate: new Date(dto.routineDate),
+      }),
       ...(dto.intensity !== undefined && { intensity: dto.intensity }),
       ...(dto.status !== undefined && { status: dto.status }),
-      ...(dto.estimatedDurationMinutes !== undefined && { estimatedDurationMinutes: dto.estimatedDurationMinutes }),
-      ...(dto.estimatedCalories !== undefined && { estimatedCalories: dto.estimatedCalories }),
+      ...(dto.estimatedDurationMinutes !== undefined && {
+        estimatedDurationMinutes: dto.estimatedDurationMinutes,
+      }),
+      ...(dto.estimatedCalories !== undefined && {
+        estimatedCalories: dto.estimatedCalories,
+      }),
       ...(dto.goals !== undefined && { goals: dto.goals }),
       ...(dto.warmUpNotes !== undefined && { warmUpNotes: dto.warmUpNotes }),
-      ...(dto.coolDownNotes !== undefined && { coolDownNotes: dto.coolDownNotes }),
-      ...(dto.completionNotes !== undefined && { completionNotes: dto.completionNotes }),
+      ...(dto.coolDownNotes !== undefined && {
+        coolDownNotes: dto.coolDownNotes,
+      }),
+      ...(dto.completionNotes !== undefined && {
+        completionNotes: dto.completionNotes,
+      }),
     };
 
     return this.routineRepo.update(id, updateData);

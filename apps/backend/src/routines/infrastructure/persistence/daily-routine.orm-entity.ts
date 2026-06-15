@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import type { RoutineExerciseOrmEntity } from './routine-exercise.orm-entity';
 
 export enum RoutineIntensity {
   LOW = 'low',
@@ -169,7 +170,7 @@ export class DailyRoutineOrmEntity {
     cascade: true,
     eager: true,
   })
-  routineExercises: any[];
+  routineExercises: RoutineExerciseOrmEntity[];
 
   @CreateDateColumn({
     type: 'timestamp with time zone',

@@ -52,8 +52,12 @@ export class AddUserOwnedRoutines1781000000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`DROP INDEX IF EXISTS idx_daily_routines_visibility_public`);
-    await queryRunner.query(`DROP INDEX IF EXISTS idx_daily_routines_owner_user_id`);
+    await queryRunner.query(
+      `DROP INDEX IF EXISTS idx_daily_routines_visibility_public`,
+    );
+    await queryRunner.query(
+      `DROP INDEX IF EXISTS idx_daily_routines_owner_user_id`,
+    );
     await queryRunner.query(`
       ALTER TABLE daily_routines
         DROP CONSTRAINT IF EXISTS daily_routines_visibility_check

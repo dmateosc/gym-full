@@ -83,10 +83,7 @@ export class RoutinesController {
   @ApiOperation({
     summary: 'Clonar una rutina existente a mis rutinas (snapshot)',
   })
-  cloneRoutineToMine(
-    @Param('id') id: string,
-    @CurrentUser() user: JwtPayload,
-  ) {
+  cloneRoutineToMine(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.userRoutines.cloneToMine(id, user.sub);
   }
 
