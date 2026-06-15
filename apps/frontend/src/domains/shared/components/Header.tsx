@@ -11,6 +11,7 @@ import {
   RepeatIcon,
 } from '../../../assets/icons/index.tsx';
 import { NotificationsBell } from '../../notifications/components/NotificationsBell';
+import { InstallAppButton } from './InstallAppButton';
 
 interface HeaderProps {
   onNavigate?: (page: string) => void;
@@ -47,6 +48,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
         {isAuthenticated && user ? (
           <div className="flex items-center gap-2">
+            <InstallAppButton />
             <NotificationsBell />
           <div className="relative">
             <button
