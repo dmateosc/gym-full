@@ -1,0 +1,74 @@
+name: Deploy — cwsierradegata.com (production)
+
+on:
+  workflow_dispatch:
+    inputs:
+      services:
+        description: 'What to rebuild'
+        required: true
+        default: 'frontend'
+        type: choice
+        options:
+          - frontend
+          - backend
+          - both
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'main'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to cwsierradegata.com
+    runs-on: self-hosted
+    steps:
+      - name: Checkout branch
+        run: |
+          cd /opt/gym-full
+          git fetch origin
+          BRANCH="${{ inputs.branch }}"
+          git checkout "$BRANCH"
+          git pull origin "$BRANCH"
+          echo "HEAD now at:"
+          git log --oneline -1
+
+      - name: Rebuild selected services
+        run: |
+          cd /opt/stacks/gym-full
+          case "${{ inputs.services }}" in
+            frontend)
+              docker compose up --build -d frontend-prod
+              ;;
+            backend)
+              docker compose up --build -d backend
+              ;;
+            both)
+              docker compose up --build -d backend frontend-prod
+              ;;
+          esac
+
+      - name: Wait for backend health
+        if: inputs.services == 'backend' || inputs.services == 'both'
+        run: |
+          for i in $(seq 1 30); do
+            status=$(docker inspect gymapp-backend --format='{{.State.Health.Status}}' 2>/dev/null || echo "starting")
+            if [ "$status" = "healthy" ]; then
+              echo "Backend healthy"
+              exit 0
+            fi
+            echo "Waiting... ($status)"
+            sleep 10
+          done
+          echo "Health check failed — last logs:"
+          docker logs gymapp-backend --tail 30
+          exit 1
+
+      - name: Verify frontend
+        if: inputs.services == 'frontend' || inputs.services == 'both'
+        run: |
+          status=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8091/)
+          echo "frontend-prod HTTP $status"
+          [ "$status" = "200" ] || exit 1

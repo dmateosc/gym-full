@@ -1,4 +1,4 @@
-name: Deploy — gym.3dmc.lab
+name: Deploy — gym.3dmc.lab (staging)
 
 on:
   push:
