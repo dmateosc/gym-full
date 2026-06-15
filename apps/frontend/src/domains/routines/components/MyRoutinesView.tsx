@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import type { DailyRoutine } from '../types/routine';
 import { RoutineService } from '../services/routineService';
 import RoutineView from './RoutineView';
+import RoutineEditor from './RoutineEditor';
 import {
   AlertIcon,
   ClipboardIcon,
@@ -10,6 +11,7 @@ import {
 const MyRoutinesView: React.FC = () => {
   const [routines, setRoutines] = useState<DailyRoutine[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -36,6 +38,18 @@ const MyRoutinesView: React.FC = () => {
       setDeletingId(null);
     }
   };
+
+  if (editing) {
+    return (
+      <RoutineEditor
+        onCancel={() => setEditing(false)}
+        onCreated={(created) => {
+          setEditing(false);
+          setRoutines((prev) => (prev ? [created, ...prev] : [created]));
+        }}
+      />
+    );
+  }
 
   if (selectedId) {
     const selected = routines?.find((r) => r.id === selectedId);
@@ -89,16 +103,31 @@ const MyRoutinesView: React.FC = () => {
         <h3 className="text-xl font-medium text-white mb-2">
           Aún no tienes rutinas guardadas
         </h3>
-        <p className="text-[#94a3b8] max-w-md mx-auto">
+        <p className="text-[#94a3b8] max-w-md mx-auto mb-5">
           Guarda la rutina del día desde la pestaña "Hoy" o crea una propia
           desde cero.
         </p>
+        <button
+          onClick={() => setEditing(true)}
+          className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90"
+        >
+          Crear nueva rutina
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <button
+          onClick={() => setEditing(true)}
+          className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90"
+        >
+          + Crear rutina
+        </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {routines.map((r) => (
         <div
           key={r.id}
@@ -135,6 +164,7 @@ const MyRoutinesView: React.FC = () => {
           </div>
         </div>
       ))}
+      </div>
     </div>
   );
 };
