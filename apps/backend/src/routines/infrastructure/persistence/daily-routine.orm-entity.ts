@@ -21,6 +21,11 @@ export enum RoutineStatus {
   SKIPPED = 'skipped',
 }
 
+export enum RoutineVisibility {
+  PRIVATE = 'private',
+  PUBLIC = 'public',
+}
+
 @Entity('daily_routines')
 export class DailyRoutineOrmEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -35,9 +40,44 @@ export class DailyRoutineOrmEntity {
   @Column({
     type: 'date',
     name: 'routine_date',
-    comment: 'Fecha específica para la cual está programada la rutina',
+    nullable: true,
+    comment:
+      'Fecha programada (solo para rutinas del sistema). NULL en templates de usuario.',
   })
-  routineDate: Date;
+  routineDate: Date | null;
+
+  @Column({
+    type: 'uuid',
+    name: 'owner_user_id',
+    nullable: true,
+    comment: 'Dueño de la rutina. NULL = rutina del sistema (IA diaria).',
+  })
+  ownerUserId: string | null;
+
+  @Column({
+    type: 'boolean',
+    name: 'is_template',
+    default: false,
+    comment:
+      'true cuando la rutina es reutilizable y no está atada a una fecha.',
+  })
+  isTemplate: boolean;
+
+  @Column({
+    type: 'uuid',
+    name: 'cloned_from_id',
+    nullable: true,
+    comment: 'Rutina origen si esta nació clonando otra (snapshot).',
+  })
+  clonedFromId: string | null;
+
+  @Column({
+    type: 'varchar',
+    length: 16,
+    default: RoutineVisibility.PRIVATE,
+    comment: "Visibilidad: 'private' (solo el dueño) | 'public' (compartida).",
+  })
+  visibility: RoutineVisibility;
 
   @Column({
     type: 'enum',

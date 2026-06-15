@@ -46,10 +46,10 @@ export class DailyRoutineCrudUseCase {
   async update(id: string, dto: UpdateDailyRoutineDto) {
     const routine = await this.findById(id);
 
-    if (
-      dto.routineDate &&
-      dto.routineDate !== routine.routineDate.toISOString().split('T')[0]
-    ) {
+    const currentDateIso = routine.routineDate
+      ? routine.routineDate.toISOString().split('T')[0]
+      : null;
+    if (dto.routineDate && dto.routineDate !== currentDateIso) {
       const conflict = await this.routineRepo.findByDate(dto.routineDate);
       if (conflict && conflict.id !== id) {
         throw new BadRequestException(

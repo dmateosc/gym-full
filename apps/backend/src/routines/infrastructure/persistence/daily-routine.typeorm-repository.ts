@@ -95,4 +95,12 @@ export class DailyRoutineTypeormRepository
       await this.repo.remove(entity);
     }
   }
+
+  async findByOwner(ownerUserId: string): Promise<DailyRoutineOrmEntity[]> {
+    return this.repo.find({
+      where: { ownerUserId },
+      relations: ['routineExercises', 'routineExercises.exercise'],
+      order: { createdAt: 'DESC' },
+    });
+  }
 }
