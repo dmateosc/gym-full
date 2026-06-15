@@ -26,9 +26,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img
-            src="/logo gym.jpeg"
+            src="/logo-centro-wellness.png"
             alt=""
-            className="w-16 h-16 mx-auto rounded-xl object-cover mb-3"
+            className="w-16 h-16 mx-auto object-contain mb-3"
             onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
           />
           <h1 className="text-3xl font-bold text-white">Centro Wellness</h1>
