@@ -90,7 +90,7 @@ export function TodaySessionsView() {
         <SessionCard
           key={s.sessionId}
           session={s}
-          busy={busy === s.sessionId || busy === s.myBookingId}
+          busy={busy !== null && (busy === s.sessionId || busy === s.myBookingId)}
           onBook={() => onBook(s)}
           onCancel={() => s.myBookingId && onCancel(s.myBookingId)}
         />
