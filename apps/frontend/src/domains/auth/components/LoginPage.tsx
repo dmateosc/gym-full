@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { EyeIcon, EyeOffIcon, AlertIcon } from '../../../assets/icons/index.tsx';
+import GoogleSignInButton from './GoogleSignInButton';
 
 interface LoginPageProps {
-  onNavigate: (page: 'register' | 'home') => void;
+  onNavigate: (page: 'register' | 'home' | 'forgot-password') => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
@@ -87,6 +88,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
               </div>
             </div>
 
+            <div className="flex justify-end -mt-2">
+              <button
+                type="button"
+                onClick={() => onNavigate('forgot-password')}
+                className="text-xs text-[#94a3b8] hover:text-white transition-colors"
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
+
             <button
               type="submit"
               disabled={isLoading}
@@ -95,6 +106,14 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
               {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
           </form>
+
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-[#334155]" />
+            <span className="text-[#64748b] text-xs uppercase tracking-wider">o</span>
+            <div className="flex-1 h-px bg-[#334155]" />
+          </div>
+
+          <GoogleSignInButton />
 
           <p className="text-center text-[#94a3b8] text-sm mt-6">
             ¿No tienes cuenta?{' '}

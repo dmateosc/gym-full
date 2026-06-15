@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { AlertIcon, CheckIcon } from '../../../assets/icons/index.tsx';
+import GoogleSignInButton from './GoogleSignInButton';
 
 interface RegisterPageProps {
   onNavigate: (page: 'login') => void;
@@ -151,6 +152,14 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
               {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
             </button>
           </form>
+
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-[#334155]" />
+            <span className="text-[#64748b] text-xs uppercase tracking-wider">o</span>
+            <div className="flex-1 h-px bg-[#334155]" />
+          </div>
+
+          <GoogleSignInButton label="Continuar con Google" />
 
           <p className="text-center text-[#94a3b8] text-sm mt-6">
             ¿Ya tienes cuenta?{' '}

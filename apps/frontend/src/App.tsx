@@ -5,7 +5,15 @@ import {
   APP_CONFIG,
   AppProvider,
 } from './domains';
-import { AuthProvider, useAuth, LoginPage, RegisterPage } from './domains/auth';
+import {
+  AuthProvider,
+  useAuth,
+  LoginPage,
+  RegisterPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+} from './domains/auth';
+import { supabase } from './domains/auth/services/supabase';
 import DashboardContainer from './domains/dashboard/components/DashboardContainer';
 import AdminUsersContainer from './domains/admin/components/AdminUsersContainer';
 import Header from './domains/shared/components/Header';
@@ -23,26 +31,57 @@ import {
 type Page =
   | 'login'
   | 'register'
+  | 'forgot-password'
+  | 'reset-password'
   | 'dashboard'
   | 'exercises'
   | 'routines'
   | 'classes'
   | 'admin';
 
+const AUTH_PAGES: ReadonlySet<Page> = new Set([
+  'login',
+  'register',
+  'forgot-password',
+  'reset-password',
+]);
+
 // ─── Contenido principal (requiere auth) ─────────────────────────────────────
 
 function AppContent() {
   const { isAuthenticated, isLoading, isAdmin } = useAuth();
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
+  const [recoveryMode, setRecoveryMode] = useState(false);
+
+  // Detectar enlace de recuperación de contraseña.
+  // Supabase dispara PASSWORD_RECOVERY al cargar la sesión desde el hash
+  // de recuperación; mantenemos al usuario en reset-password hasta que
+  // termine el flujo.
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          setRecoveryMode(true);
+          setCurrentPage('reset-password');
+        }
+      },
+    );
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Redirigir a login si no está autenticado
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && currentPage !== 'register') {
+    if (recoveryMode) return;
+    if (!isLoading && !isAuthenticated && !AUTH_PAGES.has(currentPage)) {
       setCurrentPage('login');
-    } else if (!isLoading && isAuthenticated && (currentPage === 'login' || currentPage === 'register')) {
+    } else if (
+      !isLoading &&
+      isAuthenticated &&
+      (currentPage === 'login' || currentPage === 'register' || currentPage === 'forgot-password')
+    ) {
       setCurrentPage('dashboard');
     }
-  }, [isAuthenticated, isLoading, currentPage]);
+  }, [isAuthenticated, isLoading, currentPage, recoveryMode]);
 
   const navigate = (page: string) => {
     // Proteger la ruta admin
@@ -63,17 +102,30 @@ function AppContent() {
   }
 
   // Páginas de auth (sin header ni navegación)
-  if (currentPage === 'login' || (!isAuthenticated && currentPage !== 'register')) {
+  if (currentPage === 'reset-password') {
     return (
-      <LoginPage
-        onNavigate={(page) => setCurrentPage(page === 'home' ? 'dashboard' : page)}
+      <ResetPasswordPage
+        onDone={() => {
+          setRecoveryMode(false);
+          setCurrentPage(isAuthenticated ? 'dashboard' : 'login');
+        }}
       />
     );
   }
 
+  if (currentPage === 'forgot-password') {
+    return <ForgotPasswordPage onNavigate={(page) => setCurrentPage(page)} />;
+  }
+
   if (currentPage === 'register') {
+    return <RegisterPage onNavigate={(page) => setCurrentPage(page)} />;
+  }
+
+  if (currentPage === 'login' || !isAuthenticated) {
     return (
-      <RegisterPage onNavigate={(page) => setCurrentPage(page)} />
+      <LoginPage
+        onNavigate={(page) => setCurrentPage(page === 'home' ? 'dashboard' : page)}
+      />
     );
   }
 
