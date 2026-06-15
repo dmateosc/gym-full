@@ -18,6 +18,8 @@ export abstract class DailyRoutineRepositoryPort {
     data: Partial<DailyRoutineOrmEntity>,
   ): Promise<DailyRoutineOrmEntity>;
   abstract delete(id: string): Promise<void>;
+  abstract findByOwner(ownerUserId: string): Promise<DailyRoutineOrmEntity[]>;
+  abstract findPublic(): Promise<DailyRoutineOrmEntity[]>;
 }
 
 export const DAILY_ROUTINE_REPOSITORY = Symbol('DAILY_ROUTINE_REPOSITORY');

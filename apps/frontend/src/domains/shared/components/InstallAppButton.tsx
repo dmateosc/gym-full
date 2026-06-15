@@ -58,28 +58,41 @@ export function InstallAppButton() {
       {showIosHelp && (
         <>
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-[60] bg-black/60"
             onClick={() => setShowIosHelp(false)}
           />
-          <div className="absolute right-0 top-full mt-2 w-72 rounded-xl shadow-2xl z-20 bg-[#161e2e] border border-white/10 p-4">
-            <p className="text-white text-sm font-semibold mb-2">
-              {iosBrowser === 'chrome'
-                ? 'Cómo instalar desde Chrome (iPhone)'
-                : iosBrowser === 'firefox'
-                  ? 'Cómo instalar desde Firefox (iPhone)'
-                  : iosBrowser === 'edge'
-                    ? 'Cómo instalar desde Edge (iPhone)'
-                    : 'Cómo instalar en iPhone'}
-            </p>
+          <div className="fixed left-3 right-3 top-20 sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80 rounded-xl shadow-2xl z-[70] bg-[#161e2e] border border-white/10 p-4">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <p className="text-white text-sm font-semibold">
+                {iosBrowser === 'chrome'
+                  ? 'Instalar desde Chrome (iPhone)'
+                  : iosBrowser === 'firefox'
+                    ? 'Instalar desde Firefox (iPhone)'
+                    : iosBrowser === 'edge'
+                      ? 'Instalar desde Edge (iPhone)'
+                      : 'Instalar en iPhone'}
+              </p>
+              <button
+                onClick={() => setShowIosHelp(false)}
+                aria-label="Cerrar"
+                className="text-[#94a3b8] hover:text-white text-base leading-none"
+              >
+                ✕
+              </button>
+            </div>
             <ol className="text-[#cbd5e1] text-xs space-y-2 list-decimal list-inside">
               {iosBrowser === 'chrome' ? (
                 <>
                   <li>
-                    Toca el menú <span className="font-semibold">⋯</span> (tres
-                    puntos) abajo a la derecha.
+                    Toca el botón{' '}
+                    <span className="font-semibold">Compartir</span> arriba
+                    a la derecha de la barra de direcciones (icono cuadrado
+                    con flecha hacia arriba). Si no lo ves, abre el menú{' '}
+                    <span className="font-semibold">⋯</span> y elige
+                    «Compartir».
                   </li>
                   <li>
-                    Pulsa{' '}
+                    Desplázate y pulsa{' '}
                     <span className="font-semibold">
                       «Añadir a pantalla de inicio»
                     </span>
@@ -94,8 +107,8 @@ export function InstallAppButton() {
                     puntos).
                   </li>
                   <li>
-                    Busca{' '}
-                    <span className="font-semibold">«Compartir»</span> y luego{' '}
+                    Busca <span className="font-semibold">«Compartir»</span>{' '}
+                    y luego{' '}
                     <span className="font-semibold">
                       «Añadir a pantalla de inicio»
                     </span>

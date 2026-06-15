@@ -5,6 +5,7 @@ import { DailyRoutineRepositoryPort } from '../../domain/repositories/daily-rout
 import {
   DailyRoutineOrmEntity,
   RoutineStatus,
+  RoutineVisibility,
 } from './daily-routine.orm-entity';
 
 @Injectable()
@@ -94,5 +95,21 @@ export class DailyRoutineTypeormRepository
     if (entity) {
       await this.repo.remove(entity);
     }
+  }
+
+  async findByOwner(ownerUserId: string): Promise<DailyRoutineOrmEntity[]> {
+    return this.repo.find({
+      where: { ownerUserId },
+      relations: ['routineExercises', 'routineExercises.exercise'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async findPublic(): Promise<DailyRoutineOrmEntity[]> {
+    return this.repo.find({
+      where: { visibility: RoutineVisibility.PUBLIC, isTemplate: true },
+      relations: ['routineExercises', 'routineExercises.exercise'],
+      order: { createdAt: 'DESC' },
+    });
   }
 }

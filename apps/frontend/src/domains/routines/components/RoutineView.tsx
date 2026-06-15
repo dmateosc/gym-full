@@ -9,6 +9,8 @@ import { FlameIcon, SnowflakeIcon, AlertIcon } from '../../../assets/icons/index
 
 interface RoutineViewProps {
   routine: DailyRoutine;
+  onSaveAsMine?: (routine: DailyRoutine) => Promise<void> | void;
+  savingAsMine?: boolean;
 }
 
 const CATEGORY_TINTS: Record<string, { solid: string; text: string }> = {
@@ -37,7 +39,7 @@ const FlatTag = ({ tint, children }: { tint: { solid: string; text: string }; ch
   </span>
 );
 
-const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
+const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, savingAsMine }) => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingExercise, setIsLoadingExercise] = useState(false);
@@ -97,9 +99,21 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine }) => {
             </div>
           </div>
 
-          <div className="text-center sm:text-right">
-            <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.totalExercises}</div>
-            <div className="text-[#fecaca] text-xs sm:text-sm">ejercicios</div>
+          <div className="flex flex-col items-center sm:items-end gap-3">
+            <div className="text-center sm:text-right">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.totalExercises}</div>
+              <div className="text-[#fecaca] text-xs sm:text-sm">ejercicios</div>
+            </div>
+            {onSaveAsMine && (
+              <button
+                type="button"
+                onClick={() => void onSaveAsMine(routine)}
+                disabled={savingAsMine}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 transition-colors disabled:opacity-60 whitespace-nowrap"
+              >
+                {savingAsMine ? 'Guardando…' : 'Guardar en mis rutinas'}
+              </button>
+            )}
           </div>
         </div>
       </div>

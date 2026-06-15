@@ -12,6 +12,7 @@ import { DailyRoutineQueriesUseCase } from './application/use-cases/daily-routin
 import { DailyRoutineLifecycleUseCase } from './application/use-cases/daily-routine-lifecycle.use-case';
 import { RoutineExerciseManagementUseCase } from './application/use-cases/routine-exercise-management.use-case';
 import { RoutineStatsUseCase } from './application/use-cases/routine-stats.use-case';
+import { UserRoutinesUseCase } from './application/use-cases/user-routines.use-case';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { RoutineStatsUseCase } from './application/use-cases/routine-stats.use-c
     DailyRoutineLifecycleUseCase,
     RoutineExerciseManagementUseCase,
     RoutineStatsUseCase,
+    UserRoutinesUseCase,
   ],
 })
 export class RoutinesModule {}

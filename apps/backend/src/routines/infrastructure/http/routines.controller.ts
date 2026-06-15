@@ -23,6 +23,8 @@ import { CreateDailyRoutineDto } from './dto/create-daily-routine.dto';
 import { UpdateDailyRoutineDto } from './dto/update-daily-routine.dto';
 import { CreateRoutineExerciseDto } from './dto/create-routine-exercise.dto';
 import { UpdateRoutineExerciseDto } from './dto/update-routine-exercise.dto';
+import { CreateUserRoutineDto } from './dto/create-user-routine.dto';
+import { UpdateUserRoutineDto } from './dto/update-user-routine.dto';
 import {
   JwtAuthGuard,
   Public,
@@ -37,6 +39,9 @@ import { DailyRoutineQueriesUseCase } from '../../application/use-cases/daily-ro
 import { DailyRoutineLifecycleUseCase } from '../../application/use-cases/daily-routine-lifecycle.use-case';
 import { RoutineExerciseManagementUseCase } from '../../application/use-cases/routine-exercise-management.use-case';
 import { RoutineStatsUseCase } from '../../application/use-cases/routine-stats.use-case';
+import { UserRoutinesUseCase } from '../../application/use-cases/user-routines.use-case';
+import { CurrentUser } from '../../../auth/application/decorators/current-user.decorator';
+import { JwtPayload } from '../../../shared/infrastructure/jwt/jwt-verifier';
 
 @ApiTags('routines')
 @ApiBearerAuth()
@@ -49,7 +54,62 @@ export class RoutinesController {
     private readonly lifecycleUseCase: DailyRoutineLifecycleUseCase,
     private readonly exerciseMgmtUseCase: RoutineExerciseManagementUseCase,
     private readonly statsUseCase: RoutineStatsUseCase,
+    private readonly userRoutines: UserRoutinesUseCase,
   ) {}
+
+  // Endpoints para rutinas propias del usuario (templates).
+  @Get('mine')
+  @ApiOperation({ summary: 'Listar mis rutinas guardadas' })
+  listMyRoutines(@CurrentUser() user: JwtPayload) {
+    return this.userRoutines.listMine(user.sub);
+  }
+
+  @Get('mine/:id')
+  getMyRoutine(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.userRoutines.getMine(id, user.sub);
+  }
+
+  @Post('mine')
+  @ApiOperation({ summary: 'Crear rutina propia (template)' })
+  @ApiBody({ type: CreateUserRoutineDto })
+  createMyRoutine(
+    @Body() dto: CreateUserRoutineDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.userRoutines.createMine(user.sub, dto);
+  }
+
+  @Post(':id/clone')
+  @ApiOperation({
+    summary: 'Clonar una rutina existente a mis rutinas (snapshot)',
+  })
+  cloneRoutineToMine(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.userRoutines.cloneToMine(id, user.sub);
+  }
+
+  @Delete('mine/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  deleteMyRoutine(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
+    return this.userRoutines.deleteMine(id, user.sub);
+  }
+
+  @Patch('mine/:id')
+  @ApiOperation({
+    summary: 'Actualizar mi rutina (metadatos y/o ejercicios)',
+  })
+  updateMyRoutine(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserRoutineDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.userRoutines.updateMine(id, user.sub, dto);
+  }
+
+  @Get('public')
+  @ApiOperation({ summary: 'Listar rutinas públicas (biblioteca)' })
+  listPublicRoutines() {
+    return this.userRoutines.listPublic();
+  }
 
   // Endpoints para DailyRoutine
   @Post('daily')
