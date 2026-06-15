@@ -4,6 +4,7 @@ import { useExercisesWithCache } from '../../shared';
 import FiltersPanel from './FiltersPanel';
 import ExerciseList from './ExerciseList';
 import ExerciseDetail from './ExerciseDetail';
+import { AlertIcon } from '../../../assets/icons/index.tsx';
 
 /**
  * Container Component para el dominio de Exercises
@@ -30,7 +31,7 @@ const ExercisesContainer: React.FC = () => {
   if (error) {
     return (
       <div className="text-center p-8">
-        <div className="text-red-500 text-4xl mb-4">⚠️</div>
+        <div className="text-red-500 mb-4 flex justify-center"><AlertIcon size={40} /></div>
         <h3 className="text-xl font-semibold text-white mb-2">Error al cargar ejercicios</h3>
         <p className="text-gray-400">{error}</p>
       </div>

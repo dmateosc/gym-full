@@ -22,7 +22,7 @@ interface Props {
 }
 
 const inputClass =
-  'w-full px-3 py-2 bg-[#334155] border border-[#475569] rounded-lg text-white placeholder-[#94a3b8] focus:outline-none focus:border-[#e50914] focus:ring-2 focus:ring-[rgba(229,9,20,0.2)] text-sm';
+  'w-full px-3 py-2 bg-[#334155] border border-[#475569] rounded-lg text-white placeholder-[#94a3b8] focus:outline-none focus:border-[#1f9e3f] focus:ring-2 focus:ring-[rgba(64,206,66,0.25)] text-sm';
 
 const labelClass = 'block text-xs font-medium text-[#cbd5e1] mb-1.5';
 
@@ -114,7 +114,7 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
         className="bg-[#1e293b] rounded-xl border border-[#334155] w-full max-w-lg max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-[#e50914] text-white p-4 flex items-center justify-between">
+        <div className="bg-[#1f9e3f] text-white p-4 flex items-center justify-between">
           <h2 className="text-lg font-bold">{initial ? 'Editar clase' : 'Nueva clase'}</h2>
           <button onClick={onClose} className="text-white/80 hover:text-white p-1" aria-label="Cerrar">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,7 +202,7 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
             <button
               type="submit"
               disabled={busy}
-              className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#e50914] hover:opacity-90 disabled:opacity-60"
+              className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90 disabled:opacity-60"
             >
               {busy ? 'Guardando…' : initial ? 'Guardar' : 'Crear'}
             </button>

@@ -97,7 +97,7 @@ export function MyClassesView() {
         <h2 className="text-xl sm:text-2xl font-bold text-white">Mis clases</h2>
         <button
           onClick={() => setModal({ open: true, editing: null })}
-          className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#e50914] hover:opacity-90"
+          className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90"
         >
           + Nueva clase
         </button>
@@ -120,7 +120,7 @@ export function MyClassesView() {
           <p className="text-[#94a3b8] mb-3">Aún no has creado ninguna clase.</p>
           <button
             onClick={() => setModal({ open: true, editing: null })}
-            className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#e50914] hover:opacity-90"
+            className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90"
           >
             Crear la primera
           </button>
@@ -178,7 +178,7 @@ export function MyClassesView() {
                   {c.active ? (
                     <button
                       onClick={() => handleDelete(c)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(229,9,20,0.15)]"
+                      className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(220,38,38,0.15)]"
                     >
                       Desactivar
                     </button>

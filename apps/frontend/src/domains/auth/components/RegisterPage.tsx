@@ -7,7 +7,7 @@ interface RegisterPageProps {
 }
 
 const inputClass =
-  'w-full px-4 py-3 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#e50914] focus:ring-2 focus:ring-[rgba(229,9,20,0.2)]';
+  'w-full px-4 py-3 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#1f9e3f] focus:ring-2 focus:ring-[rgba(64,206,66,0.25)]';
 
 const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
   const { signUp, isLoading, error } = useAuth();
@@ -51,7 +51,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
           </p>
           <button
             onClick={() => onNavigate('login')}
-            className="px-6 py-3 rounded-lg font-semibold text-white bg-[#e50914] hover:opacity-90 transition-opacity"
+            className="px-6 py-3 rounded-lg font-semibold text-white bg-[#1f9e3f] hover:opacity-90 transition-opacity"
           >
             Volver al login
           </button>
@@ -146,7 +146,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-lg font-semibold text-white transition-opacity duration-200 mt-2 disabled:opacity-60 bg-[#e50914] hover:opacity-90"
+              className="w-full py-3 rounded-lg font-semibold text-white transition-opacity duration-200 mt-2 disabled:opacity-60 bg-[#1f9e3f] hover:opacity-90"
             >
               {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
             </button>
@@ -156,7 +156,7 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
             ¿Ya tienes cuenta?{' '}
             <button
               onClick={() => onNavigate('login')}
-              className="font-semibold text-[#e50914] hover:underline"
+              className="font-semibold text-[#1f9e3f] hover:underline"
             >
               Inicia sesión
             </button>

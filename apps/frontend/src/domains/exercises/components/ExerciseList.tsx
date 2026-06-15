@@ -125,7 +125,7 @@ const ExerciseCard = ({
 }) => (
   <div
     onClick={() => onSelect(exercise)}
-    className="group bg-[#1e293b] rounded-xl border border-[#334155] hover:border-[rgba(229,9,20,0.6)] hover:-translate-y-0.5 transition-[border-color,transform] duration-200 cursor-pointer overflow-hidden"
+    className="group bg-[#1e293b] rounded-xl border border-[#334155] hover:border-[rgba(64,206,66,0.6)] hover:-translate-y-0.5 transition-[border-color,transform] duration-200 cursor-pointer overflow-hidden"
   >
     <div className="p-4 sm:p-6">
       <div className="flex items-start justify-between mb-2 sm:mb-3">

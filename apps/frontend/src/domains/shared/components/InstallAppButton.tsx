@@ -35,7 +35,7 @@ export function InstallAppButton() {
     <div className="relative">
       <button
         onClick={handleClick}
-        className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#e50914] hover:opacity-90 transition-opacity"
+        className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#1f9e3f] hover:opacity-90 transition-opacity"
         aria-label="Instalar la app"
       >
         <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
@@ -47,7 +47,7 @@ export function InstallAppButton() {
       {/* Versión compacta para móvil — solo icono */}
       <button
         onClick={handleClick}
-        className="sm:hidden flex items-center justify-center w-9 h-9 rounded-lg text-white bg-[#e50914] hover:opacity-90"
+        className="sm:hidden flex items-center justify-center w-9 h-9 rounded-lg text-white bg-[#1f9e3f] hover:opacity-90"
         aria-label="Instalar la app"
       >
         <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor">

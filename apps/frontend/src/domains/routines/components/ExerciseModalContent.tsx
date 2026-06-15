@@ -108,7 +108,7 @@ const CloseButton = ({ onClose }: { onClose: () => void }) => (
 );
 
 const ExerciseHeader = ({ exercise }: { exercise: Exercise }) => (
-  <div className="bg-[#e50914] text-white p-4 sm:p-6">
+  <div className="bg-[#1f9e3f] text-white p-4 sm:p-6">
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       <div className="pr-8">
         <h2 className="text-xl sm:text-2xl font-bold mb-2">{exercise.name}</h2>

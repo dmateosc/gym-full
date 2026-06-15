@@ -55,7 +55,7 @@ function AppContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0f172a]">
         <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-4 rounded-full border-2 border-[#334155] border-t-[#e50914] animate-spin" />
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full border-2 border-[#334155] border-t-[#1f9e3f] animate-spin" />
           <p className="text-[#94a3b8] text-sm">Cargando...</p>
         </div>
       </div>
@@ -129,7 +129,7 @@ function AppContent() {
                   <button
                     key={id}
                     onClick={() => navigate(id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive ? 'bg-[#e50914] text-white' : 'bg-transparent text-[#94a3b8] hover:text-white hover:bg-white/5'}`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${isActive ? 'bg-[#1f9e3f] text-white' : 'bg-transparent text-[#94a3b8] hover:text-white hover:bg-white/5'}`}
                   >
                     <Icon size={18} />
                     <span>{label}</span>

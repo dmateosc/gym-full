@@ -56,8 +56,11 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
               className={`flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors ${menuOpen ? 'bg-white/10' : 'hover:bg-white/5'}`}
             >
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-white flex-shrink-0"
-                style={{ background: isAdmin ? '#e50914' : '#475569' }}
+                className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0"
+                style={{
+                  background: isAdmin ? '#fdc400' : '#475569',
+                  color: isAdmin ? '#0f172a' : '#ffffff',
+                }}
               >
                 {displayName.charAt(0).toUpperCase()}
               </div>

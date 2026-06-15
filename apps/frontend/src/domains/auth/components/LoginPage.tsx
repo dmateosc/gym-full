@@ -18,7 +18,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
   };
 
   const inputClass =
-    'w-full px-4 py-3 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#e50914] focus:ring-2 focus:ring-[rgba(229,9,20,0.2)]';
+    'w-full px-4 py-3 rounded-lg text-white placeholder-[#64748b] outline-none transition-colors bg-[#334155] border border-[#475569] focus:border-[#1f9e3f] focus:ring-2 focus:ring-[rgba(64,206,66,0.25)]';
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-[#0f172a]">
@@ -90,7 +90,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-lg font-semibold text-white transition-opacity duration-200 disabled:opacity-60 bg-[#e50914] hover:opacity-90"
+              className="w-full py-3 rounded-lg font-semibold text-white transition-opacity duration-200 disabled:opacity-60 bg-[#1f9e3f] hover:opacity-90"
             >
               {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
@@ -100,7 +100,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onNavigate }) => {
             ¿No tienes cuenta?{' '}
             <button
               onClick={() => onNavigate('register')}
-              className="font-semibold text-[#e50914] hover:underline"
+              className="font-semibold text-[#1f9e3f] hover:underline"
             >
               Regístrate
             </button>

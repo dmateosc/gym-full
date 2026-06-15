@@ -120,7 +120,7 @@ function SessionCard({
       className={`bg-[#1e293b] rounded-xl border p-5 transition-colors ${
         cancelled
           ? 'border-[#334155] opacity-60'
-          : 'border-[#334155] hover:border-[rgba(229,9,20,0.6)]'
+          : 'border-[#334155] hover:border-[rgba(64,206,66,0.6)]'
       }`}
     >
       <div className="flex items-start justify-between mb-3">
@@ -162,7 +162,7 @@ function SessionCard({
           <button
             onClick={onCancel}
             disabled={busy}
-            className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(229,9,20,0.15)] disabled:opacity-50"
+            className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#fca5a5] hover:bg-[rgba(220,38,38,0.15)] disabled:opacity-50"
           >
             {busy ? 'Cancelando…' : 'Cancelar reserva'}
           </button>
@@ -173,7 +173,7 @@ function SessionCard({
         <button
           onClick={onBook}
           disabled={busy}
-          className="w-full px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#e50914] hover:opacity-90 disabled:opacity-60"
+          className="w-full px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#1f9e3f] hover:opacity-90 disabled:opacity-60"
         >
           {busy
             ? 'Reservando…'

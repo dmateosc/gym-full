@@ -34,7 +34,7 @@ export default function ClassesContainer() {
                 onClick={() => setTab(id)}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   active
-                    ? 'border-[#e50914] text-white'
+                    ? 'border-[#1f9e3f] text-white'
                     : 'border-transparent text-[#94a3b8] hover:text-white'
                 }`}
               >
