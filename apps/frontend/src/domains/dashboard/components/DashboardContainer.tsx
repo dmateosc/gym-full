@@ -6,7 +6,6 @@ import {
   DumbbellIcon,
   ClipboardIcon,
   CrownIcon,
-  AccountIcon,
   FlameIcon,
   PulseIcon,
 } from '../../../assets/icons/index.tsx';
@@ -98,14 +97,12 @@ const DashboardContainer: React.FC<{
             <h1 className="text-2xl font-bold text-white">
               {greeting}, {displayName}
             </h1>
-            <p className="text-[#fecaca] text-sm mt-1 flex items-center gap-1.5 flex-wrap">
-              <span className="inline-flex items-center gap-1">
-                {isAdmin ? <CrownIcon size={14} /> : <AccountIcon size={14} />}
-                {isAdmin ? 'Administrador' : 'Usuario registrado'}
-              </span>
-              <span>·</span>
-              <span>{user?.email}</span>
-            </p>
+            {isAdmin && (
+              <p className="text-[#fecaca] text-sm mt-1 inline-flex items-center gap-1">
+                <CrownIcon size={14} />
+                Administrador
+              </p>
+            )}
           </div>
         </div>
       </div>
