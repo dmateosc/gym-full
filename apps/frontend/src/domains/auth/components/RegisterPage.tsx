@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { AlertIcon, CheckIcon } from '../../../assets/icons/index.tsx';
 import GoogleSignInButton from './GoogleSignInButton';
+import PrivacyNotice from './PrivacyNotice';
 
 interface RegisterPageProps {
   onNavigate: (page: 'login') => void;
@@ -170,6 +171,8 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ onNavigate }) => {
               Inicia sesión
             </button>
           </p>
+
+          <PrivacyNotice />
         </div>
       </div>
     </div>

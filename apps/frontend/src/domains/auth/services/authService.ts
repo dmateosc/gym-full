@@ -52,6 +52,17 @@ export const AuthService = {
     if (error) throw new Error(error.message);
   },
 
+  async deleteMyAccount(token: string): Promise<void> {
+    const res = await fetch(`${BACKEND_URL}/users/me`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok && res.status !== 204) {
+      const body = (await res.json().catch(() => null)) as { message?: string } | null;
+      throw new Error(body?.message ?? `HTTP ${res.status}`);
+    }
+  },
+
   async signOut() {
     const { error } = await supabase.auth.signOut();
     _cachedToken = null;

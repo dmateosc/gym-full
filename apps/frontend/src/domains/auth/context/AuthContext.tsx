@@ -51,6 +51,7 @@ interface AuthContextType extends AuthState {
   signInWithGoogle: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<boolean>;
   updatePassword: (newPassword: string) => Promise<boolean>;
+  deleteMyAccount: () => Promise<boolean>;
   signOut: () => Promise<void>;
   clearError: () => void;
   getToken: () => string | null;
@@ -183,6 +184,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
     }
   };
 
+  const deleteMyAccount = async (): Promise<boolean> => {
+    dispatch({ type: 'CLEAR_ERROR' });
+    try {
+      const token = AuthService.getToken();
+      if (!token) throw new Error('No hay sesión activa.');
+      await AuthService.deleteMyAccount(token);
+      await AuthService.signOut();
+      dispatch({ type: 'SET_USER', payload: null });
+      return true;
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', payload: (err as Error).message });
+      return false;
+    }
+  };
+
   const signOut = async () => {
     try {
       await AuthService.signOut();
@@ -205,6 +221,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }: { 
         signInWithGoogle,
         requestPasswordReset,
         updatePassword,
+        deleteMyAccount,
         signOut,
         clearError,
         getToken,

@@ -110,7 +110,7 @@ const RoutineDateSelector: React.FC<RoutineDateSelectorProps> = ({
   return (
     <div className="bg-gray-800 rounded-lg p-3 sm:p-4 lg:p-6 mb-4 sm:mb-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Seleccionar fecha de rutina</h3>
           <p className="text-gray-400 text-xs sm:text-sm">Elige el día para ver la rutina correspondiente</p>
         </div>

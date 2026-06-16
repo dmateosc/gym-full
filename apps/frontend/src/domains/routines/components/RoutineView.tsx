@@ -72,14 +72,20 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, saving
       {/* Header de la rutina — bloque rojo plano */}
       <div className="bg-[#1f9e3f] rounded-xl p-4 sm:p-5 lg:p-6 mb-4 sm:mb-5 text-white">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold">{routine.name}</h1>
-              <span className="text-[#fecaca] text-sm lg:text-base">• {formattedDate}</span>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:flex-wrap gap-1 sm:gap-2 mb-2">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold break-words">
+                {routine.name}
+              </h1>
+              <span className="text-[#dcfce7] text-sm lg:text-base">
+                · {formattedDate}
+              </span>
             </div>
 
             {routine.description && (
-              <p className="text-[#fecaca] text-sm lg:text-base mb-3">{routine.description}</p>
+              <p className="text-[#dcfce7] text-sm lg:text-base mb-3 break-words">
+                {routine.description}
+              </p>
             )}
 
             <div className="flex flex-wrap gap-2">
@@ -102,7 +108,7 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, saving
           <div className="flex flex-col items-center sm:items-end gap-3">
             <div className="text-center sm:text-right">
               <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.totalExercises}</div>
-              <div className="text-[#fecaca] text-xs sm:text-sm">ejercicios</div>
+              <div className="text-[#dcfce7] text-xs sm:text-sm">ejercicios</div>
             </div>
             {onSaveAsMine && (
               <button
@@ -141,7 +147,12 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, saving
           <h3 className="text-base sm:text-lg font-semibold text-white mb-3">Grupos musculares trabajados</h3>
           <div className="flex flex-wrap gap-2">
             {stats.muscleGroups.map((muscle, index) => (
-              <FlatTag key={index} tint={{ solid: '#dc2626', text: '#f87171' }}>{muscle}</FlatTag>
+              <span
+                key={index}
+                className="px-2 py-1 rounded-md text-xs font-medium bg-[#334155] border border-[#475569] text-[#cbd5e1]"
+              >
+                {muscle}
+              </span>
             ))}
           </div>
         </div>
@@ -164,15 +175,15 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, saving
                     className="bg-[#172033] rounded-lg p-3 border border-[#334155] hover:border-[rgba(64,206,66,0.6)] transition-colors duration-200"
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="bg-[#f59e0b] text-[#0f172a] text-xs font-bold px-2 py-1 rounded">
+                          <span className="bg-[#fdc400] text-[#0f172a] text-xs font-bold px-2 py-1 rounded flex-shrink-0">
                             {routineExercise.orderInRoutine}
                           </span>
                           <button
                             onClick={() => handleExerciseClick(routineExercise.exercise.id)}
                             disabled={isLoadingExercise}
-                            className="text-left flex-1 group"
+                            className="text-left flex-1 min-w-0 group"
                           >
                             <h4 className="text-sm sm:text-base font-semibold text-white line-clamp-2 group-hover:text-[#fca5a5] transition-colors duration-200 cursor-pointer">
                               {routineExercise.exercise.name}
