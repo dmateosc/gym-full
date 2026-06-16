@@ -185,7 +185,7 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, saving
                             disabled={isLoadingExercise}
                             className="text-left flex-1 min-w-0 group"
                           >
-                            <h4 className="text-sm sm:text-base font-semibold text-white line-clamp-2 group-hover:text-[#fca5a5] transition-colors duration-200 cursor-pointer">
+                            <h4 className="text-sm sm:text-base font-semibold text-white line-clamp-2 break-words group-hover:text-[#fca5a5] transition-colors duration-200 cursor-pointer">
                               {routineExercise.exercise.name}
                               {isLoadingExercise ? (
                                 <span className="ml-2 text-xs text-[#94a3b8]">Cargando...</span>
@@ -197,7 +197,7 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, saving
                         </div>
 
                         {routineExercise.exercise.description && (
-                          <p className="text-[#cbd5e1] text-xs mb-2 line-clamp-2">
+                          <p className="text-[#cbd5e1] text-xs mb-2 line-clamp-2 break-words">
                             {routineExercise.exercise.description}
                           </p>
                         )}

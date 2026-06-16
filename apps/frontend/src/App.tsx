@@ -172,7 +172,10 @@ function AppContent() {
         <Header onNavigate={navigate} />
 
         {/* Navegación por tabs */}
-        <div className="sticky top-16 z-40 w-full bg-[#0d1422] border-b border-white/[0.06]">
+        <div
+          className="sticky z-40 w-full bg-[#0d1422] border-b border-white/[0.06]"
+          style={{ top: 'calc(4rem + env(safe-area-inset-top))' }}
+        >
           <div className="container mx-auto px-4">
             <nav className="flex gap-1 py-2 overflow-x-auto">
               {navigationTabs.map(({ id, label, Icon }) => {
