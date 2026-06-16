@@ -29,6 +29,7 @@ import { GetAllUsersUseCase } from '../../application/use-cases/get-all-users.us
 import { GetUserByIdUseCase } from '../../application/use-cases/get-user-by-id.use-case';
 import { UpdateUserRoleUseCase } from '../../application/use-cases/update-user-role.use-case';
 import { UpsertUserProfileUseCase } from '../../application/use-cases/upsert-user-profile.use-case';
+import { DeleteOwnAccountUseCase } from '../../application/use-cases/delete-own-account.use-case';
 import {
   USER_REPOSITORY,
   UserRepositoryPort,
@@ -46,8 +47,18 @@ export class UsersController {
     private readonly getUserById: GetUserByIdUseCase,
     private readonly updateUserRole: UpdateUserRoleUseCase,
     private readonly upsertProfile: UpsertUserProfileUseCase,
+    private readonly deleteOwnAccount: DeleteOwnAccountUseCase,
     @Inject(USER_REPOSITORY) private readonly userRepo: UserRepositoryPort,
   ) {}
+
+  @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Eliminar mi cuenta y todos mis datos personales (RGPD)',
+  })
+  async deleteMyAccount(@CurrentUser() user: JwtPayload): Promise<void> {
+    await this.deleteOwnAccount.execute(user.sub);
+  }
 
   @Get('me')
   @ApiOperation({ summary: 'Obtener perfil del usuario autenticado' })

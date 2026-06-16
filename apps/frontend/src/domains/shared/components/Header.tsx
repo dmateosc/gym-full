@@ -18,8 +18,17 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
-  const { user, isAuthenticated, isAdmin, signOut } = useAuth();
+  const { user, isAuthenticated, isAdmin, signOut, deleteMyAccount } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    await deleteMyAccount();
+    setDeleting(false);
+    setConfirmDelete(false);
+  };
 
   const displayName = user?.profile?.fullName ?? user?.email?.split('@')[0] ?? '';
 
@@ -114,10 +123,16 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
 
                   <div className="border-t border-white/10 mt-1 pt-1">
                     <button
-                      className="w-full text-left px-4 py-2.5 text-sm text-[#f87171] hover:bg-white/5 flex items-center gap-2.5 transition-colors"
+                      className="w-full text-left px-4 py-2.5 text-sm text-[#cbd5e1] hover:bg-white/5 flex items-center gap-2.5 transition-colors"
                       onClick={async () => { setMenuOpen(false); await signOut(); }}
                     >
                       <LogoutIcon size={18} /> Cerrar sesión
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2.5 text-sm text-[#f87171] hover:bg-[rgba(220,38,38,0.12)] flex items-center gap-2.5 transition-colors"
+                      onClick={() => { setMenuOpen(false); setConfirmDelete(true); }}
+                    >
+                      <LogoutIcon size={18} /> Eliminar cuenta
                     </button>
                   </div>
                 </div>
@@ -131,6 +146,44 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
           </div>
         )}
       </div>
+
+      {confirmDelete && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center px-4">
+          <div
+            className="absolute inset-0 bg-black/70"
+            onClick={() => !deleting && setConfirmDelete(false)}
+          />
+          <div className="relative z-10 w-full max-w-md rounded-2xl bg-[#1e293b] border border-[#334155] p-6 shadow-2xl">
+            <h2 className="text-lg font-bold text-white mb-2">Eliminar cuenta</h2>
+            <p className="text-[#cbd5e1] text-sm mb-3">
+              Esto borrará tu perfil, tus rutinas guardadas y tus datos
+              personales de forma <strong>permanente</strong>. No podrás
+              recuperarlos.
+            </p>
+            <p className="text-[#94a3b8] text-xs mb-5">
+              Tus reservas pasadas pueden quedar como histórico anónimo para
+              llevar la cuenta de plazas. Si quieres eliminarlas también,
+              cancélalas antes desde "Mis clases".
+            </p>
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => setConfirmDelete(false)}
+                disabled={deleting}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-[#cbd5e1] hover:bg-white/5 disabled:opacity-60"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => void handleDeleteAccount()}
+                disabled={deleting}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#dc2626] hover:opacity-90 disabled:opacity-60"
+              >
+                {deleting ? 'Eliminando…' : 'Sí, eliminar cuenta'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
