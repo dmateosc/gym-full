@@ -24,7 +24,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#0f172a',
-        theme_color: '#e50914',
+        theme_color: '#1f9e3f',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -48,6 +48,13 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,jpg,jpeg,woff2}'],
         // Limit precache to ~10MB to avoid bundling images we don't need offline.
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+        // Si hay una versión nueva del SW, que tome el control inmediatamente
+        // en lugar de quedarse en waiting hasta que el usuario cierre todas
+        // las pestañas. Combinado con autoUpdate, los cambios llegan en el
+        // siguiente refresh sin reinstalar la PWA.
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         navigateFallback: '/index.html',
         // The API itself stays online-only — bookings/reservas must always
         // hit the backend, so we never serve a stale answer.
