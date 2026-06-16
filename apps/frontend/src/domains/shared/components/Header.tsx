@@ -35,6 +35,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate }) => {
   return (
     <header
       className="sticky top-0 z-50 w-full bg-[#0b1120] border-b border-white/10"
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <button
