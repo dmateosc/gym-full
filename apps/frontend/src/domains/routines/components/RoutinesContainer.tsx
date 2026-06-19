@@ -12,7 +12,14 @@ type Tab = 'today' | 'mine' | 'public';
 
 const RoutinesContainer: React.FC = () => {
   const { currentRoutine, isLoading, error } = useRoutinesWithCache();
-  const [tab, setTab] = useState<Tab>('today');
+  const [tab, setTab] = useState<Tab>(() => {
+    const initial = sessionStorage.getItem('routines.initialTab');
+    if (initial === 'mine' || initial === 'public' || initial === 'today') {
+      sessionStorage.removeItem('routines.initialTab');
+      return initial;
+    }
+    return 'today';
+  });
   const [savingClone, setSavingClone] = useState(false);
   const [cloneError, setCloneError] = useState<string | null>(null);
   const [cloneOk, setCloneOk] = useState<string | null>(null);
