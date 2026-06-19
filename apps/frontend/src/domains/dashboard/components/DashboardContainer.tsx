@@ -67,7 +67,7 @@ const StatCard: React.FC<{
 );
 
 const DashboardContainer: React.FC<{
-  onNavigate: (page: 'exercises' | 'routines') => void;
+  onNavigate: (page: 'exercises' | 'routines' | 'classes') => void;
 }> = ({ onNavigate }) => {
   const { user, isAdmin } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
