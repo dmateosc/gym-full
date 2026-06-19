@@ -8,6 +8,7 @@ import {
   CrownIcon,
   FlameIcon,
   PulseIcon,
+  RepeatIcon,
 } from '../../../assets/icons/index.tsx';
 
 interface Stats {
@@ -17,6 +18,29 @@ interface Stats {
 }
 
 const BACKEND_URL = APP_CONFIG.API.BACKEND_URL;
+
+const QuickAccessCard: React.FC<{
+  icon: React.ReactNode;
+  iconColor: string;
+  iconBg: string;
+  title: string;
+  subtitle: string;
+  onClick: () => void;
+}> = ({ icon, iconColor, iconBg, title, subtitle, onClick }) => (
+  <button
+    onClick={onClick}
+    className="rounded-xl p-5 text-left transition-[border-color,transform] duration-200 bg-[#1e293b] border border-[#334155] hover:border-[rgba(64,206,66,0.6)] hover:-translate-y-0.5"
+  >
+    <div
+      className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 flex-shrink-0"
+      style={{ background: iconBg, color: iconColor }}
+    >
+      {icon}
+    </div>
+    <h3 className="text-white font-semibold text-base">{title}</h3>
+    <p className="text-[#94a3b8] text-sm mt-1 line-clamp-2">{subtitle}</p>
+  </button>
+);
 
 const StatCard: React.FC<{
   icon: React.ReactNode;
@@ -161,33 +185,61 @@ const DashboardContainer: React.FC<{
       {/* Accesos rápidos */}
       <div>
         <h2 className="text-white font-semibold text-lg mb-4">Accesos rápidos</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <button
-            onClick={() => onNavigate('exercises')}
-            className="rounded-xl p-6 text-left transition-[border-color,transform] duration-200 bg-[#1e293b] border border-[#334155] hover:border-[rgba(64,206,66,0.6)] hover:-translate-y-0.5"
-          >
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-[#6ee06f]" style={{ background: '#1f9e3f22' }}>
-              <ClipboardIcon size={22} />
-            </div>
-            <h3 className="text-white font-semibold text-lg">Catálogo de Ejercicios</h3>
-            <p className="text-[#94a3b8] text-sm mt-1">
-              Explora más de {stats?.totalExercises ?? '50'} ejercicios con filtros avanzados
-            </p>
-          </button>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <QuickAccessCard
+            icon={<DumbbellIcon size={22} />}
+            iconColor="#6ee06f"
+            iconBg="#1f9e3f22"
+            title="Rutina de hoy"
+            subtitle="Tu entrenamiento generado para hoy"
+            onClick={() => {
+              sessionStorage.setItem('routines.initialTab', 'today');
+              onNavigate('routines');
+            }}
+          />
 
-          <button
-            onClick={() => onNavigate('routines')}
-            className="rounded-xl p-6 text-left transition-[border-color,transform] duration-200 bg-[#1e293b] border border-[#334155] hover:border-[rgba(64,206,66,0.6)] hover:-translate-y-0.5"
-          >
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-[#fbbf24]" style={{ background: '#f59e0b22' }}>
-              <DumbbellIcon size={22} />
-            </div>
-            <h3 className="text-white font-semibold text-lg">Rutinas de Entrenamiento</h3>
-            <p className="text-[#94a3b8] text-sm mt-1">
-              Consulta la rutina de hoy generada con IA
-            </p>
-          </button>
+          <QuickAccessCard
+            icon={<ClipboardIcon size={22} />}
+            iconColor="#fdc400"
+            iconBg="#fdc40022"
+            title="Mis rutinas"
+            subtitle="Tus rutinas guardadas y editables"
+            onClick={() => {
+              sessionStorage.setItem('routines.initialTab', 'mine');
+              onNavigate('routines');
+            }}
+          />
+
+          <QuickAccessCard
+            icon={<RepeatIcon size={22} />}
+            iconColor="#60a5fa"
+            iconBg="#2563eb22"
+            title="Clases de hoy"
+            subtitle="Consulta horarios y reserva plaza"
+            onClick={() => onNavigate('classes')}
+          />
         </div>
+
+        <button
+          onClick={() => onNavigate('exercises')}
+          className="mt-4 w-full text-left flex items-center gap-3 rounded-xl p-3 sm:p-4 bg-[#172033] border border-[#334155] hover:border-[rgba(64,206,66,0.4)] transition-colors"
+        >
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-[#cbd5e1] flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.06)' }}
+          >
+            <PulseIcon size={20} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-white text-sm font-semibold">
+              Explorar catálogo de ejercicios
+            </p>
+            <p className="text-[#94a3b8] text-xs truncate">
+              {stats?.totalExercises ?? '+ de 50'} ejercicios con filtros y vídeos
+            </p>
+          </div>
+          <span className="text-[#64748b] text-lg" aria-hidden>›</span>
+        </button>
       </div>
 
       {/* Progreso de dificultad */}
