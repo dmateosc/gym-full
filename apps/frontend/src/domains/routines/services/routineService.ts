@@ -321,6 +321,37 @@ export class RoutineService {
     if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
   }
 
+  static async importFromFile(file: File): Promise<{
+    name: string;
+    description?: string;
+    exercises: {
+      exerciseId: string | null;
+      rawName: string;
+      matchedName?: string | null;
+      orderInRoutine: number;
+      sets?: number;
+      reps?: number;
+      weight?: number;
+      durationSeconds?: number;
+      distanceMeters?: number;
+      restSeconds?: number;
+      notes?: string;
+    }[];
+  }> {
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch(`${API_BASE_URL}/routines/import`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: form,
+    });
+    if (!res.ok) {
+      const body = (await res.json().catch(() => null)) as { message?: string } | null;
+      throw new Error(body?.message ?? `HTTP ${res.status}`);
+    }
+    return res.json();
+  }
+
   static async listPublicRoutines(): Promise<DailyRoutine[]> {
     const res = await fetch(`${API_BASE_URL}/routines/public`, {
       headers: authHeaders(),

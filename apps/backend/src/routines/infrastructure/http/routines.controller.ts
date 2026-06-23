@@ -11,7 +11,11 @@ import {
   HttpStatus,
   NotFoundException,
   UseGuards,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -40,6 +44,7 @@ import { DailyRoutineLifecycleUseCase } from '../../application/use-cases/daily-
 import { RoutineExerciseManagementUseCase } from '../../application/use-cases/routine-exercise-management.use-case';
 import { RoutineStatsUseCase } from '../../application/use-cases/routine-stats.use-case';
 import { UserRoutinesUseCase } from '../../application/use-cases/user-routines.use-case';
+import { ImportRoutineUseCase } from '../../application/use-cases/import-routine.use-case';
 import { CurrentUser } from '../../../auth/application/decorators/current-user.decorator';
 import { JwtPayload } from '../../../shared/infrastructure/jwt/jwt-verifier';
 
@@ -55,7 +60,28 @@ export class RoutinesController {
     private readonly exerciseMgmtUseCase: RoutineExerciseManagementUseCase,
     private readonly statsUseCase: RoutineStatsUseCase,
     private readonly userRoutines: UserRoutinesUseCase,
+    private readonly importRoutine: ImportRoutineUseCase,
   ) {}
+
+  @Post('import')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 8 * 1024 * 1024 }, // 8 MB
+    }),
+  )
+  @ApiOperation({
+    summary:
+      'Importar una rutina desde Excel/CSV o una imagen (devuelve borrador)',
+  })
+  async importFromFile(
+    @UploadedFile()
+    file: { buffer: Buffer; mimetype: string; originalname: string } | undefined,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No se ha recibido archivo');
+    }
+    return this.importRoutine.execute(file);
+  }
 
   // Endpoints para rutinas propias del usuario (templates).
   @Get('mine')

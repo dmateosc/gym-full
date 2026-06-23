@@ -10,19 +10,39 @@ import {
 import { AlertIcon, SearchIcon } from '../../../assets/icons/index.tsx';
 
 interface DraftExercise {
-  exerciseId: string;
+  /** null cuando viene de un import y no se ha podido matchear. */
+  exerciseId: string | null;
   exerciseName: string;
   exerciseType: ExerciseType;
   sets?: number;
   reps?: number;
+  weight?: number;
   durationSeconds?: number;
   distanceMeters?: number;
   restSeconds?: number;
   notes?: string;
 }
 
+export interface ImportedDraftInput {
+  name: string;
+  description?: string;
+  exercises: {
+    exerciseId: string | null;
+    rawName: string;
+    matchedName?: string | null;
+    sets?: number;
+    reps?: number;
+    weight?: number;
+    durationSeconds?: number;
+    distanceMeters?: number;
+    restSeconds?: number;
+    notes?: string;
+  }[];
+}
+
 interface RoutineEditorProps {
   initialRoutine?: DailyRoutine;
+  initialDraft?: ImportedDraftInput;
   onCancel: () => void;
   onCreated?: (routine: DailyRoutine) => void;
   onUpdated?: (routine: DailyRoutine) => void;
@@ -33,14 +53,17 @@ const inputClass =
 
 const RoutineEditor: React.FC<RoutineEditorProps> = ({
   initialRoutine,
+  initialDraft,
   onCancel,
   onCreated,
   onUpdated,
 }) => {
   const isEdit = !!initialRoutine;
-  const [name, setName] = useState(initialRoutine?.name ?? '');
+  const [name, setName] = useState(
+    initialRoutine?.name ?? initialDraft?.name ?? '',
+  );
   const [description, setDescription] = useState(
-    initialRoutine?.description ?? '',
+    initialRoutine?.description ?? initialDraft?.description ?? '',
   );
   const [intensity, setIntensity] = useState<RoutineIntensity>(
     (initialRoutine?.intensity as RoutineIntensity) ?? RoutineIntensity.MODERATE,
@@ -52,38 +75,63 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
     ((initialRoutine as { visibility?: 'private' | 'public' } | undefined)
       ?.visibility ?? 'private'),
   );
-  const [drafts, setDrafts] = useState<DraftExercise[]>(
-    (initialRoutine?.routineExercises ?? [])
-      .slice()
-      .sort((a, b) => a.orderInRoutine - b.orderInRoutine)
-      .map((re) => ({
-        exerciseId: re.exerciseId,
-        exerciseName: re.exercise?.name ?? 'Ejercicio',
-        exerciseType: re.exerciseType,
-        sets: re.sets,
-        reps: re.reps,
-        durationSeconds: re.duration,
-        distanceMeters: re.distance,
-        restSeconds: re.restSeconds,
-        notes: re.notes,
-      })),
-  );
+  const [drafts, setDrafts] = useState<DraftExercise[]>(() => {
+    if (initialRoutine) {
+      return (initialRoutine.routineExercises ?? [])
+        .slice()
+        .sort((a, b) => a.orderInRoutine - b.orderInRoutine)
+        .map((re) => ({
+          exerciseId: re.exerciseId,
+          exerciseName: re.exercise?.name ?? 'Ejercicio',
+          exerciseType: re.exerciseType,
+          sets: re.sets,
+          reps: re.reps,
+          durationSeconds: re.duration,
+          distanceMeters: re.distance,
+          restSeconds: re.restSeconds,
+          notes: re.notes,
+        }));
+    }
+    if (initialDraft) {
+      return initialDraft.exercises.map((e) => ({
+        exerciseId: e.exerciseId,
+        exerciseName: e.matchedName ?? e.rawName,
+        exerciseType: ExerciseType.SETS_REPS,
+        sets: e.sets,
+        reps: e.reps,
+        weight: e.weight,
+        durationSeconds: e.durationSeconds,
+        distanceMeters: e.distanceMeters,
+        restSeconds: e.restSeconds,
+        notes: e.notes,
+      }));
+    }
+    return [];
+  });
   const [pickerOpen, setPickerOpen] = useState(false);
+  /** Si !== null, el picker resuelve el unmatched de ese índice en vez de añadir uno nuevo. */
+  const [resolvingIdx, setResolvingIdx] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSave = name.trim().length > 0 && drafts.length > 0 && !saving;
+  const unmatchedCount = drafts.filter((d) => !d.exerciseId).length;
+  const canSave =
+    name.trim().length > 0 &&
+    drafts.length > 0 &&
+    unmatchedCount === 0 &&
+    !saving;
 
   const handleSave = async () => {
     setSaving(true);
     setError(null);
     try {
       const exercises = drafts.map((d, idx) => ({
-        exerciseId: d.exerciseId,
+        exerciseId: d.exerciseId as string, // canSave garantiza !== null
         orderInRoutine: idx + 1,
         exerciseType: d.exerciseType,
         sets: d.sets,
         reps: d.reps,
+        weight: d.weight,
         durationSeconds: d.durationSeconds,
         distanceMeters: d.distanceMeters,
         restSeconds: d.restSeconds,
@@ -124,17 +172,28 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
   };
 
   const handleAddExercise = (ex: Exercise) => {
-    setDrafts((prev) => [
-      ...prev,
-      {
-        exerciseId: ex.id,
-        exerciseName: ex.name,
-        exerciseType: ExerciseType.SETS_REPS,
-        sets: 3,
-        reps: 10,
-        restSeconds: 60,
-      },
-    ]);
+    if (resolvingIdx !== null) {
+      setDrafts((prev) =>
+        prev.map((d, i) =>
+          i === resolvingIdx
+            ? { ...d, exerciseId: ex.id, exerciseName: ex.name }
+            : d,
+        ),
+      );
+      setResolvingIdx(null);
+    } else {
+      setDrafts((prev) => [
+        ...prev,
+        {
+          exerciseId: ex.id,
+          exerciseName: ex.name,
+          exerciseType: ExerciseType.SETS_REPS,
+          sets: 3,
+          reps: 10,
+          restSeconds: 60,
+        },
+      ]);
+    }
     setPickerOpen(false);
   };
 
@@ -177,6 +236,17 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
         <div className="p-3 rounded-lg bg-red-900/40 border border-red-500/50 text-red-300 text-sm flex items-start gap-2">
           <span className="mt-0.5"><AlertIcon size={16} /></span>
           <span>{error}</span>
+        </div>
+      )}
+
+      {unmatchedCount > 0 && (
+        <div className="p-3 rounded-lg bg-[rgba(253,196,0,0.1)] border border-[rgba(253,196,0,0.4)] text-[#facc15] text-sm flex items-start gap-2">
+          <span className="mt-0.5"><AlertIcon size={16} /></span>
+          <span>
+            {unmatchedCount === 1
+              ? '1 ejercicio sin asignar al catálogo. Pulsa "Elegir del catálogo" para resolverlo antes de guardar.'
+              : `${unmatchedCount} ejercicios sin asignar al catálogo. Resuélvelos antes de guardar.`}
+          </span>
         </div>
       )}
 
@@ -290,14 +360,35 @@ const RoutineEditor: React.FC<RoutineEditorProps> = ({
           <ul className="space-y-3">
             {drafts.map((d, idx) => (
               <li
-                key={`${d.exerciseId}-${idx}`}
-                className="bg-[#172033] border border-[#334155] rounded-lg p-3"
+                key={`${d.exerciseId ?? 'unmatched'}-${idx}`}
+                className={`bg-[#172033] border rounded-lg p-3 ${
+                  !d.exerciseId
+                    ? 'border-[rgba(220,38,38,0.5)]'
+                    : 'border-[#334155]'
+                }`}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-white font-medium truncate">
                       {idx + 1}. {d.exerciseName}
                     </p>
+                    {!d.exerciseId && (
+                      <div className="mt-1 flex items-center gap-2 flex-wrap">
+                        <span className="text-[10px] uppercase tracking-wider text-[#fca5a5] bg-[rgba(220,38,38,0.15)] px-1.5 py-0.5 rounded">
+                          Sin asignar
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setResolvingIdx(idx);
+                            setPickerOpen(true);
+                          }}
+                          className="text-[11px] text-[#6ee06f] hover:underline"
+                        >
+                          Elegir del catálogo →
+                        </button>
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button

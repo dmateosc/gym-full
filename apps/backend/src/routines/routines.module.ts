@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ExercisesModule } from '../exercises/exercises.module';
 import { DailyRoutineOrmEntity } from './infrastructure/persistence/daily-routine.orm-entity';
 import { RoutineExerciseOrmEntity } from './infrastructure/persistence/routine-exercise.orm-entity';
 import { DailyRoutineTypeormRepository } from './infrastructure/persistence/daily-routine.typeorm-repository';
@@ -13,10 +14,12 @@ import { DailyRoutineLifecycleUseCase } from './application/use-cases/daily-rout
 import { RoutineExerciseManagementUseCase } from './application/use-cases/routine-exercise-management.use-case';
 import { RoutineStatsUseCase } from './application/use-cases/routine-stats.use-case';
 import { UserRoutinesUseCase } from './application/use-cases/user-routines.use-case';
+import { ImportRoutineUseCase } from './application/use-cases/import-routine.use-case';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([DailyRoutineOrmEntity, RoutineExerciseOrmEntity]),
+    ExercisesModule,
   ],
   controllers: [RoutinesController],
   providers: [
@@ -34,6 +37,7 @@ import { UserRoutinesUseCase } from './application/use-cases/user-routines.use-c
     RoutineExerciseManagementUseCase,
     RoutineStatsUseCase,
     UserRoutinesUseCase,
+    ImportRoutineUseCase,
   ],
 })
 export class RoutinesModule {}
