@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/infrastructure/users.module';
 import { ClassesModule } from './classes/classes.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { WorkoutsModule } from './workouts/workouts.module';
 
 // Entidades ORM
 import { ExerciseOrmEntity } from './exercises/infrastructure/persistence/exercise.orm-entity';
@@ -22,6 +23,7 @@ import { ClassOrmEntity } from './classes/infrastructure/persistence/class.orm-e
 import { ClassSessionOrmEntity } from './classes/infrastructure/persistence/class-session.orm-entity';
 import { BookingOrmEntity } from './classes/infrastructure/persistence/booking.orm-entity';
 import { NotificationOrmEntity } from './notifications/infrastructure/persistence/notification.orm-entity';
+import { WorkoutSessionOrmEntity } from './workouts/infrastructure/persistence/workout-session.orm-entity';
 import { DatabaseLogger } from './database/database.logger';
 
 // Guards globales
@@ -45,6 +47,7 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
         ClassSessionOrmEntity,
         BookingOrmEntity,
         NotificationOrmEntity,
+        WorkoutSessionOrmEntity,
       ],
       synchronize: false,
       // Run any pending migrations at boot. The container will not
@@ -72,6 +75,7 @@ import { RolesGuard } from './auth/application/guards/roles.guard';
     RoutinesModule,
     ClassesModule,
     NotificationsModule.register(),
+    WorkoutsModule,
   ],
   controllers: [AppController],
   providers: [

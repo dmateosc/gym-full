@@ -3,6 +3,7 @@ import type {
   Class,
   ClassCategory,
   CreateClassPayload,
+  BulkCreateClassesPayload,
   UpdateClassPayload,
 } from '../types/class';
 import {
@@ -18,7 +19,9 @@ interface Props {
   isOpen: boolean;
   initial?: Class | null;
   onClose: () => void;
-  onSubmit: (payload: CreateClassPayload | UpdateClassPayload) => Promise<void>;
+  onSubmit: (
+    payload: CreateClassPayload | UpdateClassPayload | BulkCreateClassesPayload,
+  ) => Promise<void>;
 }
 
 const inputClass =
@@ -31,7 +34,7 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<ClassCategory>('cycling');
-  const [dayOfWeek, setDayOfWeek] = useState(1);
+  const [daysOfWeek, setDaysOfWeek] = useState<number[]>([1]);
   const [startTime, setStartTime] = useState('19:00');
   const [durationMin, setDurationMin] = useState(60);
   const [capacity, setCapacity] = useState(20);
@@ -61,7 +64,7 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
       setName(initial.name);
       setDescription(initial.description ?? '');
       setCategory(initial.category);
-      setDayOfWeek(initial.dayOfWeek);
+      setDaysOfWeek([initial.dayOfWeek]);
       setStartTime(initial.startTime);
       setDurationMin(initial.durationMin);
       setCapacity(initial.capacity);
@@ -71,7 +74,7 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
       setName('');
       setDescription('');
       setCategory('cycling');
-      setDayOfWeek(1);
+      setDaysOfWeek([1]);
       setStartTime('19:00');
       setDurationMin(60);
       setCapacity(20);
@@ -83,23 +86,38 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
 
   if (!isOpen) return null;
 
+  const toggleDay = (d: number) =>
+    setDaysOfWeek((prev) =>
+      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d].sort((a, b) => a - b),
+    );
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (daysOfWeek.length === 0) {
+      setError('Selecciona al menos un día');
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
-      await onSubmit({
+      const base = {
         name,
         description: description || null,
         category,
-        dayOfWeek,
         startTime,
         durationMin,
         capacity,
         location: location || null,
-        // Only admins can set instructorId; for instructors the backend ignores it.
         ...(isAdmin && instructorId ? { instructorId } : {}),
-      });
+      };
+      if (initial) {
+        // Editar siempre afecta a una sola clase (una fila en classes).
+        await onSubmit({ ...base, dayOfWeek: daysOfWeek[0] } as UpdateClassPayload);
+      } else if (daysOfWeek.length === 1) {
+        await onSubmit({ ...base, dayOfWeek: daysOfWeek[0] } as CreateClassPayload);
+      } else {
+        await onSubmit({ ...base, daysOfWeek } as BulkCreateClassesPayload);
+      }
       onClose();
     } catch (err) {
       setError((err as Error).message);
@@ -140,23 +158,45 @@ export function ClassFormModal({ isOpen, initial, onClose, onSubmit }: Props) {
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} maxLength={2000} rows={2} className={`${inputClass} resize-none`} placeholder="Opcional" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={labelClass}>Categoría</label>
-              <select value={category} onChange={(e) => setCategory(e.target.value as ClassCategory)} className={`${inputClass} cursor-pointer`}>
-                {CLASS_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{CLASS_CATEGORY_LABELS[c]}</option>
-                ))}
-              </select>
+          <div>
+            <label className={labelClass}>Categoría</label>
+            <select value={category} onChange={(e) => setCategory(e.target.value as ClassCategory)} className={`${inputClass} cursor-pointer`}>
+              {CLASS_CATEGORIES.map((c) => (
+                <option key={c} value={c}>{CLASS_CATEGORY_LABELS[c]}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className={labelClass}>
+              {initial ? 'Día de la semana' : 'Días de la semana'}
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {DAY_OF_WEEK_LABELS.map((d, i) => {
+                const active = daysOfWeek.includes(i);
+                const disabled = !!initial && !active;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => (initial ? setDaysOfWeek([i]) : toggleDay(i))}
+                    disabled={disabled}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-30 ${
+                      active
+                        ? 'bg-[#1f9e3f] text-white'
+                        : 'bg-[#334155] text-[#cbd5e1] hover:bg-[#475569]'
+                    }`}
+                  >
+                    {d.slice(0, 3)}
+                  </button>
+                );
+              })}
             </div>
-            <div>
-              <label className={labelClass}>Día de la semana</label>
-              <select value={dayOfWeek} onChange={(e) => setDayOfWeek(Number(e.target.value))} className={`${inputClass} cursor-pointer`}>
-                {DAY_OF_WEEK_LABELS.map((d, i) => (
-                  <option key={i} value={i}>{d}</option>
-                ))}
-              </select>
-            </div>
+            {!initial && daysOfWeek.length > 1 && (
+              <p className="text-[#94a3b8] text-xs mt-1.5">
+                Se crearán {daysOfWeek.length} clases (una por día) con el mismo horario.
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-3">

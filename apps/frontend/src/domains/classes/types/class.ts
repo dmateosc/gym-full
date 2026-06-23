@@ -115,4 +115,8 @@ export interface CreateClassPayload {
   instructorId?: string;
 }
 
+export interface BulkCreateClassesPayload extends Omit<CreateClassPayload, 'dayOfWeek'> {
+  daysOfWeek: number[];
+}
+
 export type UpdateClassPayload = Partial<CreateClassPayload> & { active?: boolean };

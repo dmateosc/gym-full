@@ -33,6 +33,7 @@ import {
 } from '../../../users/domain/repositories/user.repository.port';
 
 import { CreateClassUseCase } from '../../application/use-cases/create-class.use-case';
+import { BulkCreateClassesUseCase } from '../../application/use-cases/bulk-create-classes.use-case';
 import { UpdateClassUseCase } from '../../application/use-cases/update-class.use-case';
 import { SoftDeleteClassUseCase } from '../../application/use-cases/soft-delete-class.use-case';
 import {
@@ -42,6 +43,7 @@ import {
 import { ListTodaySessionsUseCase } from '../../application/use-cases/list-today-sessions.use-case';
 
 import { CreateClassDto } from './dto/create-class.dto';
+import { BulkCreateClassesDto } from './dto/bulk-create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import {
   ClassResponseDto,
@@ -60,6 +62,7 @@ export class ClassesController {
     private readonly listMyClasses: ListMyClassesUseCase,
     private readonly listAllClasses: ListAllClassesUseCase,
     private readonly listTodaySessions: ListTodaySessionsUseCase,
+    private readonly bulkCreate: BulkCreateClassesUseCase,
     @Inject(USER_REPOSITORY)
     private readonly userRepo: UserRepositoryPort,
   ) {}
@@ -122,6 +125,34 @@ export class ClassesController {
       instructorId: dto.instructorId,
     });
     return ClassResponseDto.fromDomain(entity);
+  }
+
+  @Post('bulk')
+  @Roles(UserRole.INSTRUCTOR, UserRole.ADMIN)
+  @ApiOperation({
+    summary:
+      '[INSTRUCTOR] Crear la misma clase en varios días de la semana (TRX L+X)',
+  })
+  @ApiResponse({ status: 201, type: [ClassResponseDto] })
+  async createBulk(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: BulkCreateClassesDto,
+  ): Promise<ClassResponseDto[]> {
+    const me = await this.resolveLocalUserId(user);
+    const entities = await this.bulkCreate.execute({
+      requestingUserId: me,
+      requestingUserRole: user.role as UserRole,
+      name: dto.name,
+      description: dto.description,
+      category: dto.category,
+      daysOfWeek: dto.daysOfWeek,
+      startTime: dto.startTime,
+      durationMin: dto.durationMin,
+      capacity: dto.capacity,
+      location: dto.location,
+      instructorId: dto.instructorId,
+    });
+    return entities.map((e) => ClassResponseDto.fromDomain(e));
   }
 
   @Patch(':id')

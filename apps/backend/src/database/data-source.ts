@@ -7,6 +7,7 @@ import { UserProfileOrmEntity } from '../users/infrastructure/persistence/user-p
 import { ClassOrmEntity } from '../classes/infrastructure/persistence/class.orm-entity';
 import { ClassSessionOrmEntity } from '../classes/infrastructure/persistence/class-session.orm-entity';
 import { BookingOrmEntity } from '../classes/infrastructure/persistence/booking.orm-entity';
+import { WorkoutSessionOrmEntity } from '../workouts/infrastructure/persistence/workout-session.orm-entity';
 
 /**
  * DataSource for the TypeORM CLI (migration:generate / :run / :revert).
@@ -31,6 +32,7 @@ export const AppDataSource = new DataSource({
     ClassOrmEntity,
     ClassSessionOrmEntity,
     BookingOrmEntity,
+    WorkoutSessionOrmEntity,
   ],
   migrations: [__dirname + '/migrations/*.{ts,js}'],
   migrationsTableName: 'migrations',
