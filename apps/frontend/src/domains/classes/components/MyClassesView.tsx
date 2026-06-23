@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ClassesService } from '../services/classesService';
-import type { Class, CreateClassPayload, UpdateClassPayload } from '../types/class';
+import type {
+  Class,
+  CreateClassPayload,
+  BulkCreateClassesPayload,
+  UpdateClassPayload,
+} from '../types/class';
 import {
   CLASS_CATEGORY_LABELS,
   DAY_OF_WEEK_LABELS,
@@ -63,9 +68,13 @@ export function MyClassesView() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(load, [isAdmin]);
 
-  const handleSubmit = async (payload: CreateClassPayload | UpdateClassPayload) => {
+  const handleSubmit = async (
+    payload: CreateClassPayload | UpdateClassPayload | BulkCreateClassesPayload,
+  ) => {
     if (modal.editing) {
       await ClassesService.update(modal.editing.id, payload as UpdateClassPayload);
+    } else if ('daysOfWeek' in payload) {
+      await ClassesService.createBulk(payload);
     } else {
       await ClassesService.create(payload as CreateClassPayload);
     }

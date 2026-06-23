@@ -28,10 +28,12 @@ jobs:
       - name: Checkout branch
         run: |
           cd /opt/gym-full
-          git fetch origin
+          git fetch origin --prune
           BRANCH="${{ inputs.branch }}"
+          git reset --hard
+          git clean -fd
           git checkout "$BRANCH"
-          git pull origin "$BRANCH"
+          git reset --hard "origin/$BRANCH"
           echo "HEAD now at:"
           git log --oneline -1
 

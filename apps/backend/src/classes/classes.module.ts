@@ -11,6 +11,7 @@ import { ClassesController } from './infrastructure/http/classes.controller';
 import { BookingsController } from './infrastructure/http/bookings.controller';
 
 import { CreateClassUseCase } from './application/use-cases/create-class.use-case';
+import { BulkCreateClassesUseCase } from './application/use-cases/bulk-create-classes.use-case';
 import { UpdateClassUseCase } from './application/use-cases/update-class.use-case';
 import { SoftDeleteClassUseCase } from './application/use-cases/soft-delete-class.use-case';
 import {
@@ -46,6 +47,7 @@ import { UsersModule } from '../users/infrastructure/users.module';
     },
     { provide: BOOKING_REPOSITORY, useClass: BookingTypeormRepository },
     CreateClassUseCase,
+    BulkCreateClassesUseCase,
     UpdateClassUseCase,
     SoftDeleteClassUseCase,
     ListMyClassesUseCase,

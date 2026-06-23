@@ -6,6 +6,9 @@ import RoutineDateSelector from './RoutineDateSelector';
 import MyRoutinesView from './MyRoutinesView';
 import PublicRoutinesView from './PublicRoutinesView';
 import { RoutineService } from '../services/routineService';
+import { WorkoutsService } from '../../workouts/workoutsService';
+import type { WorkoutSession } from '../../workouts/types';
+import WorkoutView from '../../workouts/components/WorkoutView';
 import { AlertIcon } from '../../../assets/icons/index.tsx';
 
 type Tab = 'today' | 'mine' | 'public';
@@ -23,6 +26,21 @@ const RoutinesContainer: React.FC = () => {
   const [savingClone, setSavingClone] = useState(false);
   const [cloneError, setCloneError] = useState<string | null>(null);
   const [cloneOk, setCloneOk] = useState<string | null>(null);
+  const [workoutSession, setWorkoutSession] = useState<WorkoutSession | null>(null);
+  const [startingWorkout, setStartingWorkout] = useState(false);
+
+  const handleStartWorkout = async (routineId: string) => {
+    setStartingWorkout(true);
+    setCloneError(null);
+    try {
+      const session = await WorkoutsService.start(routineId);
+      setWorkoutSession(session);
+    } catch (e) {
+      setCloneError((e as Error).message);
+    } finally {
+      setStartingWorkout(false);
+    }
+  };
 
   const handleSaveAsMine = async (routineId: string) => {
     setSavingClone(true);
@@ -43,6 +61,17 @@ const RoutinesContainer: React.FC = () => {
     { id: 'mine', label: 'Mis rutinas' },
     { id: 'public', label: 'Públicas' },
   ];
+
+  if (workoutSession && currentRoutine) {
+    return (
+      <WorkoutView
+        routine={currentRoutine}
+        session={workoutSession}
+        onFinish={() => setWorkoutSession(null)}
+        onAbandon={() => setWorkoutSession(null)}
+      />
+    );
+  }
 
   return (
     <div>
@@ -111,6 +140,8 @@ const RoutinesContainer: React.FC = () => {
               routine={currentRoutine}
               onSaveAsMine={(r) => handleSaveAsMine(r.id)}
               savingAsMine={savingClone}
+              onStartWorkout={(r) => handleStartWorkout(r.id)}
+              startingWorkout={startingWorkout}
             />
           ) : (
             <EmptyRoutineState />

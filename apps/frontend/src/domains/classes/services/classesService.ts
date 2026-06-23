@@ -3,6 +3,7 @@ import { AuthService } from '../../auth/services/authService';
 import type {
   Class,
   CreateClassPayload,
+  BulkCreateClassesPayload,
   TodaySession,
   UpdateClassPayload,
 } from '../types/class';
@@ -39,6 +40,12 @@ export const ClassesService = {
   },
   create(payload: CreateClassPayload): Promise<Class> {
     return call('/classes', { method: 'POST', body: JSON.stringify(payload) });
+  },
+  createBulk(payload: BulkCreateClassesPayload): Promise<Class[]> {
+    return call('/classes/bulk', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   },
   update(id: string, payload: UpdateClassPayload): Promise<Class> {
     return call(`/classes/${id}`, { method: 'PATCH', body: JSON.stringify(payload) });

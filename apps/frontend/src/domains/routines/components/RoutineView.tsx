@@ -11,6 +11,8 @@ interface RoutineViewProps {
   routine: DailyRoutine;
   onSaveAsMine?: (routine: DailyRoutine) => Promise<void> | void;
   savingAsMine?: boolean;
+  onStartWorkout?: (routine: DailyRoutine) => Promise<void> | void;
+  startingWorkout?: boolean;
 }
 
 const CATEGORY_TINTS: Record<string, { solid: string; text: string }> = {
@@ -39,7 +41,13 @@ const FlatTag = ({ tint, children }: { tint: { solid: string; text: string }; ch
   </span>
 );
 
-const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, savingAsMine }) => {
+const RoutineView: React.FC<RoutineViewProps> = ({
+  routine,
+  onSaveAsMine,
+  savingAsMine,
+  onStartWorkout,
+  startingWorkout,
+}) => {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingExercise, setIsLoadingExercise] = useState(false);
@@ -110,6 +118,16 @@ const RoutineView: React.FC<RoutineViewProps> = ({ routine, onSaveAsMine, saving
               <div className="text-2xl sm:text-3xl lg:text-4xl font-bold">{stats.totalExercises}</div>
               <div className="text-[#dcfce7] text-xs sm:text-sm">ejercicios</div>
             </div>
+            {onStartWorkout && (
+              <button
+                type="button"
+                onClick={() => void onStartWorkout(routine)}
+                disabled={startingWorkout}
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-[#0f172a] hover:opacity-90 transition-opacity disabled:opacity-60 whitespace-nowrap"
+              >
+                {startingWorkout ? 'Iniciando…' : 'Empezar entrenamiento'}
+              </button>
+            )}
             {onSaveAsMine && (
               <button
                 type="button"
