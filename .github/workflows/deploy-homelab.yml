@@ -43,10 +43,14 @@ jobs:
       - name: Checkout branch
         run: |
           cd /opt/gym-full
-          git fetch origin
+          git fetch origin --prune
           BRANCH="${{ github.head_ref || inputs.branch || github.ref_name }}"
+          # Self-heal: nuke any local changes / untracked files left by
+          # previous runs so the checkout never fails.
+          git reset --hard
+          git clean -fd
           git checkout "$BRANCH"
-          git pull origin "$BRANCH"
+          git reset --hard "origin/$BRANCH"
 
       - name: Rebuild containers (selective)
         run: |
