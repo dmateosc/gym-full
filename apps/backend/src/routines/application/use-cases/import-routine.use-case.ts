@@ -64,15 +64,41 @@ interface LlmResponse {
 @Injectable()
 export class ImportRoutineUseCase {
   private readonly logger = new Logger(ImportRoutineUseCase.name);
-  private readonly openai: OpenAI | null;
+  /** Cliente para extraer texto (Excel/CSV). Por defecto va a Ollama local. */
+  private readonly textClient: OpenAI | null;
+  /** Cliente para visión (imagen). Por defecto OpenAI cloud (Hermes en
+   * Ollama no tiene visión todavía). */
+  private readonly visionClient: OpenAI | null;
+  private readonly textModel: string;
+  private readonly visionModel: string;
 
   constructor(
     @Inject(EXERCISE_REPOSITORY)
     private readonly exercises: ExerciseRepositoryPort,
     private readonly config: ConfigService,
   ) {
-    const apiKey = this.config.get<string>('OPENAI_API_KEY');
-    this.openai = apiKey ? new OpenAI({ apiKey }) : null;
+    // Texto: Ollama (Hermes) por defecto en el homelab. Cualquier API
+    // compatible con la spec de OpenAI funciona.
+    const textBaseUrl =
+      this.config.get<string>('LLM_TEXT_BASE_URL') ??
+      'http://192.168.0.103:11434/v1';
+    const textKey =
+      this.config.get<string>('LLM_TEXT_API_KEY') ?? 'ollama';
+    this.textModel =
+      this.config.get<string>('LLM_TEXT_MODEL') ?? 'hermes3';
+    this.textClient = new OpenAI({ baseURL: textBaseUrl, apiKey: textKey });
+
+    // Visión: OpenAI cloud (gpt-4o) o lo que el usuario configure.
+    const visionKey = this.config.get<string>('OPENAI_API_KEY');
+    const visionBaseUrl = this.config.get<string>('LLM_VISION_BASE_URL');
+    this.visionModel =
+      this.config.get<string>('LLM_VISION_MODEL') ?? 'gpt-4o';
+    this.visionClient = visionKey
+      ? new OpenAI({
+          apiKey: visionKey,
+          ...(visionBaseUrl ? { baseURL: visionBaseUrl } : {}),
+        })
+      : null;
   }
 
   async execute(file: {
@@ -80,12 +106,6 @@ export class ImportRoutineUseCase {
     mimetype: string;
     originalname: string;
   }): Promise<ImportedRoutineDraft> {
-    if (!this.openai) {
-      throw new InternalServerErrorException(
-        'OPENAI_API_KEY no configurado en el backend',
-      );
-    }
-
     const isImage = file.mimetype.startsWith('image/');
     const isSpreadsheet =
       file.mimetype.includes('spreadsheet') ||
@@ -102,6 +122,11 @@ export class ImportRoutineUseCase {
     const catalog = await this.buildCatalogPrompt();
 
     if (isImage) {
+      if (!this.visionClient) {
+        throw new InternalServerErrorException(
+          'OPENAI_API_KEY no configurado: necesario para parsear imágenes',
+        );
+      }
       return this.parseImage(file, catalog);
     }
     const rows = this.parseSpreadsheetToRows(file.buffer);
@@ -158,8 +183,8 @@ export class ImportRoutineUseCase {
     const base64 = file.buffer.toString('base64');
     const dataUrl = `data:${file.mimetype};base64,${base64}`;
 
-    const completion = await this.openai!.chat.completions.create({
-      model: 'gpt-4o',
+    const completion = await this.visionClient!.chat.completions.create({
+      model: this.visionModel,
       response_format: { type: 'json_object' },
       messages: [
         {
@@ -187,8 +212,13 @@ export class ImportRoutineUseCase {
     payload: { rows: string[][] },
     catalog: { text: string; byNormalizedName: Map<string, string> },
   ): Promise<ImportedRoutineDraft> {
-    const completion = await this.openai!.chat.completions.create({
-      model: 'gpt-4o-mini',
+    if (!this.textClient) {
+      throw new InternalServerErrorException(
+        'Cliente LLM de texto no inicializado',
+      );
+    }
+    const completion = await this.textClient.chat.completions.create({
+      model: this.textModel,
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: this.systemPrompt(catalog.text) },

@@ -5,6 +5,9 @@ import RoutineView from './RoutineView';
 import RoutineEditor from './RoutineEditor';
 import type { ImportedDraftInput } from './RoutineEditor';
 import ImportRoutineModal from './ImportRoutineModal';
+import WorkoutView from '../../workouts/components/WorkoutView';
+import { WorkoutsService } from '../../workouts/workoutsService';
+import type { WorkoutSession } from '../../workouts/types';
 import {
   AlertIcon,
   ClipboardIcon,
@@ -16,6 +19,21 @@ const MyRoutinesView: React.FC = () => {
   const [editing, setEditing] = useState<null | { id?: string }>(null);
   const [importDraft, setImportDraft] = useState<ImportedDraftInput | null>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [workoutSession, setWorkoutSession] = useState<WorkoutSession | null>(null);
+  const [startingWorkout, setStartingWorkout] = useState(false);
+
+  const handleStartWorkout = async (id: string) => {
+    setStartingWorkout(true);
+    setError(null);
+    try {
+      const session = await WorkoutsService.start(id);
+      setWorkoutSession(session);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setStartingWorkout(false);
+    }
+  };
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -77,6 +95,16 @@ const MyRoutinesView: React.FC = () => {
       setSelectedId(null);
       return null;
     }
+    if (workoutSession) {
+      return (
+        <WorkoutView
+          routine={selected}
+          session={workoutSession}
+          onFinish={() => setWorkoutSession(null)}
+          onAbandon={() => setWorkoutSession(null)}
+        />
+      );
+    }
     return (
       <div className="space-y-4">
         <button
@@ -85,7 +113,11 @@ const MyRoutinesView: React.FC = () => {
         >
           ← Volver a mis rutinas
         </button>
-        <RoutineView routine={selected} />
+        <RoutineView
+          routine={selected}
+          onStartWorkout={(r) => handleStartWorkout(r.id)}
+          startingWorkout={startingWorkout}
+        />
       </div>
     );
   }
@@ -202,12 +234,22 @@ const MyRoutinesView: React.FC = () => {
           </div>
           <div className="mt-auto flex items-center justify-between gap-2">
             <button
-              onClick={() => setSelectedId(r.id)}
-              className="text-[#6ee06f] hover:underline text-sm font-semibold"
+              onClick={() => {
+                setSelectedId(r.id);
+                void handleStartWorkout(r.id);
+              }}
+              disabled={startingWorkout}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#1f9e3f] hover:opacity-90 disabled:opacity-60"
             >
-              Ver
+              Empezar
             </button>
             <div className="flex items-center gap-1">
+              <button
+                onClick={() => setSelectedId(r.id)}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#6ee06f] hover:bg-[#1f9e3f0a]"
+              >
+                Ver
+              </button>
               <button
                 onClick={() => setEditing({ id: r.id })}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium text-[#cbd5e1] hover:bg-white/5"
