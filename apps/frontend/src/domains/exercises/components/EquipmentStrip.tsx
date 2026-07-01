@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   DumbbellIcon,
   MuscleIcon,
@@ -8,6 +8,7 @@ import {
   PulseIcon,
   FlameIcon,
 } from '../../../assets/icons/index.tsx';
+import { ApiService } from '../services/api';
 
 interface Props {
   equipment: string[];
@@ -22,8 +23,40 @@ interface Props {
  * Como no tenemos fotos por equipamiento, mapeamos por keyword del
  * nombre a un glifo del icon set.
  */
+/**
+ * Cache module-level para el mapa equipamiento → imagen: se pide una
+ * sola vez por sesión y se comparte entre monturas del strip.
+ */
+let cachedImageMap: Record<string, string> | null = null;
+
 export default function EquipmentStrip({ equipment, selected, onSelect }: Props) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [imageMap, setImageMap] = useState<Record<string, string>>(
+    () => cachedImageMap ?? {},
+  );
+
+  useEffect(() => {
+    if (cachedImageMap) return;
+    let cancelled = false;
+    ApiService.getExercises()
+      .then((all) => {
+        const map: Record<string, string> = {};
+        for (const ex of all) {
+          if (!ex.imageUrl) continue;
+          for (const eq of ex.equipment ?? []) {
+            if (!map[eq]) map[eq] = ex.imageUrl;
+          }
+        }
+        cachedImageMap = map;
+        if (!cancelled) setImageMap(map);
+      })
+      .catch(() => {
+        // Silencio: caemos al icono en cada tile
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const items = React.useMemo(
     () =>
@@ -53,6 +86,7 @@ export default function EquipmentStrip({ equipment, selected, onSelect }: Props)
             key={eq}
             label={eq}
             icon={pickIcon(eq)}
+            imageUrl={imageMap[eq]}
             active={selected === eq}
             onClick={() => onSelect(selected === eq ? null : eq)}
           />
@@ -65,31 +99,46 @@ export default function EquipmentStrip({ equipment, selected, onSelect }: Props)
 const Tile: React.FC<{
   label: string;
   icon: React.ReactNode;
+  imageUrl?: string;
   active: boolean;
   onClick: () => void;
-}> = ({ label, icon, active, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`shrink-0 flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${
-      active
-        ? 'bg-[#1f9e3f] text-white'
-        : 'bg-[#1e293b] border border-[#334155] text-[#cbd5e1] hover:border-[rgba(64,206,66,0.6)]'
-    }`}
-    style={{ minWidth: 88 }}
-    aria-pressed={active}
-  >
-    <div
-      className={`w-11 h-11 rounded-lg flex items-center justify-center ${
-        active ? 'bg-white/15' : 'bg-[#0f172a]'
+}> = ({ label, icon, imageUrl, active, onClick }) => {
+  const [imgFailed, setImgFailed] = useState(false);
+  const showImage = !!imageUrl && !imgFailed;
+  return (
+    <button
+      onClick={onClick}
+      className={`shrink-0 flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl transition-colors ${
+        active
+          ? 'bg-[#1f9e3f] text-white'
+          : 'bg-[#1e293b] border border-[#334155] text-[#cbd5e1] hover:border-[rgba(64,206,66,0.6)]'
       }`}
+      style={{ minWidth: 88 }}
+      aria-pressed={active}
     >
-      {icon}
-    </div>
-    <span className="text-[11px] font-medium leading-tight max-w-[88px] line-clamp-2 text-center">
-      {label}
-    </span>
-  </button>
-);
+      <div
+        className={`w-11 h-11 rounded-lg flex items-center justify-center overflow-hidden ${
+          showImage ? 'bg-white/10' : active ? 'bg-white/15' : 'bg-[#0f172a]'
+        }`}
+      >
+        {showImage ? (
+          <img
+            src={imageUrl}
+            alt=""
+            loading="lazy"
+            onError={() => setImgFailed(true)}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          icon
+        )}
+      </div>
+      <span className="text-[11px] font-medium leading-tight max-w-[88px] line-clamp-2 text-center">
+        {label}
+      </span>
+    </button>
+  );
+};
 
 function pickIcon(equipment: string): React.ReactNode {
   const n = equipment
