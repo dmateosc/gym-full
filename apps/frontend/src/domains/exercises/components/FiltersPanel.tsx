@@ -16,7 +16,7 @@ const selectClass = `${inputClass} cursor-pointer`;
 const labelClass = 'block text-xs sm:text-sm font-medium text-[#cbd5e1] mb-2';
 
 export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelProps) {
-  const { categories, muscleGroups, equipment, isLoaded } = useFilterOptionsWithCache();
+  const { categories, muscleGroups, isLoaded } = useFilterOptionsWithCache();
 
   const handleFilterChange = (key: keyof ExerciseFilters, value: string) => {
     onFiltersChange({
@@ -153,21 +153,6 @@ export default function FiltersPanel({ filters, onFiltersChange }: FiltersPanelP
         </select>
       </div>
 
-      <div>
-        <label className={labelClass}>Equipamiento</label>
-        <select
-          value={filters.equipment || ''}
-          onChange={(e) => handleFilterChange('equipment', e.target.value)}
-          className={selectClass}
-        >
-          <option value="">Todo el equipamiento</option>
-          {equipment.map(eq => (
-            <option key={eq} value={eq} className="bg-[#334155] text-white">
-              {eq}
-            </option>
-          ))}
-        </select>
-      </div>
     </div>
   );
 }
