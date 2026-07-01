@@ -3,6 +3,8 @@ import type { Exercise } from '../types/exercise';
 import { useExercisesWithCache } from '../../shared';
 import FiltersPanel from './FiltersPanel';
 import ExerciseList from './ExerciseList';
+import EquipmentStrip from './EquipmentStrip';
+import { useFilterOptionsWithCache } from '../../shared';
 import ExerciseDetail from './ExerciseDetail';
 import { AlertIcon } from '../../../assets/icons/index.tsx';
 
@@ -48,23 +50,44 @@ const ExercisesContainer: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-1 xl:grid-cols-4 md:gap-4 lg:gap-6 xl:gap-8">
-      {/* Panel de filtros - En mobile aparece arriba */}
-      <div className="xl:col-span-1 order-1 md:order-1">
-        <div className="md:sticky md:top-4">
-          <FiltersPanel 
-            filters={filters} 
-            onFiltersChange={updateFilters}
+    <EquipmentAndGrid
+      filters={filters}
+      updateFilters={updateFilters}
+      exercises={exercises}
+      onExerciseSelect={setSelectedExercise}
+    />
+  );
+};
+
+const EquipmentAndGrid: React.FC<{
+  filters: ReturnType<typeof useExercisesWithCache>['filters'];
+  updateFilters: ReturnType<typeof useExercisesWithCache>['updateFilters'];
+  exercises: ReturnType<typeof useExercisesWithCache>['exercises'];
+  onExerciseSelect: (e: Exercise) => void;
+}> = ({ filters, updateFilters, exercises, onExerciseSelect }) => {
+  const { equipment } = useFilterOptionsWithCache();
+
+  return (
+    <div className="space-y-4">
+      <EquipmentStrip
+        equipment={equipment}
+        selected={filters.equipment ?? null}
+        onSelect={(v) => updateFilters({ ...filters, equipment: v ?? undefined })}
+      />
+
+      <div className="md:grid md:grid-cols-1 xl:grid-cols-4 md:gap-4 lg:gap-6 xl:gap-8 space-y-4 md:space-y-0">
+        <div className="xl:col-span-1 order-1 md:order-1">
+          <div className="md:sticky md:top-4">
+            <FiltersPanel filters={filters} onFiltersChange={updateFilters} />
+          </div>
+        </div>
+
+        <div className="xl:col-span-3 order-2 md:order-2">
+          <ExerciseList
+            exercises={exercises}
+            onExerciseSelect={onExerciseSelect}
           />
         </div>
-      </div>
-      
-      {/* Lista de ejercicios - En mobile aparece debajo de los filtros */}
-      <div className="xl:col-span-3 order-2 md:order-2">
-        <ExerciseList 
-          exercises={exercises}
-          onExerciseSelect={setSelectedExercise}
-        />
       </div>
     </div>
   );
