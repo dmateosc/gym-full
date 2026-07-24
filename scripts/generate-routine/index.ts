@@ -76,6 +76,10 @@ async function callOllama(prompt: string): Promise<OllamaRoutine> {
       prompt,
       format: 'json',
       stream: false,
+      // Los modelos con modo razonamiento (p.ej. qwen3) desvían la salida al
+      // campo `thinking` y dejan `response` vacío, rompiendo el JSON.parse.
+      // Desactivamos el thinking para que el JSON venga siempre en `response`.
+      think: false,
       options: { temperature: 0.7, num_predict: 1024 },
     }),
     signal: AbortSignal.timeout(300_000),
@@ -86,8 +90,11 @@ async function callOllama(prompt: string): Promise<OllamaRoutine> {
     throw new Error(`Ollama HTTP ${response.status}: ${body}`);
   }
 
-  const data = await response.json() as { response: string };
-  return JSON.parse(data.response) as OllamaRoutine;
+  const data = await response.json() as { response: string; thinking?: string };
+  // Fallback defensivo: si algún modelo ignora think:false y coloca el JSON en
+  // `thinking`, lo usamos en vez de fallar con un `response` vacío.
+  const raw = data.response?.trim() ? data.response : (data.thinking ?? '');
+  return JSON.parse(raw) as OllamaRoutine;
 }
 
 // ─── Prompt builder ───────────────────────────────────────────────────────────
